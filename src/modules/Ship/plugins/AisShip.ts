@@ -167,11 +167,16 @@ export class AisShip extends BaseShip<IAisShipOptions> {
   }
   override icon(): GeoJSON.Feature<GeoJSON.Point, IAisShipOptions> {
     const state = this.getState()
-    let icon = this.options.icon ?? AisShip.NAME
-    icon = `${icon}-${this.orientation}`
+    let icon = null
 
-    if (state?.hover || state?.focus) {
-      icon = `${icon}-active`
+    if (this.options.icon) {
+      icon = this.options.icon
+    } else {
+      icon = `${AisShip.NAME}-${this.orientation}`
+
+      if (state?.hover || state?.focus) {
+        icon = `${icon}-active`
+      }
     }
 
     return point<IAisShipOptions>(

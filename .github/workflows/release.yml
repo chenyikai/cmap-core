@@ -1,0 +1,51 @@
+name: Release
+
+# 触发条件：推送到 main 分支
+on:
+  push:
+    branches:
+      - main
+
+# 权限设置：允许 Action 读写代码和创建 PR
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 检出代码
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      # 2. 安装 Node.js 环境
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+
+      # 3. 安装依赖 (使用 npm ci 或 install)
+      - name: Install Dependencies
+        run: npm install
+
+      # 4. Changesets 核心步骤
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          # --- 阶段二：发布命令 ---
+          # 当检测到版本已更新且无 changeset 文件时，执行此命令发布到 NPM
+          publish: npm run release
+
+          # --- 阶段一：PR 标题和提交信息 ---
+          # 当检测到有 changeset 文件时，创建 PR 用的标题
+          commit: "chore: update versions"
+          title: "chore: update versions"
+        env:
+          # GitHub 自动提供的 Token，用于创建 PR 和 Tag
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 我们刚才配置的 Token，用于发布到 NPM
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
