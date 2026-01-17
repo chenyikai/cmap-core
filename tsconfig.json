@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+
+    /* 模块解析：配合 Vite 打包 */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+
+    /* 核心：只生成类型声明，不生成 JS (JS 由 Vite 生成) */
+    "declaration": true,
+    "noEmit": true,
+
+    /* 🔥 地狱级严格模式 (Type-Checking) */
+    "strict": true,
+    "noImplicitReturns": true,        // 函数分支必须有返回值
+    "noImplicitOverride": true,       // 子类重写必须加 override
+    "noUnusedLocals": true,           // 既然有 ESLint 自动清理，这里开启作为双重保障
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    /* 路径别名 */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src", "src/**/*.d.ts", "src/types/**/*.d.ts"]
+}
