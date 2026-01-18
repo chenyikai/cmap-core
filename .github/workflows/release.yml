@@ -1,12 +1,14 @@
 name: Release
 
-# 触发条件：推送到 main 分支
 on:
   push:
     branches:
       - main
 
-# 权限设置：允许 Action 读写代码和创建 PR
+# 防止并发冲突
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+# 🔒 权限配置：必须有写权限才能创建 PR 和更新版本号
 permissions:
   contents: write
   pull-requests: write
@@ -20,32 +22,40 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      # 2. 安装 Node.js 环境
+      # 2. 安装 pnpm (这是修复 "spawn pnpm ENOENT" 的关键)
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9 # 或者保持跟你本地一致的版本
+
+      # 3. 配置 Node 环境
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          # 必须指定 registry-url，否则无法读取 NODE_AUTH_TOKEN
           registry-url: 'https://registry.npmjs.org'
+          # 开启缓存，加速安装
+          cache: 'pnpm'
 
-      # 3. 安装依赖 (使用 npm ci 或 install)
+      # 4. 安装依赖 (使用 pnpm)
       - name: Install Dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
-      # 4. Changesets 核心步骤
+      # 5. Changesets 核心步骤
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
         with:
-          # --- 阶段二：发布命令 ---
-          # 当检测到版本已更新且无 changeset 文件时，执行此命令发布到 NPM
-          publish: npm run release
+          # --- 发布命令 ---
+          # 必须使用 pnpm run release，因为项目里有 pnpm-lock.yaml
+          publish: pnpm run release
 
-          # --- 阶段一：PR 标题和提交信息 ---
-          # 当检测到有 changeset 文件时，创建 PR 用的标题
+          # --- PR 信息 ---
           commit: "chore: update versions"
           title: "chore: update versions"
         env:
-          # GitHub 自动提供的 Token，用于创建 PR 和 Tag
+          # GitHub 自动生成的 Token
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # 我们刚才配置的 Token，用于发布到 NPM
+          # 你在 Secrets 里配置的 NPM Token (必须叫 NPM_TOKEN 或 NODE_AUTH_TOKEN)
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
