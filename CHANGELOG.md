@@ -1,5 +1,11 @@
 # c-map
 
+## 0.4.0
+
+### Minor Changes
+
+- a2aed1a: 去除private
+
 ## 0.3.0
 
 ### Minor Changes
