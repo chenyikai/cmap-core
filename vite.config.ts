@@ -18,7 +18,7 @@ export default defineConfig({
     // 库模式核心
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'CMap', // UMD 全局变量名: window.CMap
+      name: 'cmap-core', // UMD 全局变量名: window.CMap
       fileName: (format) => `index.${format}.js`,
     },
     rollupOptions: {
