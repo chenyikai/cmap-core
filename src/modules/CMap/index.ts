@@ -2,7 +2,7 @@ import EventEmitter from 'eventemitter3'
 import { Map } from 'mapbox-gl'
 
 import IconManager from '@/core/IconManager'
-import { SHIP_ICON, UPDATE_STATUS } from '@/modules/Ship/vars.ts'
+import { SHIP_COLOR, SHIP_ICON, UPDATE_STATUS } from '@/modules/Ship/vars.ts'
 import type { ICMapOptions } from '@/types/CMap'
 import { MapType } from '@/types/CMap'
 import type { SvgIcon } from '@/types/IconManager'
@@ -56,15 +56,15 @@ export class CMap extends EventEmitter {
         await Promise.all([
           this.icon.addSvg({
             name: icon.name.replace('$color', UPDATE_STATUS.ONLINE),
-            svg: icon.svg.replace('$color', `#03CC02`),
+            svg: icon.svg.replace('$color', SHIP_COLOR.ONLINE),
           }),
           this.icon.addSvg({
             name: icon.name.replace('$color', UPDATE_STATUS.DELAY),
-            svg: icon.svg.replace('$color', `#FFFD6C`),
+            svg: icon.svg.replace('$color', SHIP_COLOR.DELAY),
           }),
           this.icon.addSvg({
             name: icon.name.replace('$color', UPDATE_STATUS.OFFLINE),
-            svg: icon.svg.replace('$color', `#999999`),
+            svg: icon.svg.replace('$color', SHIP_COLOR.OFFLINE),
           }),
         ])
       })

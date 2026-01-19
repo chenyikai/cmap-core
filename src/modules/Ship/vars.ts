@@ -12,6 +12,18 @@ export const SHIP_REAL_LAYER_NAME = 'mapbox-gl-ship-real-layer'
 
 export const SHIP_REAL_OUTLINE_LAYER_NAME = 'mapbox-gl-ship-real-outline-layer'
 
+export enum UPDATE_STATUS {
+  ONLINE = 'Online',
+  DELAY = 'Delay',
+  OFFLINE = 'Offline',
+}
+
+export enum SHIP_COLOR {
+  ONLINE = '#03CC02',
+  DELAY = '#FFFD6C',
+  OFFLINE = '#999999',
+}
+
 export const SHIP_ICON_LAYER: LayerSpecification = {
   id: SHIP_ICON_LAYER_NAME,
   source: SHIP_SOURCE_NAME,
@@ -31,7 +43,16 @@ export const SHIP_REAL_LAYER: LayerSpecification = {
   type: 'fill',
   layout: {},
   paint: {
-    'fill-color': '#0f0',
+    'fill-color': [
+      'case',
+      ['==', ['get', 'updateStatus'], UPDATE_STATUS.ONLINE],
+      SHIP_COLOR.ONLINE,
+      ['==', ['get', 'updateStatus'], UPDATE_STATUS.DELAY],
+      SHIP_COLOR.DELAY,
+      ['==', ['get', 'updateStatus'], UPDATE_STATUS.OFFLINE],
+      SHIP_COLOR.OFFLINE,
+      SHIP_COLOR.OFFLINE,
+    ],
   },
 }
 
@@ -169,9 +190,3 @@ export const SHIP_ICON: SvgIcon[] = [
       '</svg>',
   },
 ]
-
-export enum UPDATE_STATUS {
-  ONLINE = 'Online',
-  DELAY = 'Delay',
-  OFFLINE = 'Offline',
-}

@@ -122,6 +122,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
     if (this.options.rot < -180) {
       _rateOfTurn = this.options.rot + 180
     }
+
     if (this.options.speed === 0 || !this.options.speed) return 'static'
     if (_rateOfTurn === -128.0) return 'static' //-128为特殊值，无转向
     if (_rateOfTurn < 0 && _rateOfTurn > -180) return 'left' //0到-180 左转，-127为每30秒5度以上右转
@@ -214,6 +215,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
         ...this.options,
         icon,
         direction: this.direction,
+        updateStatus: this.updateStatus,
       },
       {
         id: this.id,
@@ -267,6 +269,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
       let ship: GeoJSON.Feature<GeoJSON.Polygon, IAisShipOptions> = lineToPolygon(line, {
         properties: {
           ...this.options,
+          updateStatus: this.updateStatus,
           outLine: true,
         },
       }) as GeoJSON.Feature<GeoJSON.Polygon, IAisShipOptions>
