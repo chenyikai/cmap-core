@@ -6,6 +6,17 @@
     "dist",
     "types"
   ],
+  "main": "./dist/index.umd.js",
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.es.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.es.d.ts",
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.umd.js"
+    },
+    "./style.css": "./dist/cmap-core.css"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
