@@ -12,10 +12,10 @@ export function initShip(cMap: CMap) {
   cMap.mapLoaded().then(map => {
     ship = new Ship(map);
 
-    getShipData(map, false)
+    getShipData(map, true)
 
     map.on('moveend', () => {
-      getShipData(map, false);
+      getShipData(map, true);
     });
   })
 }
@@ -79,7 +79,7 @@ function renderShip(_map: Map, data: any) {
   if (k && v) {
      shipData  = kvToJson(k, v);
   } else {
-     shipData  = data.filter(item => item.mmsi === '412766860' || item.mmsi === '413605390')
+     shipData  = data
   }
 
   const list: Array<IAisShipOptions> = shipData.map((item: any) => {

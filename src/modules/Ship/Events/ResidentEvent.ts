@@ -28,12 +28,8 @@ export class ResidentEvent extends EventState {
       this.ships = ships
     }
   }
-  onAdd(): void {
-    this._click = this.onClick.bind(this)
-    this._move = this.onMove.bind(this)
-    this._leave = this.onLeave.bind(this)
-    this._zoomEnd = this.onZoomEnd.bind(this)
 
+  override on(): void {
     this.context.map.on('click', SHIP_ICON_LAYER_NAME, this._click)
     this.context.map.on('mousemove', SHIP_ICON_LAYER_NAME, this._move)
     this.context.map.on('mouseleave', SHIP_ICON_LAYER_NAME, this._leave)
@@ -45,7 +41,7 @@ export class ResidentEvent extends EventState {
     this.context.map.on('zoomend', this._zoomEnd)
   }
 
-  onRemove(): void {
+  override off(): void {
     this.context.map.off('click', SHIP_ICON_LAYER_NAME, this._click)
     this.context.map.off('mousemove', SHIP_ICON_LAYER_NAME, this._move)
     this.context.map.off('mouseleave', SHIP_ICON_LAYER_NAME, this._leave)
@@ -55,6 +51,19 @@ export class ResidentEvent extends EventState {
     this.context.map.off('mouseleave', SHIP_REAL_LAYER_NAME, this._leave)
 
     this.context.map.off('zoomend', this._zoomEnd)
+  }
+
+  onAdd(): void {
+    this._click = this.onClick.bind(this)
+    this._move = this.onMove.bind(this)
+    this._leave = this.onLeave.bind(this)
+    this._zoomEnd = this.onZoomEnd.bind(this)
+
+    this.on()
+  }
+
+  onRemove(): void {
+    this.off()
   }
 
   add(ship: AisShip): void {
@@ -105,8 +114,8 @@ export class ResidentEvent extends EventState {
       const id = e.features[0].id
       if (id) {
         const ship = this.findShip(id)
-        // TODO 需要传事件出去
-        console.log(ship, 'click')
+        ship?.focus()
+        this.context.events.emit('click', ship)
       }
     }
   }
@@ -117,8 +126,7 @@ export class ResidentEvent extends EventState {
     const ship = this.findShip(this.hoverId)
     ship?.setState({ hover: true })
     ship?.render()
-    console.log(ship, 'hover')
-    // TODO 需要传事件出去
+    this.context.events.emit('hover', ship)
   }
 
   unhover(): void {
@@ -127,8 +135,7 @@ export class ResidentEvent extends EventState {
     const ship = this.findShip(this.hoverId)
     ship?.setState({ hover: false })
     ship?.render()
-    console.log(ship, 'unhover')
-    // TODO 需要传事件出去
+    this.context.events.emit('unhover', ship)
   }
 
   findShip(id: IAisShipOptions['id']): AisShip | undefined {

@@ -62,7 +62,14 @@ export const SHIP_REAL_OUTLINE_LAYER: LayerSpecification = {
   type: 'line',
   layout: {},
   paint: {
-    'line-color': ['case', ['boolean', ['feature-state', 'hover'], false], '#f00', '#000'],
+    'line-color': [
+      'case',
+      ['boolean', ['feature-state', 'hover'], false],
+      '#f00',
+      ['boolean', ['feature-state', 'focus'], false],
+      '#f00',
+      '#000',
+    ],
     'line-width': 2,
   },
 }

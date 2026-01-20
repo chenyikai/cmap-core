@@ -1,6 +1,7 @@
 import EventEmitter from 'eventemitter3'
 import type { Map } from 'mapbox-gl'
 
+import Focus from '@/core/Focus'
 import IconManager from '@/core/IconManager'
 import ResourceRegister from '@/core/ResourceRegister'
 import type { IContextOptions } from '@/types/Module/Context.ts'
@@ -10,6 +11,7 @@ export class Context {
   public readonly events: EventEmitter
   public readonly register: ResourceRegister
   public readonly iconManage: IconManager
+  public readonly focus: Focus
 
   // 4. 一个通用的状态存储 (替代原来的 Store._listeners 等)
   // public readonly state: Map<string, any> = new Map();
@@ -19,6 +21,11 @@ export class Context {
     this.events = new EventEmitter()
     this.register = new ResourceRegister(this.map)
     this.iconManage = new IconManager(this.map)
+    this.focus = new Focus(this.map)
+
+    // this.map.on('load', () => {
+    //   this.focus.onAdd()
+    // })
   }
 
   // 提供一个销毁方法，统一清理资源

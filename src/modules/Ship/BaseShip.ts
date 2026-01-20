@@ -22,6 +22,14 @@ export abstract class BaseShip<T extends IBaseShipOptions> extends Module {
   override destroy(): void {
     throw new Error('Method not implemented.')
   }
+  get isFocus(): boolean {
+    const state = this.getState()
+    if (state) {
+      return !!state.focus
+    } else {
+      return false
+    }
+  }
 
   public abstract override onAdd(): void
 
@@ -30,6 +38,8 @@ export abstract class BaseShip<T extends IBaseShipOptions> extends Module {
   abstract get id(): IBaseShipOptions['id']
 
   abstract get updateStatus(): UPDATE_STATUS
+
+  abstract getIconName(): string
 
   abstract position(): IBaseShipOptions['position']
 

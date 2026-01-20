@@ -3,7 +3,6 @@ import dayjs from 'dayjs'
 import type * as GeoJSON from 'geojson'
 import type { LngLat, Map } from 'mapbox-gl'
 import { Point } from 'mapbox-gl'
-import type { BBox } from 'rbush'
 
 import { Tooltip } from '@/core/Tooltip/index.ts'
 import { BaseShip } from '@/modules/Ship/BaseShip.ts'
@@ -11,7 +10,6 @@ import { LAYER_LIST, NAME, SHIP_SOURCE_NAME, UPDATE_STATUS } from '@/modules/Shi
 import type { IAisShipOptions } from '@/types/Ship/AisShip.ts'
 import type { Orientation, Shape } from '@/types/Ship/BaseShip'
 import { distanceToPx } from '@/utils/util.ts'
-import { isNull } from '@/utils/validate.ts'
 
 export class AisShip extends BaseShip<IAisShipOptions> {
   static override readonly SOURCE: string = SHIP_SOURCE_NAME
@@ -76,20 +74,28 @@ export class AisShip extends BaseShip<IAisShipOptions> {
     }
   }
 
-  override position(): LngLat {
-    const zoom = this.options.realZoom ?? 16
-    if (this.context.map.getZoom() >= zoom) {
-      if (this.offset().x === 0 && this.offset().y === 0) {
-        return this.options.position
-      } else {
-        const orientation: Point = this.context.map.project(this.options.position)
-        const x = orientation.x + this.offset().x
-        const y = orientation.y + this.offset().y
-        return this.context.map.unproject(new Point(x, y))
+  public override getIconName(): string {
+    const state = this.getState()
+    let icon = null
+
+    if (this.options.icon) {
+      icon = this.options.icon
+    } else {
+      icon = `${AisShip.NAME}-${this.updateStatus}-${this.orientation}`
+
+      if (state?.hover || state?.focus) {
+        icon = `${icon}-active`
       }
     }
 
-    return this.options.position
+    return icon
+  }
+
+  override position(): LngLat {
+    const orientation: Point = this.context.map.project(this.options.position)
+    const x = orientation.x + this.offset().x
+    const y = orientation.y + this.offset().y
+    return this.context.map.unproject(new Point(x, y))
   }
   override get direction(): number {
     if (this.options.hdg && this.options.hdg >= 0 && this.options.hdg < 360) {
@@ -190,30 +196,24 @@ export class AisShip extends BaseShip<IAisShipOptions> {
   }
 
   override focus(): void {
-    throw new Error('Method not implemented.')
+    this.setState({ focus: true })
+
+    const icon = this.context.iconManage.getImage(this.getIconName())
+    this.context.focus.set(this.getFeature(), {
+      size: icon?.height,
+      id: String(this.id) + '-focus',
+      padding: 10,
+    })
   }
   override unfocus(): void {
-    throw new Error('Method not implemented.')
+    this.setState({ focus: false })
   }
   override icon(): GeoJSON.Feature<GeoJSON.Point, IAisShipOptions> {
-    const state = this.getState()
-    let icon = null
-
-    if (this.options.icon) {
-      icon = this.options.icon
-    } else {
-      icon = `${AisShip.NAME}-${this.updateStatus}-${this.orientation}`
-
-      if (state?.hover || state?.focus) {
-        icon = `${icon}-active`
-      }
-    }
-
     return point<IAisShipOptions>(
       this.position().toArray(),
       {
         ...this.options,
-        icon,
+        icon: this.getIconName(),
         direction: this.direction,
         updateStatus: this.updateStatus,
       },
@@ -311,21 +311,18 @@ export class AisShip extends BaseShip<IAisShipOptions> {
   override offset(): Point {
     const offset = new Point(0, 0)
 
-    if (
-      !isNull(this.options.top) &&
-      !isNull(this.options.bottom) &&
-      !isNull(this.options.left) &&
-      !isNull(this.options.right)
-    ) {
-      const bbox: BBox = {
-        minX: -distanceToPx(this.context.map, this.options.left ?? 0),
-        minY: -distanceToPx(this.context.map, this.options.top ?? 0),
-        maxX: distanceToPx(this.context.map, this.options.right ?? 0),
-        maxY: distanceToPx(this.context.map, this.options.bottom ?? 0),
-      }
+    if (this.options.top && this.options.bottom && this.options.left && this.options.right) {
+      const ey = distanceToPx(
+        this.context.map,
+        Math.abs(this.options.top - this.options.bottom) / 2,
+      )
+      const ex = distanceToPx(
+        this.context.map,
+        Math.abs(this.options.left - this.options.right) / 2,
+      )
 
-      offset.x = (bbox.minX + bbox.maxX) / 2
-      offset.y = (bbox.maxY + bbox.minY) / 2
+      offset.x = this.options.right > this.options.left ? ex : -ex
+      offset.y = this.options.top > this.options.bottom ? ey : -ey
     }
 
     return offset

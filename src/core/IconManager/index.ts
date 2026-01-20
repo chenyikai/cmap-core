@@ -86,8 +86,8 @@ class IconManager {
     return this._map.hasImage(name)
   }
 
-  getImage(name: string): Image {
-    return this._cache.get(name) as Image
+  getImage(name: string): Image | undefined {
+    return this._cache.get(name) as Image | undefined
   }
 
   update(icon: Icon): Promise<result> {
