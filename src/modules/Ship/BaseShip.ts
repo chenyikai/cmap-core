@@ -57,6 +57,10 @@ export abstract class BaseShip<T extends IBaseShipOptions> extends Module {
 
   abstract update(options: IAisShipOptions): void
 
+  abstract select(): void
+
+  abstract unselect(): void
+
   abstract focus(): void
 
   abstract unfocus(): void

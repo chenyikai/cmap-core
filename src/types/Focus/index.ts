@@ -1,14 +1,13 @@
 import type { Feature, MultiLineString } from 'geojson'
 
 export interface IFocusOptions {
-  icon?: string
   size?: number
-  id?: string
   padding?: number
+  armLength?: number
 }
 
 export interface FocusItem {
-  id: string
+  id: string | number
   border: Feature<MultiLineString>
   feature: Feature
   options?: IFocusOptions

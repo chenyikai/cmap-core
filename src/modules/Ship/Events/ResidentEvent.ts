@@ -115,6 +115,8 @@ export class ResidentEvent extends EventState {
       if (id) {
         const ship = this.findShip(id)
         ship?.focus()
+
+        console.log(ship, 'ship')
         this.context.events.emit('click', ship)
       }
     }

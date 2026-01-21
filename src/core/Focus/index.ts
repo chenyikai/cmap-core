@@ -1,13 +1,13 @@
 import { bbox, multiLineString } from '@turf/turf'
 import EventEmitter from 'eventemitter3'
-import type { BBox, Feature, LineString, MultiLineString, Point, Polygon } from 'geojson'
+import type { BBox, Feature, MultiLineString } from 'geojson'
 import { set } from 'lodash-es'
-import type { GeoJSONSource, LngLatLike } from 'mapbox-gl'
+import type { GeoJSONSource } from 'mapbox-gl'
 import type { Map } from 'mapbox-gl'
 import { v4 } from 'uuid'
 
 import type { FocusItem, IFocusOptions } from '@/types/Focus'
-import { distanceToPx, getPointScope } from '@/utils/util.ts'
+import { distanceToPx } from '@/utils/util.ts'
 
 import { FOCUS_LAYER, FOCUS_SOURCE_NAME } from './vars.ts'
 
@@ -44,8 +44,8 @@ class Focus extends EventEmitter {
     this.removeAll()
   }
 
-  set(feature: Feature, options?: IFocusOptions): string {
-    const uuid = options?.id ?? v4()
+  set(feature: Feature, options?: IFocusOptions): string | number {
+    const uuid = feature.id ?? v4()
 
     this._onHandle(uuid, feature, options)
 
@@ -87,31 +87,23 @@ class Focus extends EventEmitter {
     }
   }
 
-  _zoomend(): void {
-    this.focusItems.forEach((item) => {
-      this.set(item.feature, { ...item.options, id: item.id })
-    })
+  private _zoomend(): void {
+    // this.focusItems.forEach((item) => {
+    //   this.set(item.feature, { ...item.options, id: item.id })
+    // })
 
     this.render()
   }
 
-  _onHandle(uuid: string, feature: Feature, options?: IFocusOptions): void {
-    let item: FocusItem | null = null
-    if (feature.geometry.type === 'Point') {
-      item = this._onPoint(uuid, feature as Feature<Point>, options)
-    } else if (feature.geometry.type === 'LineString') {
-      this._onLineString(uuid, feature as Feature<LineString>, options)
-    } else if (feature.geometry.type === 'Polygon') {
-      item = this._onPolygon(uuid, feature as Feature<Polygon>)
-    }
+  private _onHandle(uuid: string | number, feature: Feature, options?: IFocusOptions): void {
+    const border = this.getFocusBorder(feature, options)
+    const item: FocusItem = { id: uuid, border, feature, options }
 
     const i = this.focusItems.findIndex((item) => item.id === uuid)
     if (i !== -1) {
       set(this.focusItems, i, item)
     } else {
-      if (item) {
-        this.focusItems.push(item)
-      }
+      this.focusItems.push(item)
     }
 
     this.render()
@@ -123,76 +115,124 @@ class Focus extends EventEmitter {
     }
   }
 
-  _onPoint(id: string, feature: Feature<Point>, options?: IFocusOptions): FocusItem {
-    const size = (options?.size ?? 0) / 2 + (options?.padding ?? 0)
-    const center = feature.geometry.coordinates as LngLatLike
-    const { x, y } = this.map.project(center)
+  /**
+   * 通用聚焦边框生成方法
+   * @param feature 目标要素 (Point | LineString | Polygon)
+   * @param options 配置项
+   * @returns 聚焦框 Feature
+   */
+  public getFocusBorder(
+    feature: Feature,
+    options: IFocusOptions = {},
+  ): Feature<MultiLineString, { id: string }> {
+    const id = String(feature.id ?? v4())
+    const { padding = 10, armLength = 20, size = 40 } = options
 
-    const bbox = getPointScope(this.map, x, y, size)
-    const border = this._getBorder(id, bbox, size)
+    // 1. 计算原始 BBox
+    // 如果是 Point，bbox 是一个点；如果是 Line/Poly，是外包矩形
+    const rawBBox = bbox(feature) // [minLng, minLat, maxLng, maxLat]
 
-    return { id, border, feature, options }
+    // 2. 准备计算参数
+    // 计算当前缩放级别下，1 像素代表多少米 (用于像素 -> 地理坐标转换)
+    // distanceToPx(map, 1) 返回的是 1米多少像素，取倒数就是 1像素多少米
+    const metersPerPixel = 1 / distanceToPx(this.map, 1)
+
+    // 3. 差异化处理
+    let finalBBox = rawBBox
+    let finalArmLengthMeters = 0
+
+    if (feature.geometry.type === 'Point') {
+      // === Point 逻辑 ===
+      // 主要是基于 icon size 向外扩张
+      // 假设 pointSize 是图标宽/高，padding 是额外留白
+      const halfSizePx = size / 2
+      const expandMeters = halfSizePx * metersPerPixel
+
+      // 计算手臂长度：保持你原来的比例 (size * 0.3)
+      finalArmLengthMeters = size * 0.3 * metersPerPixel
+
+      // 扩展 BBox (中心点向四周扩散)
+      finalBBox = this._expandBBox(rawBBox, expandMeters, rawBBox[1])
+    } else {
+      // === LineString / Polygon 逻辑 ===
+      // 基于几何体 BBox，加上固定的 Padding
+      const paddingMeters = padding * metersPerPixel
+
+      // 手臂长度：使用固定的像素长度 (防止大物体出现巨大手臂)
+      // 同时做一个限制：手臂不能超过边长的一半，否则四个角会这就连在一起了
+      // 简单起见，这里先用固定长度
+      finalArmLengthMeters = armLength * metersPerPixel
+
+      // 扩展 BBox
+      finalBBox = this._expandBBox(rawBBox, paddingMeters, rawBBox[1])
+    }
+
+    // 4. 调用核心绘制逻辑
+    return this._createBracketGeometry(id, finalBBox, finalArmLengthMeters)
   }
 
-  _onLineString(id: string, feature: Feature<LineString>, options?: IFocusOptions): void {
-    console.log(id, feature, options)
+  /**
+   * 辅助：向外扩展 BBox (米 -> 经纬度)
+   */
+  private _expandBBox(rawBBox: number[], expandMeters: number, baseLat: number): BBox {
+    const [minLng, minLat, maxLng, maxLat] = rawBBox
+
+    const METERS_PER_DEGREE_LAT = 111319
+    const dLat = expandMeters / METERS_PER_DEGREE_LAT
+    const dLng = dLat / Math.cos((baseLat * Math.PI) / 180)
+
+    return [minLng - dLng, minLat - dLat, maxLng + dLng, maxLat + dLat]
   }
 
-  _onPolygon(id: string, feature: Feature<Polygon>, options?: IFocusOptions): FocusItem {
-    const _bbox = bbox(feature)
-    const border = this._getBorder(id, _bbox, options?.size ?? 80)
-
-    return { id, border, feature, options }
-  }
-
-  _getBorder(id: string, bbox: BBox, size: number): Feature<MultiLineString, { id: string }> {
+  /**
+   * 核心绘制：根据 BBox 和 手臂物理长度 生成括号坐标
+   * (这是你原来那个方法的纯净版，去掉了业务逻辑，只负责画图)
+   */
+  private _createBracketGeometry(
+    id: string,
+    bbox: number[],
+    armLengthMeters: number,
+  ): Feature<MultiLineString, { id: string }> {
     const [minLng, minLat, maxLng, maxLat] = bbox
 
-    const armLengthMeters = (size / distanceToPx(this.map, 1)) * 0.3
-
-    // 2. 将米转换为经纬度差值 (核心优化)
-    // 地球平均半径约 6371km，1度纬度 ≈ 111319米
+    // 经纬度转换
     const METERS_PER_DEGREE_LAT = 111319
     const dLat = armLengthMeters / METERS_PER_DEGREE_LAT
-
-    // 经度会随纬度变化，需除以 cos(lat)
-    // 使用中心纬度或者最小纬度均可，视觉误差极小
     const latRad = (minLat * Math.PI) / 180
     const dLng = dLat / Math.cos(latRad)
 
-    // 3. 直接构建坐标数组 (顺序：左下 -> 左上 -> 右上 -> 右下)
-    // 每个角是一个 L 形：[延伸点, 角点, 延伸点]
+    // 限制手臂长度，防止重叠 (可选优化)
+    // 如果 BBox 特别小，dLat 可能大于高度的一半
+    const actualDLat = Math.min(dLat, (maxLat - minLat) / 2)
+    const actualDLng = Math.min(dLng, (maxLng - minLng) / 2)
+
     const coordinates = [
-      // 左下角 (BL): 向右延伸 -> 角点 -> 向上延伸
+      // 左下角 (BL)
       [
-        [minLng + dLng, minLat],
+        [minLng + actualDLng, minLat],
         [minLng, minLat],
-        [minLng, minLat + dLat],
+        [minLng, minLat + actualDLat],
       ],
-
-      // 左上角 (TL): 向下延伸 -> 角点 -> 向右延伸
+      // 左上角 (TL)
       [
-        [minLng, maxLat - dLat],
+        [minLng, maxLat - actualDLat],
         [minLng, maxLat],
-        [minLng + dLng, maxLat],
+        [minLng + actualDLng, maxLat],
       ],
-
-      // 右上角 (TR): 向左延伸 -> 角点 -> 向下延伸
+      // 右上角 (TR)
       [
-        [maxLng - dLng, maxLat],
+        [maxLng - actualDLng, maxLat],
         [maxLng, maxLat],
-        [maxLng, maxLat - dLat],
+        [maxLng, maxLat - actualDLat],
       ],
-
-      // 右下角 (BR): 向上延伸 -> 角点 -> 向左延伸
+      // 右下角 (BR)
       [
-        [maxLng, minLat + dLat],
+        [maxLng, minLat + actualDLat],
         [maxLng, minLat],
-        [maxLng - dLng, minLat],
+        [maxLng - actualDLng, minLat],
       ],
     ]
 
-    // 4. 返回结果
     return multiLineString(coordinates, { id }, { id })
   }
 }

@@ -114,6 +114,7 @@ function renderShip(_map: Map, data: any) {
   if (ship) {
     ship.load(list)
     setTimeout(() => {
+      ship.select('413363020')
       // ship.remove('210000151')
     }, 2000)
   }

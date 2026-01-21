@@ -195,18 +195,29 @@ export class AisShip extends BaseShip<IAisShipOptions> {
     this.render()
   }
 
+  override select(): void {
+    this.context.map.flyTo({
+      center: this.position(),
+      zoom: 16,
+    })
+
+    this.context.map.once('moveend', () => {
+      this.focus()
+    })
+  }
+  override unselect(): void {
+    this.unfocus()
+  }
+
   override focus(): void {
     this.setState({ focus: true })
 
-    const icon = this.context.iconManage.getImage(this.getIconName())
-    this.context.focus.set(this.getFeature(), {
-      size: icon?.height,
-      id: String(this.id) + '-focus',
-      padding: 10,
-    })
+    this.render()
   }
   override unfocus(): void {
     this.setState({ focus: false })
+
+    this.render()
   }
   override icon(): GeoJSON.Feature<GeoJSON.Point, IAisShipOptions> {
     return point<IAisShipOptions>(
@@ -288,6 +299,15 @@ export class AisShip extends BaseShip<IAisShipOptions> {
     this.tooltip?.render()
 
     this.context.register.updateGeoJSONData(AisShip.SOURCE, this.getFeature())
+
+    if (this.isFocus) {
+      const icon = this.context.iconManage.getImage(this.getIconName())
+      this.context.focus.set(this.getFeature(), {
+        size: icon?.width,
+        armLength: 10,
+        padding: 10,
+      })
+    }
   }
   override label(): HTMLElement {
     const id = `${String(this.id)}-ship-name-box`

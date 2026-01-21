@@ -102,6 +102,24 @@ class Ship extends Module {
       ship.render()
     })
   }
+
+  get(id: IAisShipOptions['id']): AisShip | undefined {
+    return this.ships.find((item) => item.id === id)
+  }
+
+  select(id: IAisShipOptions['id']): void {
+    const ship = this.get(id)
+    if (ship) {
+      ship.select()
+    }
+  }
+
+  unselect(id: IAisShipOptions['id']): void {
+    const ship = this.get(id)
+    if (ship) {
+      ship.unselect()
+    }
+  }
 }
 
 export default Ship

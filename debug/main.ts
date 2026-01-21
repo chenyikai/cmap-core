@@ -12,5 +12,8 @@ const cMap = new CMap({
 cMap.on('loaded', (map) => {
 
   window.map = map
+
+  // console.log(map.showCollisionBoxes = true);
+  map.showTerrainWireframe = true;
   initShip(cMap)
 })

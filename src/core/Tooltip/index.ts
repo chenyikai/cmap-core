@@ -281,7 +281,7 @@ export class Tooltip extends Module {
 
   render(): this {
     if (!this.mark) {
-      console.warn('tooltip尚未初始化')
+      console.warn(this, 'tooltip尚未初始化')
       return this
     }
 
