@@ -13,7 +13,7 @@ import { distanceToPx } from '@/utils/util.ts'
 
 export class AisShip extends BaseShip<IAisShipOptions> {
   override readonly SOURCE: string = SHIP_SOURCE_NAME
-  override readonly NAME: string = NAME
+  static override NAME: string = NAME
 
   constructor(map: Map, options: IAisShipOptions) {
     super(map, options)
@@ -81,7 +81,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
     if (this.options.icon) {
       icon = this.options.icon
     } else {
-      icon = `${this.NAME}-${this.updateStatus}-${this.orientation}`
+      icon = `${AisShip.NAME}-${this.updateStatus}-${this.orientation}`
 
       if (state?.hover || state?.focus) {
         icon = `${icon}-active`

@@ -23,8 +23,8 @@ export default defineConfig({
     },
     rollupOptions: {
       // ⚠️ 如果 CMap 依赖了 Leaflet 或 OpenLayers 等库，在这里排除它们
-      // external: ['leaflet'],
-      // output: { globals: { leaflet: 'L' } }
+      external: ['mapbox-gl'],
+      output: { globals: { 'mapbox-gl': 'mapboxgl' } }
     },
     sourcemap: true, // 方便用户调试
     emptyOutDir: true, // 自动清空 dist

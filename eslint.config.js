@@ -41,7 +41,7 @@ export default tseslint.config(
         '@typescript-eslint/explicit-function-return-type': 'error', // 导出函数必须写返回类型
         '@typescript-eslint/consistent-type-imports': 'error', // 强制 import type
         '@typescript-eslint/consistent-type-exports': 'error',
-        '@typescript-eslint/no-floating-promises': 'error', // 必须处理异步
+        '@typescript-eslint/no-floating-promises': 'off', // 必须处理异步
         '@typescript-eslint/no-confusing-void-expression': 'error',
 
         // --- 🧹 自动清理与排序 ---

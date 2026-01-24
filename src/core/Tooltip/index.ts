@@ -218,6 +218,7 @@ export class Tooltip extends Module {
 
   setLngLat(lngLat: LngLat): this {
     this.options.position = lngLat
+
     if (this.mark) {
       this.mark.setLngLat(lngLat)
     }
@@ -296,6 +297,8 @@ export class Tooltip extends Module {
   }
 
   _zoom(): void {
+    if (!this.mark || !this.visible) return
+
     this.connectLine()
   }
 }

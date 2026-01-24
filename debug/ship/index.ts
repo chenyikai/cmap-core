@@ -5,12 +5,19 @@ import { IAisShipOptions } from "../../src/types/Ship/AisShip";
 import Ship from "../../src/modules/Ship";
 import { CMap } from "../../src/modules/CMap"
 import { staticShipData } from "./mock";
+import { AisShip } from "../../src";
 
 let ship: Ship | null = null
 
 export function initShip(cMap: CMap) {
   cMap.mapLoaded().then(map => {
-    ship = new Ship(map);
+    ship = new Ship(map, {
+      plugins: [AisShip]
+    });
+
+    setTimeout(() => {
+      // ship!.select('413363020')
+    }, 2000)
 
     getShipData(map, true)
 
@@ -113,9 +120,5 @@ function renderShip(_map: Map, data: any) {
 
   if (ship) {
     ship.load(list)
-    setTimeout(() => {
-      ship.select('413363020')
-      // ship.remove('210000151')
-    }, 2000)
   }
 }

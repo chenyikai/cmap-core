@@ -10,7 +10,8 @@ import type { IBaseShipOptions, Orientation, Shape } from '@/types/Ship/BaseShip
 export abstract class BaseShip<T extends IBaseShipOptions> extends Module {
   public options: T
   readonly SOURCE: string = 'mapbox-gl-ship-source'
-  readonly NAME: string = 'Base'
+  static NAME = 'Base'
+  // readonly NAME: string = 'Base'
 
   public tooltip: Tooltip | null = null
 
@@ -105,6 +106,6 @@ export abstract class BaseShip<T extends IBaseShipOptions> extends Module {
   }
 
   public getName(): string {
-    return this.NAME
+    return BaseShip.NAME
   }
 }

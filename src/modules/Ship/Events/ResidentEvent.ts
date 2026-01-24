@@ -6,7 +6,7 @@ import { SHIP_ICON_LAYER_NAME, SHIP_REAL_LAYER_NAME } from '@/modules/Ship/vars.
 import type { IAisShipOptions } from '@/types/Ship/AisShip.ts'
 
 export class ResidentEvent extends EventState {
-  protected readonly ships: AisShip[] = []
+  private ships: AisShip[] = []
   protected hoverId: IAisShipOptions['id'] | null | undefined = null
   protected _click: OmitThisParameter<(e: MapMouseEvent) => void> = (): void => {
     /* empty */
@@ -80,6 +80,10 @@ export class ResidentEvent extends EventState {
     if (i !== -1) {
       this.ships.splice(i, 1)
     }
+  }
+
+  removeAll(): void {
+    this.ships = []
   }
 
   onZoomEnd(): void {

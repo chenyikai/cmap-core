@@ -25,6 +25,8 @@ export interface IBaseShipOptions {
   right?: number
   bottom?: number
   icon?: string
+  minIconSize?: number
+  maxIconSize?: number
 }
 
 /**

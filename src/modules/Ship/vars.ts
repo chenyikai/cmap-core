@@ -33,7 +33,17 @@ export const SHIP_ICON_LAYER: LayerSpecification = {
     'icon-allow-overlap': true,
     'icon-image': ['get', 'icon'],
     'icon-rotate': ['get', 'direction'],
-    'icon-size': ['interpolate', ['linear'], ['zoom'], 0, 0.2, 19, 0.5],
+    'icon-size': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      0,
+      // ['case', ['has', ['get', 'minIconSize']], ['get', 'minIconSize'], 0.2],
+      0.2,
+      19,
+      // ['case', ['has', ['get', 'maxIconSize']], ['get', 'maxIconSize'], 0.5],
+      0.5,
+    ],
   },
 }
 

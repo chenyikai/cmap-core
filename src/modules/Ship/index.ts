@@ -7,8 +7,7 @@ import type { BaseShip } from '@/modules/Ship/BaseShip.ts'
 import { ResidentEvent } from '@/modules/Ship/Events/ResidentEvent'
 import type { CollisionItemOptions } from '@/types/Collision/item.ts'
 import type { IShipOptions } from '@/types/Ship'
-import type { IAisShipOptions } from '@/types/Ship/AisShip.ts'
-import type { BaseShipConstructor } from '@/types/Ship/BaseShip.ts'
+import type { BaseShipConstructor, IBaseShipOptions } from '@/types/Ship/BaseShip.ts'
 
 class Ship extends Module {
   options: IShipOptions
@@ -40,6 +39,8 @@ class Ship extends Module {
 
   private registerPlugins(plugins: BaseShipConstructor[] = []): void {
     plugins.forEach((PluginClass) => {
+      console.log(PluginClass.prototype, 'PluginClass')
+
       if (PluginClass.NAME) {
         this.pluginRegistry.set(PluginClass.NAME, PluginClass)
       } else {
@@ -70,7 +71,7 @@ class Ship extends Module {
     })
   }
 
-  add(data: IAisShipOptions): BaseShip<any> | undefined {
+  add(data: IBaseShipOptions): BaseShip<any> | undefined {
     const Constructor = this.pluginRegistry.get(data.type)
 
     if (!Constructor) {
@@ -85,7 +86,7 @@ class Ship extends Module {
     return ship
   }
 
-  load(list: IAisShipOptions[]): BaseShip<any>[] {
+  load(list: IBaseShipOptions[]): BaseShip<any>[] {
     this.removeAll()
 
     const newShips: BaseShip<any>[] = []
@@ -102,7 +103,7 @@ class Ship extends Module {
     return newShips
   }
 
-  remove(id: IAisShipOptions['id']): void {
+  remove(id: IBaseShipOptions['id']): void {
     this.event.remove(id)
 
     const i = this.ships.findIndex((ship) => ship.id === id)
@@ -119,6 +120,8 @@ class Ship extends Module {
       ship.remove()
     })
     this.ships = []
+
+    this.event.removeAll()
   }
 
   render(): void {
@@ -131,14 +134,14 @@ class Ship extends Module {
     return this.ships.find((item) => item.id === id)
   }
 
-  select(id: IAisShipOptions['id']): void {
+  select(id: IBaseShipOptions['id']): void {
     const ship = this.get(id)
     if (ship) {
       ship.select()
     }
   }
 
-  unselect(id: IAisShipOptions['id']): void {
+  unselect(id: IBaseShipOptions['id']): void {
     const ship = this.get(id)
     if (ship) {
       ship.unselect()
