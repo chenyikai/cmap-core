@@ -91,11 +91,11 @@ export class Tooltip extends Module {
 
   getAllBbox(): AllAnchor {
     return {
-      center: this.getBbox('center'),
-      top: this.getBbox('top'),
-      bottom: this.getBbox('bottom'),
-      left: this.getBbox('left'),
-      right: this.getBbox('right'),
+      // center: this.getBbox('center'),
+      // top: this.getBbox('top'),
+      // bottom: this.getBbox('bottom'),
+      // left: this.getBbox('left'),
+      // right: this.getBbox('right'),
       'top-left': this.getBbox('top-left'),
       'top-right': this.getBbox('top-right'),
       'bottom-left': this.getBbox('bottom-left'),
@@ -127,28 +127,29 @@ export class Tooltip extends Module {
       maxY: point.y,
     }
 
-    if (anchor === 'top') {
-      bbox.minX = point.x - offsetWidth / 2
-      bbox.maxX = point.x + offsetWidth / 2
-      bbox.maxY = point.y + offsetHeight + Math.abs(offset.y)
-    } else if (anchor === 'bottom') {
-      bbox.minX = point.x - offsetWidth / 2
-      bbox.maxX = point.x + offsetWidth / 2
-      bbox.minY = point.y - offsetHeight + offset.y
-    } else if (anchor === 'left') {
-      bbox.maxY = point.y + offsetHeight / 2
-      bbox.minY = point.y - offsetHeight / 2
-      bbox.maxX = point.x + offsetWidth + Math.abs(offset.x)
-    } else if (anchor === 'right') {
-      bbox.maxY = point.y + offsetHeight / 2
-      bbox.minY = point.y - offsetHeight / 2
-      bbox.minX = point.x - offsetWidth + offset.x
-    } else if (anchor === 'center') {
-      bbox.maxY = point.y + offsetHeight / 2
-      bbox.minY = point.y - offsetHeight / 2
-      bbox.maxX = point.x + offsetWidth / 2
-      bbox.minX = point.x - offsetWidth / 2
-    } else if (anchor === 'top-left') {
+    // if (anchor === 'top') {
+    //   bbox.minX = point.x - offsetWidth / 2
+    //   bbox.maxX = point.x + offsetWidth / 2
+    //   bbox.maxY = point.y + offsetHeight + Math.abs(offset.y)
+    // } else if (anchor === 'bottom') {
+    //   bbox.minX = point.x - offsetWidth / 2
+    //   bbox.maxX = point.x + offsetWidth / 2
+    //   bbox.minY = point.y - offsetHeight + offset.y
+    // } else if (anchor === 'left') {
+    //   bbox.maxY = point.y + offsetHeight / 2
+    //   bbox.minY = point.y - offsetHeight / 2
+    //   bbox.maxX = point.x + offsetWidth + Math.abs(offset.x)
+    // } else if (anchor === 'right') {
+    //   bbox.maxY = point.y + offsetHeight / 2
+    //   bbox.minY = point.y - offsetHeight / 2
+    //   bbox.minX = point.x - offsetWidth + offset.x
+    // } else if (anchor === 'center') {
+    //   bbox.maxY = point.y + offsetHeight / 2
+    //   bbox.minY = point.y - offsetHeight / 2
+    //   bbox.maxX = point.x + offsetWidth / 2
+    //   bbox.minX = point.x - offsetWidth / 2
+    // } else
+    if (anchor === 'top-left') {
       bbox.maxY = point.y + offsetHeight + Math.abs(offset.y)
       bbox.maxX = point.x + offsetWidth + Math.abs(offset.x)
     } else if (anchor === 'top-right') {
@@ -194,22 +195,23 @@ export class Tooltip extends Module {
 
   _getOffsetByAnchor(): Point {
     const offset = new Point(0, 0)
-    if (this.options.anchor === 'center') {
-      offset.x = 0
-      offset.y = 0
-    } else if (this.options.anchor === 'top') {
-      offset.x = 0
-      offset.y = this.options.offsetY ?? 0
-    } else if (this.options.anchor === 'bottom') {
-      offset.x = 0
-      offset.y = -(this.options.offsetY ?? 0)
-    } else if (this.options.anchor === 'left') {
-      offset.x = this.options.offsetX ?? 0
-      offset.y = 0
-    } else if (this.options.anchor === 'right') {
-      offset.x = -(this.options.offsetX ?? 0)
-      offset.y = 0
-    } else if (this.options.anchor === 'top-left') {
+    // if (this.options.anchor === 'center') {
+    //   offset.x = 0
+    //   offset.y = 0
+    // } else if (this.options.anchor === 'top') {
+    //   offset.x = 0
+    //   offset.y = this.options.offsetY ?? 0
+    // } else if (this.options.anchor === 'bottom') {
+    //   offset.x = 0
+    //   offset.y = -(this.options.offsetY ?? 0)
+    // } else if (this.options.anchor === 'left') {
+    //   offset.x = this.options.offsetX ?? 0
+    //   offset.y = 0
+    // } else if (this.options.anchor === 'right') {
+    //   offset.x = -(this.options.offsetX ?? 0)
+    //   offset.y = 0
+    // } else
+    if (this.options.anchor === 'top-left') {
       offset.x = this.options.offsetX ?? 0
       offset.y = this.options.offsetY ?? 0
     } else if (this.options.anchor === 'top-right') {
