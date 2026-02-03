@@ -5,7 +5,8 @@ export interface BeforeRemoveEvent {
    * 阻止销毁的方法
    * @param isCancel - true: 阻止销毁; false: 继续销毁
    */
-  cancel: (isCancel: boolean) => void
+  cancel: () => void
+  next: () => void
 }
 
 export enum MapType {

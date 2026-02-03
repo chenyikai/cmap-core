@@ -148,7 +148,7 @@ class Focus extends EventEmitter {
       // === Point 逻辑 ===
       // 主要是基于 icon size 向外扩张
       // 假设 pointSize 是图标宽/高，padding 是额外留白
-      const halfSizePx = size / 2
+      const halfSizePx = (size + padding) / 2
       const expandMeters = halfSizePx * metersPerPixel
 
       // 计算手臂长度：保持你原来的比例 (size * 0.3)

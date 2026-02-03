@@ -19,10 +19,10 @@ export function initShip(cMap: CMap) {
       // ship!.select('413363020')
     }, 2000)
 
-    getShipData(map, false)
+    getShipData(map, true)
 
     map.on('moveend', () => {
-      getShipData(map, false);
+      getShipData(map, true);
     });
   })
 }

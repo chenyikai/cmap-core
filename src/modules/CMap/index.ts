@@ -41,13 +41,22 @@ export class CMap extends EventEmitter {
     this.originalRemove = this.map.remove.bind(this.map)
 
     this.map.remove = (): void => {
+      let isCancelled = false
+
       this.map.fire('beforeRemove', {
-        cancel: (isCancel: boolean) => {
-          if (!isCancel) {
-            this.originalRemove()
-          }
+        cancel: () => {
+          isCancelled = true
+        },
+        next: () => {
+          isCancelled = false
         },
       })
+
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (!isCancelled) {
+        console.log('originalRemove')
+        this.originalRemove()
+      }
     }
 
     this.map.once('load', () => {

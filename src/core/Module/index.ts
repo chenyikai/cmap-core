@@ -1,7 +1,5 @@
 import type { Map } from 'mapbox-gl'
 
-import type { BeforeRemoveEvent } from '@/types/CMap'
-
 import type { Context } from './Context.ts'
 import { getOrCreateContext } from './Context.ts'
 
@@ -17,14 +15,18 @@ export abstract class Module {
 
     this.onAdd()
 
-    this.context.map.once('beforeRemove', (e: BeforeRemoveEvent) => {
-      console.log(e.cancel, 'beforeRemove')
+    this.context.map.once('beforeRemove', () => {
+      this.onRemove()
     })
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   public emit() {
     this.context.events.emit('')
+  }
+
+  public mount(): void {
+    this.onAdd()
   }
 
   public destroy(): void {

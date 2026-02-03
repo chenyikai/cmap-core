@@ -170,6 +170,11 @@ export class AisShip extends BaseShip<IAisShipOptions> {
   override remove(): void {
     this.removeTooltip()
 
+    if (this.isFocus) {
+      this.unfocus()
+      this.context.focus.remove(String(this.id))
+    }
+
     const emptyFeature: GeoJSON.Feature<null> = {
       type: 'Feature',
       geometry: null,
@@ -294,6 +299,12 @@ export class AisShip extends BaseShip<IAisShipOptions> {
   }
 
   override render(): void {
+    const bounds = this.context.map.getBounds()
+    if (!bounds?.contains(this.position())) {
+      this.tooltip?.remove()
+      return
+    }
+
     this.tooltip?.setLngLat(this.position())
     this.tooltip?.render()
 

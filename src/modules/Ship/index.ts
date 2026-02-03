@@ -114,22 +114,12 @@ class Ship extends Module {
   removeAll(): void {
     this.collision.clear()
 
-    // 频率过高的设置图层数据导致问题
     this.ships.forEach((ship) => {
       ship.remove()
     })
     this.ships = []
 
     this.event.removeAll()
-
-    // setTimeout(() => {
-    // const source = this.context.map.getSource('mapbox-gl-ship-source')
-    // if (source?.type === 'geojson') {
-    //   source.setData({
-    //     type: 'FeatureCollection',
-    //     features: [],
-    //   })
-    // }
   }
 
   render(): void {

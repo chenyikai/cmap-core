@@ -167,10 +167,10 @@ export class Tooltip extends Module {
   }
 
   remove(): void {
-    if (this.mark) {
-      this.mark.remove()
-      this.mark = null
-    }
+    // if (this.mark) {
+    //   this.mark.remove()
+    //   this.mark = null
+    // }
 
     this.visible = false
     this.connectLine()
