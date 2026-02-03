@@ -39,7 +39,8 @@
     "type-check": "tsc --noEmit",
     "change": "changeset",
     "version": "changeset version",
-    "release": "npm run build && changeset publish"
+    "release": "npm run build && changeset publish",
+    "build:publish": "tsc && vite build && cp -rf dist package.json /Users/yikaichen/Projects/chenzq/cmap-core/ && cd /Users/yikaichen/Projects/chenzq/cmap-core && git add . && (git commit -m \"chore: update dist and package.json $(date +'%Y-%m-%d_%H-%M-%S')\" || echo \"No changes to commit\") && git push"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.8",

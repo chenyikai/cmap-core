@@ -6910,3 +6910,3564 @@ export const trackData = {
     ]
   }
 }
+
+
+export const bdTrackData = {
+  "code":200,
+  "data":[
+    {
+      "direction":0.0,
+      "latitude":29.919443,
+      "longitude":122.40211,
+      "positionDate":"2026-02-02 16:37:10",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919443,
+      "longitude":122.401943,
+      "positionDate":"2026-02-02 16:42:11",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919527,
+      "longitude":122.401888,
+      "positionDate":"2026-02-02 16:47:12",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919583,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 16:52:13",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":144.0,
+      "latitude":29.9195,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 16:57:14",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":347.0,
+      "latitude":29.9195,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 17:02:15",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919472,
+      "longitude":122.402,
+      "positionDate":"2026-02-02 17:07:16",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.401917,
+      "positionDate":"2026-02-02 17:12:17",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":103.0,
+      "latitude":29.91961,
+      "longitude":122.401943,
+      "positionDate":"2026-02-02 17:17:18",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919527,
+      "longitude":122.401917,
+      "positionDate":"2026-02-02 17:22:18",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919667,
+      "longitude":122.401917,
+      "positionDate":"2026-02-02 17:27:19",
+      "speed":0.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.9195,
+      "longitude":122.401972,
+      "positionDate":"2026-02-02 17:32:22",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":305.0,
+      "latitude":29.91961,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 17:37:22",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919638,
+      "longitude":122.401917,
+      "positionDate":"2026-02-02 17:42:24",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919638,
+      "longitude":122.401917,
+      "positionDate":"2026-02-02 17:47:23",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.9195,
+      "longitude":122.40225,
+      "positionDate":"2026-02-02 17:52:26",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.920167,
+      "longitude":122.40186,
+      "positionDate":"2026-02-02 17:57:26",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402055,
+      "positionDate":"2026-02-02 18:02:47",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.91936,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 18:07:28",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 18:12:29",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.91936,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 18:17:30",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402055,
+      "positionDate":"2026-02-02 18:22:31",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":31.0,
+      "latitude":29.919443,
+      "longitude":122.402055,
+      "positionDate":"2026-02-02 18:27:32",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.402083,
+      "positionDate":"2026-02-02 18:32:33",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":18.0,
+      "latitude":29.919417,
+      "longitude":122.402055,
+      "positionDate":"2026-02-02 18:37:34",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402,
+      "positionDate":"2026-02-02 18:42:35",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402,
+      "positionDate":"2026-02-02 18:47:36",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.91936,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 18:52:37",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919443,
+      "longitude":122.40211,
+      "positionDate":"2026-02-02 18:57:38",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.91936,
+      "longitude":122.402388,
+      "positionDate":"2026-02-02 19:02:39",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.401972,
+      "positionDate":"2026-02-02 19:07:41",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":277.0,
+      "latitude":29.919417,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 19:12:41",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402,
+      "positionDate":"2026-02-02 19:17:42",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.401943,
+      "positionDate":"2026-02-02 19:22:45",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.401917,
+      "positionDate":"2026-02-02 19:27:44",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.402,
+      "positionDate":"2026-02-02 19:32:45",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 19:37:46",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":163.0,
+      "latitude":29.919388,
+      "longitude":122.401917,
+      "positionDate":"2026-02-02 19:42:47",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":124.0,
+      "latitude":29.919443,
+      "longitude":122.401943,
+      "positionDate":"2026-02-02 19:47:48",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919443,
+      "longitude":122.402083,
+      "positionDate":"2026-02-02 19:52:49",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919443,
+      "longitude":122.402167,
+      "positionDate":"2026-02-02 19:57:50",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.401972,
+      "positionDate":"2026-02-02 20:02:49",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":344.0,
+      "latitude":29.919443,
+      "longitude":122.402083,
+      "positionDate":"2026-02-02 20:07:52",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.401972,
+      "positionDate":"2026-02-02 20:12:53",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":20.0,
+      "latitude":29.919388,
+      "longitude":122.401943,
+      "positionDate":"2026-02-02 20:17:54",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.402055,
+      "positionDate":"2026-02-02 20:22:55",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":182.0,
+      "latitude":29.91936,
+      "longitude":122.402,
+      "positionDate":"2026-02-02 20:27:56",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":199.0,
+      "latitude":29.919472,
+      "longitude":122.401972,
+      "positionDate":"2026-02-02 20:32:57",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 20:37:58",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.402,
+      "positionDate":"2026-02-02 20:42:59",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.401972,
+      "positionDate":"2026-02-02 20:48:00",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.402,
+      "positionDate":"2026-02-02 20:53:01",
+      "speed":0.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 20:58:02",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.40211,
+      "positionDate":"2026-02-02 21:03:03",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":76.0,
+      "latitude":29.919388,
+      "longitude":122.402,
+      "positionDate":"2026-02-02 21:08:04",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":180.0,
+      "latitude":29.919333,
+      "longitude":122.402055,
+      "positionDate":"2026-02-02 21:13:05",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402055,
+      "positionDate":"2026-02-02 21:18:06",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402083,
+      "positionDate":"2026-02-02 21:23:07",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402083,
+      "positionDate":"2026-02-02 21:28:08",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.91936,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 21:33:09",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.91936,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 21:38:10",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":71.0,
+      "latitude":29.919388,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 21:43:11",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402083,
+      "positionDate":"2026-02-02 21:48:12",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402138,
+      "positionDate":"2026-02-02 21:53:13",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":256.0,
+      "latitude":29.919417,
+      "longitude":122.402,
+      "positionDate":"2026-02-02 21:58:14",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.402055,
+      "positionDate":"2026-02-02 22:03:14",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":2.0,
+      "latitude":29.91936,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 22:08:15",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":339.0,
+      "latitude":29.919417,
+      "longitude":122.401972,
+      "positionDate":"2026-02-02 22:13:17",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.91936,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 22:18:18",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":103.0,
+      "latitude":29.919388,
+      "longitude":122.402055,
+      "positionDate":"2026-02-02 22:23:19",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":304.0,
+      "latitude":29.919388,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 22:28:20",
+      "speed":0.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.91936,
+      "longitude":122.402055,
+      "positionDate":"2026-02-02 22:33:21",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.401917,
+      "positionDate":"2026-02-02 22:38:22",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919333,
+      "longitude":122.402138,
+      "positionDate":"2026-02-02 22:43:23",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":224.0,
+      "latitude":29.919417,
+      "longitude":122.402138,
+      "positionDate":"2026-02-02 22:48:24",
+      "speed":0.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402167,
+      "positionDate":"2026-02-02 22:53:25",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919443,
+      "longitude":122.402083,
+      "positionDate":"2026-02-02 22:58:26",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.401972,
+      "positionDate":"2026-02-02 23:03:27",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.40211,
+      "positionDate":"2026-02-02 23:08:27",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919443,
+      "longitude":122.401943,
+      "positionDate":"2026-02-02 23:13:29",
+      "speed":0.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919472,
+      "longitude":122.401805,
+      "positionDate":"2026-02-02 23:18:31",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 23:23:37",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402,
+      "positionDate":"2026-02-02 23:28:37",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.401943,
+      "positionDate":"2026-02-02 23:33:37",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402,
+      "positionDate":"2026-02-02 23:38:43",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.401972,
+      "positionDate":"2026-02-02 23:43:43",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402027,
+      "positionDate":"2026-02-02 23:48:43",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.401972,
+      "positionDate":"2026-02-02 23:53:43",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402055,
+      "positionDate":"2026-02-02 23:58:43",
+      "speed":0.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402027,
+      "positionDate":"2026-02-03 00:04:17",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402055,
+      "positionDate":"2026-02-03 00:08:39",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402027,
+      "positionDate":"2026-02-03 00:13:40",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":83.0,
+      "latitude":29.919443,
+      "longitude":122.402027,
+      "positionDate":"2026-02-03 00:18:41",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.401972,
+      "positionDate":"2026-02-03 00:23:42",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.401972,
+      "positionDate":"2026-02-03 00:28:43",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.401972,
+      "positionDate":"2026-02-03 00:33:44",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.402055,
+      "positionDate":"2026-02-03 00:38:45",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.401972,
+      "positionDate":"2026-02-03 00:43:46",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402,
+      "positionDate":"2026-02-03 00:51:47",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919333,
+      "longitude":122.402055,
+      "positionDate":"2026-02-03 00:52:48",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.401972,
+      "positionDate":"2026-02-03 00:53:49",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402,
+      "positionDate":"2026-02-03 00:54:50",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":53.0,
+      "latitude":29.919388,
+      "longitude":122.402027,
+      "positionDate":"2026-02-03 00:55:51",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402027,
+      "positionDate":"2026-02-03 01:00:52",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402027,
+      "positionDate":"2026-02-03 01:05:53",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.401943,
+      "positionDate":"2026-02-03 01:10:54",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.91936,
+      "longitude":122.402,
+      "positionDate":"2026-02-03 01:15:55",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.401943,
+      "positionDate":"2026-02-03 01:20:56",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.401943,
+      "positionDate":"2026-02-03 01:25:57",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919472,
+      "longitude":122.402083,
+      "positionDate":"2026-02-03 01:30:58",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402,
+      "positionDate":"2026-02-03 01:35:59",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402055,
+      "positionDate":"2026-02-03 01:41:00",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.91936,
+      "longitude":122.402055,
+      "positionDate":"2026-02-03 01:46:01",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.91936,
+      "longitude":122.402055,
+      "positionDate":"2026-02-03 01:51:02",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":32.0,
+      "latitude":29.919417,
+      "longitude":122.401943,
+      "positionDate":"2026-02-03 01:56:03",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":87.0,
+      "latitude":29.919388,
+      "longitude":122.402,
+      "positionDate":"2026-02-03 02:01:03",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.401972,
+      "positionDate":"2026-02-03 02:06:05",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.91936,
+      "longitude":122.401972,
+      "positionDate":"2026-02-03 02:11:06",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402027,
+      "positionDate":"2026-02-03 02:16:07",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.402055,
+      "positionDate":"2026-02-03 02:21:08",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.401972,
+      "positionDate":"2026-02-03 02:26:09",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402,
+      "positionDate":"2026-02-03 02:31:10",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":112.0,
+      "latitude":29.919417,
+      "longitude":122.401972,
+      "positionDate":"2026-02-03 02:36:11",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402,
+      "positionDate":"2026-02-03 02:41:12",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.401888,
+      "positionDate":"2026-02-03 02:46:12",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402055,
+      "positionDate":"2026-02-03 02:51:14",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":88.0,
+      "latitude":29.919388,
+      "longitude":122.402055,
+      "positionDate":"2026-02-03 02:56:13",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402,
+      "positionDate":"2026-02-03 03:01:15",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":275.0,
+      "latitude":29.919388,
+      "longitude":122.402055,
+      "positionDate":"2026-02-03 03:06:16",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":128.0,
+      "latitude":29.91936,
+      "longitude":122.402027,
+      "positionDate":"2026-02-03 03:11:17",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.402,
+      "positionDate":"2026-02-03 03:16:18",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":151.0,
+      "latitude":29.919417,
+      "longitude":122.402055,
+      "positionDate":"2026-02-03 03:21:19",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":322.0,
+      "latitude":29.919417,
+      "longitude":122.402055,
+      "positionDate":"2026-02-03 03:26:20",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.402,
+      "positionDate":"2026-02-03 03:31:21",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.401943,
+      "positionDate":"2026-02-03 03:36:22",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919472,
+      "longitude":122.401917,
+      "positionDate":"2026-02-03 03:41:23",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":200.0,
+      "latitude":29.91936,
+      "longitude":122.402027,
+      "positionDate":"2026-02-03 03:46:24",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919417,
+      "longitude":122.401943,
+      "positionDate":"2026-02-03 03:51:25",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":151.0,
+      "latitude":29.919443,
+      "longitude":122.401917,
+      "positionDate":"2026-02-03 03:56:26",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.91936,
+      "longitude":122.402,
+      "positionDate":"2026-02-03 04:01:47",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.91936,
+      "longitude":122.402,
+      "positionDate":"2026-02-03 04:06:28",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.91936,
+      "longitude":122.401943,
+      "positionDate":"2026-02-03 04:11:29",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":317.0,
+      "latitude":29.919388,
+      "longitude":122.40211,
+      "positionDate":"2026-02-03 04:16:30",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":72.0,
+      "latitude":29.91936,
+      "longitude":122.40211,
+      "positionDate":"2026-02-03 04:21:31",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":160.0,
+      "latitude":29.919417,
+      "longitude":122.401972,
+      "positionDate":"2026-02-03 04:26:32",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919443,
+      "longitude":122.40211,
+      "positionDate":"2026-02-03 04:31:33",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919443,
+      "longitude":122.402083,
+      "positionDate":"2026-02-03 04:36:34",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":310.0,
+      "latitude":29.919527,
+      "longitude":122.40211,
+      "positionDate":"2026-02-03 04:41:35",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919555,
+      "longitude":122.402083,
+      "positionDate":"2026-02-03 04:46:36",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919527,
+      "longitude":122.402055,
+      "positionDate":"2026-02-03 04:51:37",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":193.0,
+      "latitude":29.9195,
+      "longitude":122.402083,
+      "positionDate":"2026-02-03 04:56:38",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919555,
+      "longitude":122.402055,
+      "positionDate":"2026-02-03 05:01:39",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":150.0,
+      "latitude":29.9195,
+      "longitude":122.402083,
+      "positionDate":"2026-02-03 05:06:40",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.9195,
+      "longitude":122.40211,
+      "positionDate":"2026-02-03 05:11:41",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919555,
+      "longitude":122.402055,
+      "positionDate":"2026-02-03 05:16:42",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":172.0,
+      "latitude":29.919472,
+      "longitude":122.40211,
+      "positionDate":"2026-02-03 05:21:43",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":90.0,
+      "latitude":29.919417,
+      "longitude":122.401972,
+      "positionDate":"2026-02-03 05:26:44",
+      "speed":0.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.91936,
+      "longitude":122.401943,
+      "positionDate":"2026-02-03 05:31:45",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.919388,
+      "longitude":122.402027,
+      "positionDate":"2026-02-03 05:36:46",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":81.0,
+      "latitude":29.919667,
+      "longitude":122.401472,
+      "positionDate":"2026-02-03 05:41:47",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":137.0,
+      "latitude":29.919667,
+      "longitude":122.401667,
+      "positionDate":"2026-02-03 05:46:48",
+      "speed":2.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":101.0,
+      "latitude":29.918805,
+      "longitude":122.408333,
+      "positionDate":"2026-02-03 05:51:49",
+      "speed":15.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":101.0,
+      "latitude":29.918055,
+      "longitude":122.413388,
+      "positionDate":"2026-02-03 05:52:50",
+      "speed":12.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":111.0,
+      "latitude":29.91725,
+      "longitude":122.416667,
+      "positionDate":"2026-02-03 05:53:51",
+      "speed":13.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":96.0,
+      "latitude":29.916638,
+      "longitude":122.421417,
+      "positionDate":"2026-02-03 05:54:52",
+      "speed":23.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":99.0,
+      "latitude":29.916027,
+      "longitude":122.428638,
+      "positionDate":"2026-02-03 05:55:53",
+      "speed":21.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":95.0,
+      "latitude":29.915277,
+      "longitude":122.435805,
+      "positionDate":"2026-02-03 05:56:54",
+      "speed":22.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":94.0,
+      "latitude":29.915138,
+      "longitude":122.44325,
+      "positionDate":"2026-02-03 05:57:55",
+      "speed":22.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":87.0,
+      "latitude":29.915138,
+      "longitude":122.45061,
+      "positionDate":"2026-02-03 05:58:56",
+      "speed":22.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":92.0,
+      "latitude":29.91511,
+      "longitude":122.456693,
+      "positionDate":"2026-02-03 05:59:57",
+      "speed":16.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":92.0,
+      "latitude":29.91486,
+      "longitude":122.461833,
+      "positionDate":"2026-02-03 06:00:57",
+      "speed":18.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":100.0,
+      "latitude":29.914083,
+      "longitude":122.467833,
+      "positionDate":"2026-02-03 06:01:59",
+      "speed":19.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":109.0,
+      "latitude":29.912972,
+      "longitude":122.473583,
+      "positionDate":"2026-02-03 06:03:00",
+      "speed":20.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":100.0,
+      "latitude":29.911638,
+      "longitude":122.479083,
+      "positionDate":"2026-02-03 06:04:01",
+      "speed":18.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":96.0,
+      "latitude":29.910943,
+      "longitude":122.484305,
+      "positionDate":"2026-02-03 06:05:02",
+      "speed":17.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":100.0,
+      "latitude":29.910333,
+      "longitude":122.490138,
+      "positionDate":"2026-02-03 06:06:03",
+      "speed":18.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":98.0,
+      "latitude":29.909332,
+      "longitude":122.496055,
+      "positionDate":"2026-02-03 06:07:04",
+      "speed":17.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":96.0,
+      "latitude":29.908527,
+      "longitude":122.501693,
+      "positionDate":"2026-02-03 06:08:05",
+      "speed":18.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":101.0,
+      "latitude":29.908277,
+      "longitude":122.507055,
+      "positionDate":"2026-02-03 06:09:06",
+      "speed":17.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":96.0,
+      "latitude":29.907527,
+      "longitude":122.51275,
+      "positionDate":"2026-02-03 06:10:07",
+      "speed":16.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":99.0,
+      "latitude":29.906943,
+      "longitude":122.518722,
+      "positionDate":"2026-02-03 06:11:08",
+      "speed":20.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":99.0,
+      "latitude":29.906248,
+      "longitude":122.524722,
+      "positionDate":"2026-02-03 06:12:09",
+      "speed":19.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":112.0,
+      "latitude":29.905417,
+      "longitude":122.530805,
+      "positionDate":"2026-02-03 06:13:10",
+      "speed":15.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":102.0,
+      "latitude":29.9045,
+      "longitude":122.536527,
+      "positionDate":"2026-02-03 06:14:11",
+      "speed":19.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":102.0,
+      "latitude":29.903583,
+      "longitude":122.542055,
+      "positionDate":"2026-02-03 06:15:12",
+      "speed":18.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":97.0,
+      "latitude":29.902693,
+      "longitude":122.54786,
+      "positionDate":"2026-02-03 06:16:13",
+      "speed":19.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":83.0,
+      "latitude":29.902027,
+      "longitude":122.55361,
+      "positionDate":"2026-02-03 06:17:14",
+      "speed":9.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":93.0,
+      "latitude":29.90161,
+      "longitude":122.558722,
+      "positionDate":"2026-02-03 06:18:15",
+      "speed":16.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":99.0,
+      "latitude":29.901055,
+      "longitude":122.564693,
+      "positionDate":"2026-02-03 06:19:16",
+      "speed":18.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":94.0,
+      "latitude":29.900527,
+      "longitude":122.570555,
+      "positionDate":"2026-02-03 06:20:17",
+      "speed":19.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":104.0,
+      "latitude":29.89961,
+      "longitude":122.5765,
+      "positionDate":"2026-02-03 06:21:18",
+      "speed":18.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":102.0,
+      "latitude":29.898805,
+      "longitude":122.582277,
+      "positionDate":"2026-02-03 06:22:19",
+      "speed":16.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":100.0,
+      "latitude":29.898055,
+      "longitude":122.587777,
+      "positionDate":"2026-02-03 06:23:20",
+      "speed":18.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":98.0,
+      "latitude":29.897277,
+      "longitude":122.593555,
+      "positionDate":"2026-02-03 06:24:21",
+      "speed":20.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":92.0,
+      "latitude":29.896388,
+      "longitude":122.599443,
+      "positionDate":"2026-02-03 06:25:22",
+      "speed":15.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":97.0,
+      "latitude":29.895638,
+      "longitude":122.605388,
+      "positionDate":"2026-02-03 06:26:23",
+      "speed":17.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":98.0,
+      "latitude":29.89486,
+      "longitude":122.610833,
+      "positionDate":"2026-02-03 06:27:24",
+      "speed":16.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":94.0,
+      "latitude":29.894333,
+      "longitude":122.616722,
+      "positionDate":"2026-02-03 06:28:25",
+      "speed":19.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":94.0,
+      "latitude":29.893693,
+      "longitude":122.622583,
+      "positionDate":"2026-02-03 06:29:26",
+      "speed":18.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":93.0,
+      "latitude":29.893083,
+      "longitude":122.62861,
+      "positionDate":"2026-02-03 06:30:27",
+      "speed":19.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":97.0,
+      "latitude":29.892443,
+      "longitude":122.634443,
+      "positionDate":"2026-02-03 06:31:28",
+      "speed":22.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":91.0,
+      "latitude":29.891888,
+      "longitude":122.640472,
+      "positionDate":"2026-02-03 06:32:29",
+      "speed":19.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":96.0,
+      "latitude":29.89125,
+      "longitude":122.64636,
+      "positionDate":"2026-02-03 06:33:30",
+      "speed":17.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":106.0,
+      "latitude":29.890527,
+      "longitude":122.652305,
+      "positionDate":"2026-02-03 06:34:31",
+      "speed":14.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":100.0,
+      "latitude":29.88975,
+      "longitude":122.657527,
+      "positionDate":"2026-02-03 06:35:32",
+      "speed":16.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":101.0,
+      "latitude":29.889083,
+      "longitude":122.66325,
+      "positionDate":"2026-02-03 06:36:33",
+      "speed":16.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":96.0,
+      "latitude":29.888333,
+      "longitude":122.669167,
+      "positionDate":"2026-02-03 06:37:34",
+      "speed":19.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":102.0,
+      "latitude":29.88761,
+      "longitude":122.675667,
+      "positionDate":"2026-02-03 06:38:35",
+      "speed":19.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":98.0,
+      "latitude":29.887,
+      "longitude":122.682193,
+      "positionDate":"2026-02-03 06:39:36",
+      "speed":20.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":97.0,
+      "latitude":29.886167,
+      "longitude":122.688833,
+      "positionDate":"2026-02-03 06:40:37",
+      "speed":19.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":106.0,
+      "latitude":29.885333,
+      "longitude":122.69511,
+      "positionDate":"2026-02-03 06:41:38",
+      "speed":20.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":97.0,
+      "latitude":29.884693,
+      "longitude":122.701527,
+      "positionDate":"2026-02-03 06:42:39",
+      "speed":21.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":95.0,
+      "latitude":29.88375,
+      "longitude":122.708138,
+      "positionDate":"2026-02-03 06:43:40",
+      "speed":20.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":97.0,
+      "latitude":29.882833,
+      "longitude":122.71475,
+      "positionDate":"2026-02-03 06:44:41",
+      "speed":21.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":94.0,
+      "latitude":29.881917,
+      "longitude":122.72161,
+      "positionDate":"2026-02-03 06:45:42",
+      "speed":21.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":100.0,
+      "latitude":29.881,
+      "longitude":122.728388,
+      "positionDate":"2026-02-03 06:46:43",
+      "speed":19.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":99.0,
+      "latitude":29.880222,
+      "longitude":122.73475,
+      "positionDate":"2026-02-03 06:47:44",
+      "speed":21.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":99.0,
+      "latitude":29.879193,
+      "longitude":122.741417,
+      "positionDate":"2026-02-03 06:48:45",
+      "speed":22.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":96.0,
+      "latitude":29.87825,
+      "longitude":122.748027,
+      "positionDate":"2026-02-03 06:49:46",
+      "speed":20.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":102.0,
+      "latitude":29.87736,
+      "longitude":122.754555,
+      "positionDate":"2026-02-03 06:50:47",
+      "speed":21.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":97.0,
+      "latitude":29.876555,
+      "longitude":122.761,
+      "positionDate":"2026-02-03 06:51:48",
+      "speed":20.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":98.0,
+      "latitude":29.87575,
+      "longitude":122.767333,
+      "positionDate":"2026-02-03 06:52:49",
+      "speed":20.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":94.0,
+      "latitude":29.875055,
+      "longitude":122.773777,
+      "positionDate":"2026-02-03 06:53:50",
+      "speed":16.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":95.0,
+      "latitude":29.87425,
+      "longitude":122.780055,
+      "positionDate":"2026-02-03 06:54:51",
+      "speed":15.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":91.0,
+      "latitude":29.873638,
+      "longitude":122.786583,
+      "positionDate":"2026-02-03 06:55:52",
+      "speed":20.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":93.0,
+      "latitude":29.873,
+      "longitude":122.793055,
+      "positionDate":"2026-02-03 06:56:53",
+      "speed":21.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":97.0,
+      "latitude":29.872388,
+      "longitude":122.799,
+      "positionDate":"2026-02-03 06:57:54",
+      "speed":20.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":97.0,
+      "latitude":29.871693,
+      "longitude":122.805333,
+      "positionDate":"2026-02-03 06:58:55",
+      "speed":19.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":92.0,
+      "latitude":29.87111,
+      "longitude":122.81136,
+      "positionDate":"2026-02-03 06:59:56",
+      "speed":21.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":90.0,
+      "latitude":29.870638,
+      "longitude":122.817555,
+      "positionDate":"2026-02-03 07:00:57",
+      "speed":18.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":96.0,
+      "latitude":29.869917,
+      "longitude":122.82361,
+      "positionDate":"2026-02-03 07:01:58",
+      "speed":17.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":94.0,
+      "latitude":29.869222,
+      "longitude":122.829833,
+      "positionDate":"2026-02-03 07:02:59",
+      "speed":20.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":99.0,
+      "latitude":29.868638,
+      "longitude":122.836082,
+      "positionDate":"2026-02-03 07:04:00",
+      "speed":18.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":108.0,
+      "latitude":29.867777,
+      "longitude":122.841943,
+      "positionDate":"2026-02-03 07:05:01",
+      "speed":18.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":99.0,
+      "latitude":29.867138,
+      "longitude":122.847638,
+      "positionDate":"2026-02-03 07:06:02",
+      "speed":18.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":92.0,
+      "latitude":29.866583,
+      "longitude":122.85361,
+      "positionDate":"2026-02-03 07:07:03",
+      "speed":18.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":93.0,
+      "latitude":29.86611,
+      "longitude":122.859527,
+      "positionDate":"2026-02-03 07:08:04",
+      "speed":17.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":96.0,
+      "latitude":29.865583,
+      "longitude":122.865,
+      "positionDate":"2026-02-03 07:09:05",
+      "speed":17.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":94.0,
+      "latitude":29.864972,
+      "longitude":122.871,
+      "positionDate":"2026-02-03 07:10:06",
+      "speed":19.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":99.0,
+      "latitude":29.864193,
+      "longitude":122.876917,
+      "positionDate":"2026-02-03 07:11:07",
+      "speed":18.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":98.0,
+      "latitude":29.863638,
+      "longitude":122.882748,
+      "positionDate":"2026-02-03 07:12:08",
+      "speed":16.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":94.0,
+      "latitude":29.862722,
+      "longitude":122.88836,
+      "positionDate":"2026-02-03 07:13:09",
+      "speed":17.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":111.0,
+      "latitude":29.861917,
+      "longitude":122.894138,
+      "positionDate":"2026-02-03 07:14:10",
+      "speed":21.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":99.0,
+      "latitude":29.860943,
+      "longitude":122.89986,
+      "positionDate":"2026-02-03 07:15:11",
+      "speed":19.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":92.0,
+      "latitude":29.86011,
+      "longitude":122.90525,
+      "positionDate":"2026-02-03 07:16:12",
+      "speed":15.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":110.0,
+      "latitude":29.859583,
+      "longitude":122.910943,
+      "positionDate":"2026-02-03 07:17:13",
+      "speed":21.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":98.0,
+      "latitude":29.85875,
+      "longitude":122.916777,
+      "positionDate":"2026-02-03 07:18:14",
+      "speed":17.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":98.0,
+      "latitude":29.858193,
+      "longitude":122.922167,
+      "positionDate":"2026-02-03 07:19:15",
+      "speed":16.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":98.0,
+      "latitude":29.857583,
+      "longitude":122.927888,
+      "positionDate":"2026-02-03 07:20:16",
+      "speed":17.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":104.0,
+      "latitude":29.856805,
+      "longitude":122.933222,
+      "positionDate":"2026-02-03 07:21:17",
+      "speed":15.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":99.0,
+      "latitude":29.85625,
+      "longitude":122.938638,
+      "positionDate":"2026-02-03 07:22:18",
+      "speed":17.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":96.0,
+      "latitude":29.8555,
+      "longitude":122.944055,
+      "positionDate":"2026-02-03 07:23:19",
+      "speed":17.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":101.0,
+      "latitude":29.854777,
+      "longitude":122.94961,
+      "positionDate":"2026-02-03 07:24:20",
+      "speed":19.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":106.0,
+      "latitude":29.853693,
+      "longitude":122.955193,
+      "positionDate":"2026-02-03 07:25:21",
+      "speed":18.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":96.0,
+      "latitude":29.853083,
+      "longitude":122.960805,
+      "positionDate":"2026-02-03 07:26:22",
+      "speed":19.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":100.0,
+      "latitude":29.8525,
+      "longitude":122.966777,
+      "positionDate":"2026-02-03 07:27:23",
+      "speed":18.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":94.0,
+      "latitude":29.85175,
+      "longitude":122.9725,
+      "positionDate":"2026-02-03 07:28:24",
+      "speed":16.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":99.0,
+      "latitude":29.851388,
+      "longitude":122.978083,
+      "positionDate":"2026-02-03 07:29:25",
+      "speed":19.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":96.0,
+      "latitude":29.850888,
+      "longitude":122.983917,
+      "positionDate":"2026-02-03 07:30:26",
+      "speed":17.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":98.0,
+      "latitude":29.850667,
+      "longitude":122.987333,
+      "positionDate":"2026-02-03 07:31:27",
+      "speed":5.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":93.0,
+      "latitude":29.847277,
+      "longitude":123.014972,
+      "positionDate":"2026-02-03 07:36:28",
+      "speed":17.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":92.0,
+      "latitude":29.846667,
+      "longitude":123.020027,
+      "positionDate":"2026-02-03 07:37:29",
+      "speed":14.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":101.0,
+      "latitude":29.845805,
+      "longitude":123.02536,
+      "positionDate":"2026-02-03 07:38:30",
+      "speed":17.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":101.0,
+      "latitude":29.844917,
+      "longitude":123.031305,
+      "positionDate":"2026-02-03 07:39:31",
+      "speed":14.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":99.0,
+      "latitude":29.844222,
+      "longitude":123.036972,
+      "positionDate":"2026-02-03 07:40:32",
+      "speed":19.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":93.0,
+      "latitude":29.843693,
+      "longitude":123.042583,
+      "positionDate":"2026-02-03 07:41:33",
+      "speed":16.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":97.0,
+      "latitude":29.843222,
+      "longitude":123.048305,
+      "positionDate":"2026-02-03 07:42:34",
+      "speed":17.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":97.0,
+      "latitude":29.842472,
+      "longitude":123.05386,
+      "positionDate":"2026-02-03 07:43:35",
+      "speed":19.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":94.0,
+      "latitude":29.841693,
+      "longitude":123.059888,
+      "positionDate":"2026-02-03 07:44:36",
+      "speed":17.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":94.0,
+      "latitude":29.840943,
+      "longitude":123.065388,
+      "positionDate":"2026-02-03 07:45:37",
+      "speed":17.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":97.0,
+      "latitude":29.840415,
+      "longitude":123.071193,
+      "positionDate":"2026-02-03 07:46:38",
+      "speed":16.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":94.0,
+      "latitude":29.839555,
+      "longitude":123.076943,
+      "positionDate":"2026-02-03 07:47:39",
+      "speed":16.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":97.0,
+      "latitude":29.838667,
+      "longitude":123.082805,
+      "positionDate":"2026-02-03 07:48:40",
+      "speed":20.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":98.0,
+      "latitude":29.837805,
+      "longitude":123.088805,
+      "positionDate":"2026-02-03 07:49:41",
+      "speed":18.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":91.0,
+      "latitude":29.837,
+      "longitude":123.094667,
+      "positionDate":"2026-02-03 07:50:42",
+      "speed":17.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":96.0,
+      "latitude":29.836693,
+      "longitude":123.09986,
+      "positionDate":"2026-02-03 07:51:43",
+      "speed":19.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":102.0,
+      "latitude":29.835917,
+      "longitude":123.105777,
+      "positionDate":"2026-02-03 07:52:44",
+      "speed":20.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":98.0,
+      "latitude":29.835193,
+      "longitude":123.108917,
+      "positionDate":"2026-02-03 07:53:45",
+      "speed":11.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":94.0,
+      "latitude":29.834443,
+      "longitude":123.114555,
+      "positionDate":"2026-02-03 07:54:46",
+      "speed":17.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":85.0,
+      "latitude":29.834222,
+      "longitude":123.119943,
+      "positionDate":"2026-02-03 07:55:47",
+      "speed":17.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":16.0,
+      "latitude":29.835277,
+      "longitude":123.124415,
+      "positionDate":"2026-02-03 07:56:48",
+      "speed":6.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":244.0,
+      "latitude":29.835667,
+      "longitude":123.123833,
+      "positionDate":"2026-02-03 08:01:48",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":106.0,
+      "latitude":29.83461,
+      "longitude":123.126222,
+      "positionDate":"2026-02-03 08:06:50",
+      "speed":4.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":229.0,
+      "latitude":29.83411,
+      "longitude":123.12636,
+      "positionDate":"2026-02-03 08:11:51",
+      "speed":0.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":300.0,
+      "latitude":29.834083,
+      "longitude":123.12636,
+      "positionDate":"2026-02-03 08:16:52",
+      "speed":1.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":338.0,
+      "latitude":29.833583,
+      "longitude":123.126777,
+      "positionDate":"2026-02-03 08:21:53",
+      "speed":2.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.83425,
+      "longitude":123.125443,
+      "positionDate":"2026-02-03 08:26:54",
+      "speed":1.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.834138,
+      "longitude":123.125943,
+      "positionDate":"2026-02-03 08:31:55",
+      "speed":1.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":265.0,
+      "latitude":29.833583,
+      "longitude":123.126083,
+      "positionDate":"2026-02-03 08:36:56",
+      "speed":0.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.83361,
+      "longitude":123.126443,
+      "positionDate":"2026-02-03 08:41:57",
+      "speed":1.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.83286,
+      "longitude":123.126805,
+      "positionDate":"2026-02-03 08:46:58",
+      "speed":1.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.833722,
+      "longitude":123.125667,
+      "positionDate":"2026-02-03 08:51:59",
+      "speed":0.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.832083,
+      "longitude":123.126638,
+      "positionDate":"2026-02-03 08:57:00",
+      "speed":1.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.833055,
+      "longitude":123.125555,
+      "positionDate":"2026-02-03 09:02:01",
+      "speed":0.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":328.0,
+      "latitude":29.832167,
+      "longitude":123.126138,
+      "positionDate":"2026-02-03 09:07:02",
+      "speed":0.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":145.0,
+      "latitude":29.83225,
+      "longitude":123.1255,
+      "positionDate":"2026-02-03 09:12:03",
+      "speed":8.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":10.0,
+      "latitude":29.832388,
+      "longitude":123.1255,
+      "positionDate":"2026-02-03 09:17:04",
+      "speed":0.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":251.0,
+      "latitude":29.832027,
+      "longitude":123.126248,
+      "positionDate":"2026-02-03 09:22:05",
+      "speed":0.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":49.0,
+      "latitude":29.833,
+      "longitude":123.125277,
+      "positionDate":"2026-02-03 09:27:06",
+      "speed":1.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.832333,
+      "longitude":123.125917,
+      "positionDate":"2026-02-03 09:32:07",
+      "speed":1.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":101.0,
+      "latitude":29.832943,
+      "longitude":123.125167,
+      "positionDate":"2026-02-03 09:37:08",
+      "speed":5.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":32.0,
+      "latitude":29.832333,
+      "longitude":123.12611,
+      "positionDate":"2026-02-03 09:42:08",
+      "speed":0.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.8335,
+      "longitude":123.12536,
+      "positionDate":"2026-02-03 09:47:10",
+      "speed":0.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":351.0,
+      "latitude":29.83361,
+      "longitude":123.126167,
+      "positionDate":"2026-02-03 09:52:10",
+      "speed":1.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":293.0,
+      "latitude":29.833443,
+      "longitude":123.125833,
+      "positionDate":"2026-02-03 09:57:11",
+      "speed":1.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.833333,
+      "longitude":123.125888,
+      "positionDate":"2026-02-03 10:02:12",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":4.0,
+      "latitude":29.83275,
+      "longitude":123.126248,
+      "positionDate":"2026-02-03 10:07:13",
+      "speed":1.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.833805,
+      "longitude":123.12561,
+      "positionDate":"2026-02-03 10:12:14",
+      "speed":1.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.831943,
+      "longitude":123.126193,
+      "positionDate":"2026-02-03 10:17:15",
+      "speed":1.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.83311,
+      "longitude":123.125693,
+      "positionDate":"2026-02-03 10:22:16",
+      "speed":1.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":159.0,
+      "latitude":29.832555,
+      "longitude":123.125888,
+      "positionDate":"2026-02-03 10:27:17",
+      "speed":7.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":299.0,
+      "latitude":29.832443,
+      "longitude":123.12575,
+      "positionDate":"2026-02-03 10:32:18",
+      "speed":0.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.83136,
+      "longitude":123.126027,
+      "positionDate":"2026-02-03 10:37:19",
+      "speed":1.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.832527,
+      "longitude":123.125777,
+      "positionDate":"2026-02-03 10:42:20",
+      "speed":1.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":151.0,
+      "latitude":29.832333,
+      "longitude":123.125693,
+      "positionDate":"2026-02-03 10:47:21",
+      "speed":7.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":290.0,
+      "latitude":29.832305,
+      "longitude":123.12611,
+      "positionDate":"2026-02-03 10:52:22",
+      "speed":0.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.83336,
+      "longitude":123.125972,
+      "positionDate":"2026-02-03 10:57:23",
+      "speed":0.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":327.0,
+      "latitude":29.83175,
+      "longitude":123.126055,
+      "positionDate":"2026-02-03 11:02:24",
+      "speed":0.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":355.0,
+      "latitude":29.832805,
+      "longitude":123.126,
+      "positionDate":"2026-02-03 11:07:25",
+      "speed":0.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.831888,
+      "longitude":123.12586,
+      "positionDate":"2026-02-03 11:12:26",
+      "speed":0.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":82.0,
+      "latitude":29.83311,
+      "longitude":123.125943,
+      "positionDate":"2026-02-03 11:17:27",
+      "speed":0.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":129.0,
+      "latitude":29.831943,
+      "longitude":123.125388,
+      "positionDate":"2026-02-03 11:22:28",
+      "speed":0.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":200.0,
+      "latitude":29.831805,
+      "longitude":123.125222,
+      "positionDate":"2026-02-03 11:27:30",
+      "speed":12.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.830805,
+      "longitude":123.125027,
+      "positionDate":"2026-02-03 11:28:29",
+      "speed":1.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.832,
+      "longitude":123.125193,
+      "positionDate":"2026-02-03 11:33:30",
+      "speed":0.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.832888,
+      "longitude":123.125415,
+      "positionDate":"2026-02-03 11:38:31",
+      "speed":0.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.831193,
+      "longitude":123.12536,
+      "positionDate":"2026-02-03 11:43:32",
+      "speed":1.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":335.0,
+      "latitude":29.832083,
+      "longitude":123.12575,
+      "positionDate":"2026-02-03 11:48:34",
+      "speed":0.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":143.0,
+      "latitude":29.833027,
+      "longitude":123.126248,
+      "positionDate":"2026-02-03 11:53:34",
+      "speed":0.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":49.0,
+      "latitude":29.832138,
+      "longitude":123.12511,
+      "positionDate":"2026-02-03 11:58:35",
+      "speed":2.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":173.0,
+      "latitude":29.832055,
+      "longitude":123.125167,
+      "positionDate":"2026-02-03 12:04:17",
+      "speed":9.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.83136,
+      "longitude":123.125333,
+      "positionDate":"2026-02-03 12:08:38",
+      "speed":0.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.83211,
+      "longitude":123.125667,
+      "positionDate":"2026-02-03 12:13:39",
+      "speed":0.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.833055,
+      "longitude":123.126305,
+      "positionDate":"2026-02-03 12:18:40",
+      "speed":0.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.832083,
+      "longitude":123.124777,
+      "positionDate":"2026-02-03 12:23:41",
+      "speed":0.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.832777,
+      "longitude":123.12525,
+      "positionDate":"2026-02-03 12:28:42",
+      "speed":0.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.833388,
+      "longitude":123.12586,
+      "positionDate":"2026-02-03 12:33:43",
+      "speed":0.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.833277,
+      "longitude":123.125305,
+      "positionDate":"2026-02-03 12:38:44",
+      "speed":0.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.833722,
+      "longitude":123.12586,
+      "positionDate":"2026-02-03 12:43:45",
+      "speed":1.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":215.0,
+      "latitude":29.8325,
+      "longitude":123.125638,
+      "positionDate":"2026-02-03 12:48:46",
+      "speed":9.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":101.0,
+      "latitude":29.832055,
+      "longitude":123.125693,
+      "positionDate":"2026-02-03 12:53:47",
+      "speed":1.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.832333,
+      "longitude":123.126472,
+      "positionDate":"2026-02-03 12:58:48",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.83236,
+      "longitude":123.125222,
+      "positionDate":"2026-02-03 13:03:49",
+      "speed":0.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.832055,
+      "longitude":123.124943,
+      "positionDate":"2026-02-03 13:08:50",
+      "speed":1.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":43.0,
+      "latitude":29.832193,
+      "longitude":123.125667,
+      "positionDate":"2026-02-03 13:13:51",
+      "speed":1.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.832167,
+      "longitude":123.125693,
+      "positionDate":"2026-02-03 13:18:52",
+      "speed":0.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":307.0,
+      "latitude":29.832055,
+      "longitude":123.125138,
+      "positionDate":"2026-02-03 13:23:53",
+      "speed":0.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.83211,
+      "longitude":123.126027,
+      "positionDate":"2026-02-03 13:28:54",
+      "speed":0.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":114.0,
+      "latitude":29.832443,
+      "longitude":123.125138,
+      "positionDate":"2026-02-03 13:33:55",
+      "speed":0.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.832472,
+      "longitude":123.12586,
+      "positionDate":"2026-02-03 13:38:56",
+      "speed":0.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":255.0,
+      "latitude":29.832277,
+      "longitude":123.125805,
+      "positionDate":"2026-02-03 13:43:57",
+      "speed":6.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":105.0,
+      "latitude":29.83211,
+      "longitude":123.125833,
+      "positionDate":"2026-02-03 13:48:58",
+      "speed":1.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.831888,
+      "longitude":123.126667,
+      "positionDate":"2026-02-03 13:53:59",
+      "speed":0.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.832417,
+      "longitude":123.125722,
+      "positionDate":"2026-02-03 13:59:00",
+      "speed":0.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":82.0,
+      "latitude":29.832138,
+      "longitude":123.126555,
+      "positionDate":"2026-02-03 14:04:00",
+      "speed":0.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":287.0,
+      "latitude":29.83275,
+      "longitude":123.125277,
+      "positionDate":"2026-02-03 14:09:02",
+      "speed":1.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.83225,
+      "longitude":123.125917,
+      "positionDate":"2026-02-03 14:14:03",
+      "speed":0.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.83261,
+      "longitude":123.125943,
+      "positionDate":"2026-02-03 14:19:04",
+      "speed":1.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":297.0,
+      "latitude":29.832138,
+      "longitude":123.126222,
+      "positionDate":"2026-02-03 14:24:05",
+      "speed":9.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":250.0,
+      "latitude":29.83236,
+      "longitude":123.126167,
+      "positionDate":"2026-02-03 14:29:06",
+      "speed":1.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.832583,
+      "longitude":123.125943,
+      "positionDate":"2026-02-03 14:34:07",
+      "speed":0.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.833,
+      "longitude":123.125305,
+      "positionDate":"2026-02-03 14:39:08",
+      "speed":0.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":48.0,
+      "latitude":29.8325,
+      "longitude":123.126083,
+      "positionDate":"2026-02-03 14:44:09",
+      "speed":1.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":0.0,
+      "latitude":29.832777,
+      "longitude":123.125972,
+      "positionDate":"2026-02-03 14:49:10",
+      "speed":1.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":127.0,
+      "latitude":29.831888,
+      "longitude":123.126527,
+      "positionDate":"2026-02-03 14:54:11",
+      "speed":1.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":255.0,
+      "latitude":29.830805,
+      "longitude":123.126667,
+      "positionDate":"2026-02-03 14:59:12",
+      "speed":2.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":273.0,
+      "latitude":29.832167,
+      "longitude":123.09436,
+      "positionDate":"2026-02-03 15:04:13",
+      "speed":22.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":281.0,
+      "latitude":29.832943,
+      "longitude":123.087055,
+      "positionDate":"2026-02-03 15:05:14",
+      "speed":23.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":275.0,
+      "latitude":29.83411,
+      "longitude":123.079805,
+      "positionDate":"2026-02-03 15:06:15",
+      "speed":22.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":276.0,
+      "latitude":29.834888,
+      "longitude":123.072472,
+      "positionDate":"2026-02-03 15:07:16",
+      "speed":19.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":279.0,
+      "latitude":29.835667,
+      "longitude":123.065388,
+      "positionDate":"2026-02-03 15:08:17",
+      "speed":22.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":279.0,
+      "latitude":29.83686,
+      "longitude":123.057972,
+      "positionDate":"2026-02-03 15:09:18",
+      "speed":24.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":272.0,
+      "latitude":29.837527,
+      "longitude":123.050693,
+      "positionDate":"2026-02-03 15:10:19",
+      "speed":23.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":277.0,
+      "latitude":29.838055,
+      "longitude":123.043277,
+      "positionDate":"2026-02-03 15:11:20",
+      "speed":23.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":275.0,
+      "latitude":29.838527,
+      "longitude":123.036138,
+      "positionDate":"2026-02-03 15:12:21",
+      "speed":24.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":270.0,
+      "latitude":29.838833,
+      "longitude":123.028693,
+      "positionDate":"2026-02-03 15:13:22",
+      "speed":23.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":269.0,
+      "latitude":29.838943,
+      "longitude":123.021443,
+      "positionDate":"2026-02-03 15:14:23",
+      "speed":23.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":272.0,
+      "latitude":29.839027,
+      "longitude":123.01411,
+      "positionDate":"2026-02-03 15:15:24",
+      "speed":24.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":269.0,
+      "latitude":29.839167,
+      "longitude":123.007222,
+      "positionDate":"2026-02-03 15:16:25",
+      "speed":21.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":296.0,
+      "latitude":29.841222,
+      "longitude":123.0005,
+      "positionDate":"2026-02-03 15:17:26",
+      "speed":23.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":290.0,
+      "latitude":29.843638,
+      "longitude":122.994333,
+      "positionDate":"2026-02-03 15:18:27",
+      "speed":20.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":284.0,
+      "latitude":29.845805,
+      "longitude":122.988083,
+      "positionDate":"2026-02-03 15:19:28",
+      "speed":21.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":279.0,
+      "latitude":29.84725,
+      "longitude":122.981472,
+      "positionDate":"2026-02-03 15:20:29",
+      "speed":20.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":281.0,
+      "latitude":29.84836,
+      "longitude":122.975,
+      "positionDate":"2026-02-03 15:21:30",
+      "speed":21.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":280.0,
+      "latitude":29.849583,
+      "longitude":122.968138,
+      "positionDate":"2026-02-03 15:22:31",
+      "speed":20.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":273.0,
+      "latitude":29.851083,
+      "longitude":122.961555,
+      "positionDate":"2026-02-03 15:23:32",
+      "speed":20.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":273.0,
+      "latitude":29.851722,
+      "longitude":122.955055,
+      "positionDate":"2026-02-03 15:24:33",
+      "speed":21.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":280.0,
+      "latitude":29.85236,
+      "longitude":122.948888,
+      "positionDate":"2026-02-03 15:25:34",
+      "speed":11.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":292.0,
+      "latitude":29.853027,
+      "longitude":122.94636,
+      "positionDate":"2026-02-03 15:26:35",
+      "speed":4.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":278.0,
+      "latitude":29.860055,
+      "longitude":122.88711,
+      "positionDate":"2026-02-03 15:36:37",
+      "speed":23.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":275.0,
+      "latitude":29.860805,
+      "longitude":122.880527,
+      "positionDate":"2026-02-03 15:37:38",
+      "speed":21.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":277.0,
+      "latitude":29.86161,
+      "longitude":122.873527,
+      "positionDate":"2026-02-03 15:38:39",
+      "speed":23.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":277.0,
+      "latitude":29.862417,
+      "longitude":122.866277,
+      "positionDate":"2026-02-03 15:39:40",
+      "speed":23.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":276.0,
+      "latitude":29.863305,
+      "longitude":122.859138,
+      "positionDate":"2026-02-03 15:40:41",
+      "speed":23.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":277.0,
+      "latitude":29.864167,
+      "longitude":122.851667,
+      "positionDate":"2026-02-03 15:41:42",
+      "speed":22.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":278.0,
+      "latitude":29.865055,
+      "longitude":122.844417,
+      "positionDate":"2026-02-03 15:42:43",
+      "speed":22.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":280.0,
+      "latitude":29.866305,
+      "longitude":122.837138,
+      "positionDate":"2026-02-03 15:43:44",
+      "speed":22.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":280.0,
+      "latitude":29.867167,
+      "longitude":122.829805,
+      "positionDate":"2026-02-03 15:44:45",
+      "speed":22.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":277.0,
+      "latitude":29.868027,
+      "longitude":122.822388,
+      "positionDate":"2026-02-03 15:45:47",
+      "speed":21.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":273.0,
+      "latitude":29.868972,
+      "longitude":122.81511,
+      "positionDate":"2026-02-03 15:46:47",
+      "speed":24.9,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":279.0,
+      "latitude":29.869888,
+      "longitude":122.807443,
+      "positionDate":"2026-02-03 15:47:48",
+      "speed":22.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":277.0,
+      "latitude":29.870805,
+      "longitude":122.799777,
+      "positionDate":"2026-02-03 15:48:49",
+      "speed":22.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":279.0,
+      "latitude":29.871722,
+      "longitude":122.792277,
+      "positionDate":"2026-02-03 15:49:50",
+      "speed":22.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":276.0,
+      "latitude":29.87261,
+      "longitude":122.784888,
+      "positionDate":"2026-02-03 15:50:51",
+      "speed":23.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":276.0,
+      "latitude":29.873417,
+      "longitude":122.777443,
+      "positionDate":"2026-02-03 15:51:52",
+      "speed":22.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":279.0,
+      "latitude":29.874193,
+      "longitude":122.770055,
+      "positionDate":"2026-02-03 15:52:53",
+      "speed":23.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":275.0,
+      "latitude":29.875,
+      "longitude":122.762777,
+      "positionDate":"2026-02-03 15:53:54",
+      "speed":23.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":278.0,
+      "latitude":29.875833,
+      "longitude":122.755277,
+      "positionDate":"2026-02-03 15:54:55",
+      "speed":23.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":276.0,
+      "latitude":29.876722,
+      "longitude":122.74811,
+      "positionDate":"2026-02-03 15:55:56",
+      "speed":21.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":278.0,
+      "latitude":29.87761,
+      "longitude":122.740833,
+      "positionDate":"2026-02-03 15:56:57",
+      "speed":23.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":278.0,
+      "latitude":29.878527,
+      "longitude":122.73325,
+      "positionDate":"2026-02-03 15:57:58",
+      "speed":22.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":276.0,
+      "latitude":29.879305,
+      "longitude":122.725805,
+      "positionDate":"2026-02-03 15:58:59",
+      "speed":22.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":280.0,
+      "latitude":29.880527,
+      "longitude":122.71636,
+      "positionDate":"2026-02-03 16:00:17",
+      "speed":22.7,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":289.0,
+      "latitude":29.881333,
+      "longitude":122.711443,
+      "positionDate":"2026-02-03 16:01:00",
+      "speed":18.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":279.0,
+      "latitude":29.882222,
+      "longitude":122.70436,
+      "positionDate":"2026-02-03 16:02:02",
+      "speed":22.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":279.0,
+      "latitude":29.883027,
+      "longitude":122.697083,
+      "positionDate":"2026-02-03 16:03:03",
+      "speed":21.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":275.0,
+      "latitude":29.883777,
+      "longitude":122.690138,
+      "positionDate":"2026-02-03 16:04:03",
+      "speed":21.8,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":278.0,
+      "latitude":29.884777,
+      "longitude":122.682583,
+      "positionDate":"2026-02-03 16:05:05",
+      "speed":22.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":280.0,
+      "latitude":29.88575,
+      "longitude":122.675277,
+      "positionDate":"2026-02-03 16:06:06",
+      "speed":23.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":277.0,
+      "latitude":29.88675,
+      "longitude":122.66786,
+      "positionDate":"2026-02-03 16:07:06",
+      "speed":24.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":277.0,
+      "latitude":29.88761,
+      "longitude":122.660388,
+      "positionDate":"2026-02-03 16:08:07",
+      "speed":22.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":274.0,
+      "latitude":29.88836,
+      "longitude":122.653193,
+      "positionDate":"2026-02-03 16:09:08",
+      "speed":22.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":274.0,
+      "latitude":29.88886,
+      "longitude":122.645667,
+      "positionDate":"2026-02-03 16:10:09",
+      "speed":23.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":270.0,
+      "latitude":29.889305,
+      "longitude":122.638193,
+      "positionDate":"2026-02-03 16:11:11",
+      "speed":23.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":273.0,
+      "latitude":29.889777,
+      "longitude":122.630833,
+      "positionDate":"2026-02-03 16:12:11",
+      "speed":22.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":273.0,
+      "latitude":29.89025,
+      "longitude":122.623167,
+      "positionDate":"2026-02-03 16:13:12",
+      "speed":24.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":273.0,
+      "latitude":29.890833,
+      "longitude":122.615472,
+      "positionDate":"2026-02-03 16:14:14",
+      "speed":24.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":274.0,
+      "latitude":29.891417,
+      "longitude":122.60736,
+      "positionDate":"2026-02-03 16:15:19",
+      "speed":23.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":275.0,
+      "latitude":29.892055,
+      "longitude":122.59911,
+      "positionDate":"2026-02-03 16:16:25",
+      "speed":23.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":274.0,
+      "latitude":29.892277,
+      "longitude":122.591943,
+      "positionDate":"2026-02-03 16:17:25",
+      "speed":21.3,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":275.0,
+      "latitude":29.89286,
+      "longitude":122.583972,
+      "positionDate":"2026-02-03 16:18:31",
+      "speed":23.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":287.0,
+      "latitude":29.893055,
+      "longitude":122.57986,
+      "positionDate":"2026-02-03 16:19:31",
+      "speed":14.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":275.0,
+      "latitude":29.893805,
+      "longitude":122.571943,
+      "positionDate":"2026-02-03 16:20:37",
+      "speed":23.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":277.0,
+      "latitude":29.8945,
+      "longitude":122.564667,
+      "positionDate":"2026-02-03 16:21:37",
+      "speed":24.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":277.0,
+      "latitude":29.895388,
+      "longitude":122.556472,
+      "positionDate":"2026-02-03 16:22:43",
+      "speed":22.2,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":276.0,
+      "latitude":29.896222,
+      "longitude":122.54911,
+      "positionDate":"2026-02-03 16:23:43",
+      "speed":23.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":278.0,
+      "latitude":29.897083,
+      "longitude":122.540777,
+      "positionDate":"2026-02-03 16:24:49",
+      "speed":23.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":270.0,
+      "latitude":29.897777,
+      "longitude":122.53325,
+      "positionDate":"2026-02-03 16:25:49",
+      "speed":23.0,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":275.0,
+      "latitude":29.898388,
+      "longitude":122.525167,
+      "positionDate":"2026-02-03 16:26:55",
+      "speed":22.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":276.0,
+      "latitude":29.898943,
+      "longitude":122.517972,
+      "positionDate":"2026-02-03 16:27:55",
+      "speed":22.6,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":273.0,
+      "latitude":29.899472,
+      "longitude":122.510138,
+      "positionDate":"2026-02-03 16:29:01",
+      "speed":22.1,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":274.0,
+      "latitude":29.900222,
+      "longitude":122.502693,
+      "positionDate":"2026-02-03 16:30:01",
+      "speed":22.4,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":278.0,
+      "latitude":29.901138,
+      "longitude":122.494555,
+      "positionDate":"2026-02-03 16:31:07",
+      "speed":23.5,
+      "terminal":"KA0761"
+    },
+    {
+      "direction":277.0,
+      "latitude":29.901972,
+      "longitude":122.48711,
+      "positionDate":"2026-02-03 16:32:07",
+      "speed":23.3,
+      "terminal":"KA0761"
+    }
+  ],
+  "msg":"操作成功",
+  "timestamp":"1770107551194"
+}

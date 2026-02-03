@@ -14,10 +14,14 @@ import { TooltipType } from '@/types/Track'
 
 import {
   ARROW_ICON,
+  ARROW_ICON_NAME,
   END_ICON,
+  END_ICON_NAME,
   LAYER_LIST,
   NORMAL_ICON,
+  NORMAL_ICON_NAME,
   START_ICON,
+  START_ICON_NAME,
   TRACK_ICON_LAYER_NAME,
   TRACK_SOURCE_NAME,
 } from './vars.ts'
@@ -153,19 +157,19 @@ export class Track extends Module {
 
     this.context.iconManage.loadSvg([
       {
-        name: 'track-start',
+        name: START_ICON_NAME,
         svg: START_ICON,
       },
       {
-        name: 'track-end',
+        name: END_ICON_NAME,
         svg: END_ICON,
       },
       {
-        name: 'track-arrow',
+        name: ARROW_ICON_NAME,
         svg: ARROW_ICON,
       },
       {
-        name: 'track-normal',
+        name: NORMAL_ICON_NAME,
         svg: NORMAL_ICON,
       },
     ])
@@ -309,13 +313,13 @@ export class Track extends Module {
         }
 
         sortedItems.forEach((item, index) => {
-          let icon = 'track-normal'
+          let icon = NORMAL_ICON_NAME
           let iconSize = 0.2
           if (index === 0) {
-            icon = 'track-start'
+            icon = START_ICON_NAME
             iconSize = 0.4
           } else if (index === length - 1) {
-            icon = 'track-end'
+            icon = END_ICON_NAME
             iconSize = 0.4
           }
 

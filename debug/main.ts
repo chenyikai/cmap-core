@@ -1,7 +1,7 @@
 import { CMap } from "../src/modules/CMap";
 import '../src/styles/index.scss'
 import { initShip } from "./ship";
-// import { registerTack } from "./track";
+import { registerTack } from "./track";
 // import { Tooltip } from '@/core/Tooltip'
 
 const cMap = new CMap({
@@ -18,7 +18,8 @@ cMap.on('loaded', (map) => {
   // console.log(map.showCollisionBoxes = true);
   initShip(cMap)
 
-  // registerTack(map)
+
+  registerTack(map)
 
   // const tooltip = new Tooltip(map)
 
