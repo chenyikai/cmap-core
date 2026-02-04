@@ -18,7 +18,6 @@ export interface IBaseShipOptions {
   status?: string
   time: Date
   tooltip?: boolean
-  immediate?: boolean
   realZoom?: number
   top?: number
   left?: number

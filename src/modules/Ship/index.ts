@@ -16,6 +16,7 @@ class Ship extends Module {
 
   private pluginRegistry = new Map<string, BaseShipConstructor>()
   private collision: Collision
+  private focusId: IBaseShipOptions['id'] | null = null
 
   constructor(map: MapboxGlMap, options: IShipOptions) {
     super(map)
@@ -99,6 +100,13 @@ class Ship extends Module {
 
     this.collisionTooltip()
 
+    if (this.focusId) {
+      const ship = this.get(this.focusId)
+      if (ship) {
+        ship.focus()
+      }
+    }
+
     return newShips
   }
 
@@ -137,6 +145,9 @@ class Ship extends Module {
     const ship = this.get(id)
     if (ship) {
       ship.select()
+      this.focusId = ship.id
+    } else {
+      console.warn(`The ship-${String(id)} was not found.`)
     }
   }
 
@@ -144,6 +155,9 @@ class Ship extends Module {
     const ship = this.get(id)
     if (ship) {
       ship.unselect()
+      this.focusId = null
+    } else {
+      console.warn(`The ship-${String(id)} was not found.`)
     }
   }
 }
