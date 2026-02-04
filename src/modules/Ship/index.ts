@@ -63,9 +63,9 @@ class Ship extends Module {
 
       if (collision.visible) {
         tooltip.setAnchor(collision.dir)
-      } else {
-        tooltip.hide()
       }
+      //   tooltip.hide()
+      // }
     })
   }
 
@@ -96,6 +96,7 @@ class Ship extends Module {
     })
 
     this.render()
+
     this.collisionTooltip()
 
     return newShips

@@ -5,7 +5,7 @@ import { IAisShipOptions } from "../../src/types/Ship/AisShip";
 import Ship from "../../src/modules/Ship";
 import { CMap } from "../../src/modules/CMap"
 import { staticShipData } from "./mock";
-import { AisShip } from "../../src";
+import { AisShip, Tooltip } from "../../src";
 
 let ship: Ship | null = null
 
@@ -19,10 +19,10 @@ export function initShip(cMap: CMap) {
       // ship!.select('413363020')
     }, 2000)
 
-    getShipData(map, true)
+    getShipData(map, false)
 
     map.on('moveend', () => {
-      getShipData(map, true);
+      getShipData(map, false);
     });
   })
 }
@@ -68,7 +68,7 @@ function getShipData(map: Map, isStatic: boolean = false) {
   axios
     .post('/ship/rest/ehhship/getShipDataList', getBounds(map), {
       headers: {
-        Authorization: 'bearer d018ebb6-09cc-4f56-832d-8a521abd54d2',
+        Authorization: 'bearer 11c2b040-2857-4a0a-be32-5a4967be26e7',
       },
     })
     .then(({ data }) => {
@@ -93,6 +93,8 @@ function renderShip(_map: Map, data: any) {
   } else {
      shipData  = data
   }
+
+  // Tooltip.DEBUG = true
 
   const list: Array<IAisShipOptions> = shipData.map((item: any) => {
     const [lat, lon] = item.location.split(',');

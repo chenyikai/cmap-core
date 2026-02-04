@@ -33,7 +33,7 @@ export interface ITooltipOptions {
   visible?: boolean
   className?: string
   position: LngLat
-  element?: HTMLElement
+  element: HTMLElement
   offsetX?: number
   offsetY?: number
   anchor?: Anchor

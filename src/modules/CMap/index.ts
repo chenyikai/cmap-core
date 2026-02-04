@@ -77,6 +77,7 @@ export class CMap extends EventEmitter {
           }),
         ])
       })
+
       this.emit('loaded', this.map)
     })
   }

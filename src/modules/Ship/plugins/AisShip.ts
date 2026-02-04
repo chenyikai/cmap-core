@@ -28,11 +28,9 @@ export class AisShip extends BaseShip<IAisShipOptions> {
           offsetY: 25,
           element: this.label(),
           anchor: 'bottom-right',
-          visible: true,
+          visible: false,
         }),
       )
-
-      this.render()
     }
   }
 
@@ -301,11 +299,10 @@ export class AisShip extends BaseShip<IAisShipOptions> {
   override render(): void {
     const bounds = this.context.map.getBounds()
     if (!bounds?.contains(this.position())) {
-      this.tooltip?.remove()
+      this.tooltip?.hide()
       return
     }
 
-    this.tooltip?.setLngLat(this.position())
     this.tooltip?.render()
 
     this.context.register.setGeoJSONData(this.SOURCE, this.getFeature())

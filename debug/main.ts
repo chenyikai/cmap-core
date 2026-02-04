@@ -16,7 +16,11 @@ cMap.on('loaded', (map) => {
   window.map = map
 
   // console.log(map.showCollisionBoxes = true);
-  initShip(cMap)
+  const flag = true
+
+  if (flag) {
+    initShip(cMap)
+  }
 
 
   registerTack(map)
