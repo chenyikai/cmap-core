@@ -35,7 +35,9 @@ export class Tooltip extends Module {
   }
 
   get visible(): boolean {
-    return !!this.options.visible
+    const bounds = this.context.map.getBounds()
+
+    return !!this.options.visible && !!bounds?.contains(this.options.position)
   }
 
   get bbox(): BBox {
@@ -63,7 +65,7 @@ export class Tooltip extends Module {
     this.remove()
   }
 
-  public debug(): void {
+  private debug(): void {
     const { minX, minY, maxX, maxY } = this.bbox
     const { lng: minLon, lat: minLat } = this.context.map.unproject(new Point(minX, minY))
     const { lng: maxLon, lat: maxLat } = this.context.map.unproject(new Point(maxX, maxY))
@@ -95,10 +97,9 @@ export class Tooltip extends Module {
       this.mark = null
     }
 
-    this.options.visible = true
     this.options.anchor = anchor
 
-    this.render()
+    this.show()
   }
 
   getSimpleBbox(): SimpleAnchor {
@@ -164,13 +165,13 @@ export class Tooltip extends Module {
       bbox.maxX = point.x + width + Math.abs(offset.x)
     } else if (anchor === 'top-right') {
       bbox.maxY = point.y + height + Math.abs(offset.y)
-      bbox.minX = point.x - width + offset.x
+      bbox.minX = point.x - (width + offset.x)
     } else if (anchor === 'bottom-left') {
       bbox.minY = point.y - (height + offset.y)
       bbox.maxX = point.x + width + Math.abs(offset.x)
     } else if (anchor === 'bottom-right') {
       bbox.minY = point.y - (height + offset.y)
-      bbox.minX = point.x - width + offset.x
+      bbox.minX = point.x - (width + offset.x)
     }
 
     return bbox
@@ -198,7 +199,7 @@ export class Tooltip extends Module {
     // element.style.width = 'max-content';
 
     // 3. 插入 DOM
-    document.body.appendChild(element)
+    this.context.map.getCanvasContainer().appendChild(element)
 
     // 4. 测量
     const width = element.offsetWidth
@@ -209,7 +210,7 @@ export class Tooltip extends Module {
     // const height = rect.height;
 
     // 5. 移除 DOM
-    document.body.removeChild(element)
+    this.context.map.getCanvasContainer().removeChild(element)
 
     // 6. 恢复原始样式 (如果是克隆的节点这一步可以省略)
     element.style.position = originalStyles.position
@@ -222,15 +223,16 @@ export class Tooltip extends Module {
   }
 
   remove(): void {
+    this.options.visible = false
+    this.context.map.off('zoom', this.zoom)
+    this.context.map.off('zoomend', this.zoom)
+
     if (this.mark) {
       this.mark.remove()
       this.mark = null
     }
 
-    this.options.visible = false
     this.connectLine()
-    this.context.map.off('zoom', this.zoom)
-    this.context.map.off('zoomend', this.zoom)
   }
 
   _create(): void {

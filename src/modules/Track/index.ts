@@ -190,6 +190,12 @@ export class Track extends Module {
     this.trackData.set(id, this.markItem(sorts))
   }
 
+  remove(): void {
+    this.removeAllTooltip()
+    this.event.off()
+    this.context.register.setGeoJSONData(TRACK_SOURCE_NAME, this.getFeature())
+  }
+
   private markItem(items: TrackItem[]): TrackItemWithLabel[] {
     if (items.length === 0) return []
 
@@ -413,7 +419,7 @@ export class Track extends Module {
             dayjs(Number(item.properties.time)).format('YYYY-MM-DD HH:mm:ss'),
           ),
           anchor: 'bottom-right',
-          visible: true,
+          visible: false,
         }),
     )
 

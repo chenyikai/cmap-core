@@ -39,4 +39,5 @@ export type customPopupOptions = PopupOptions & {
 
 export interface ICMapOptions extends MapOptions {
   type?: MapType
+  TDTToken?: string
 }

@@ -1,4 +1,5 @@
 import EventEmitter from 'eventemitter3'
+import { isEmpty } from 'lodash-es'
 import { Map } from 'mapbox-gl'
 
 import IconManager from '@/core/IconManager'
@@ -7,7 +8,7 @@ import type { ICMapOptions } from '@/types/CMap'
 import { MapType } from '@/types/CMap'
 import type { SvgIcon } from '@/types/IconManager'
 
-import { landStyle } from './vars.ts'
+import { landStyle, satelliteStyle } from './vars.ts'
 
 export class CMap extends EventEmitter {
   public readonly map: Map
@@ -24,18 +25,21 @@ export class CMap extends EventEmitter {
   constructor(options: ICMapOptions) {
     super()
 
-    // if (options.type === CMap.LAND) {
-    //   this.options = {
-    //     ...options,
-    //     style: landStyle,
-    //   }
-    // }
     this.options = options
+
+    if (isEmpty(this.options.style)) {
+      if (options.type === CMap.LAND) {
+        this.options.style = landStyle
+      } else if (options.type === CMap.SATELLITE) {
+        this.options.style = satelliteStyle
+      }
+    }
+
     Map.prototype._authenticate = (): void => {
       /* empty */
     }
 
-    this.map = new Map({ ...this.options, style: landStyle })
+    this.map = new Map(this.options)
     this.icon = new IconManager(this.map)
 
     this.originalRemove = this.map.remove.bind(this.map)
@@ -54,32 +58,38 @@ export class CMap extends EventEmitter {
 
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (!isCancelled) {
-        console.log('originalRemove')
         this.originalRemove()
       }
     }
 
     this.map.once('load', () => {
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      SHIP_ICON.forEach(async (icon: SvgIcon) => {
-        await Promise.all([
-          this.icon.addSvg({
+      SHIP_ICON.forEach((icon: SvgIcon) => {
+        this.icon.loadSvg([
+          {
             name: icon.name.replace('$color', UPDATE_STATUS.ONLINE),
             svg: icon.svg.replace('$color', SHIP_COLOR.ONLINE),
-          }),
-          this.icon.addSvg({
+          },
+          {
             name: icon.name.replace('$color', UPDATE_STATUS.DELAY),
             svg: icon.svg.replace('$color', SHIP_COLOR.DELAY),
-          }),
-          this.icon.addSvg({
+          },
+          {
             name: icon.name.replace('$color', UPDATE_STATUS.OFFLINE),
             svg: icon.svg.replace('$color', SHIP_COLOR.OFFLINE),
-          }),
+          },
         ])
       })
 
       this.emit('loaded', this.map)
     })
+  }
+
+  change(type: MapType): void {
+    if (type === CMap.LAND) {
+      this.getMap().setStyle(landStyle)
+    } else if (type === CMap.SATELLITE) {
+      this.getMap().setStyle(satelliteStyle)
+    }
   }
 
   getMap(): Map {

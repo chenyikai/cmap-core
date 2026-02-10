@@ -1,4 +1,4 @@
-import { lineString, lineToPolygon, point, transformRotate } from '@turf/turf'
+import { lineString, lineToPolygon, point, rhumbDestination, transformRotate } from '@turf/turf'
 import dayjs from 'dayjs'
 import type * as GeoJSON from 'geojson'
 import type { LngLat, Map } from 'mapbox-gl'
@@ -9,7 +9,7 @@ import { BaseShip } from '@/modules/Ship/BaseShip.ts'
 import { LAYER_LIST, NAME, SHIP_SOURCE_NAME, UPDATE_STATUS } from '@/modules/Ship/vars.ts'
 import type { IAisShipOptions } from '@/types/Ship/AisShip.ts'
 import type { Orientation, Shape } from '@/types/Ship/BaseShip'
-import { distanceToPx } from '@/utils/util.ts'
+import { distanceToPx, pixelsToMeters } from '@/utils/util.ts'
 
 export class AisShip extends BaseShip<IAisShipOptions> {
   override readonly SOURCE: string = SHIP_SOURCE_NAME
@@ -79,7 +79,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
     if (this.options.icon) {
       icon = this.options.icon
     } else {
-      icon = `${AisShip.NAME}-${this.updateStatus}-${this.orientation}`
+      icon = `${AisShip.NAME}-${this.updateStatus}`
 
       if (state?.hover || state?.focus) {
         icon = `${icon}-active`
@@ -95,6 +95,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
     const y = orientation.y + this.offset().y
     return this.context.map.unproject(new Point(x, y))
   }
+
   override get direction(): number {
     if (this.options.hdg && this.options.hdg >= 0 && this.options.hdg < 360) {
       if (
@@ -119,21 +120,26 @@ export class AisShip extends BaseShip<IAisShipOptions> {
   }
 
   override get orientation(): Orientation {
-    let _rateOfTurn = 0
-    if (this.options.rot > 180) {
-      _rateOfTurn = this.options.rot - 180
-    }
-    if (this.options.rot < -180) {
-      _rateOfTurn = this.options.rot + 180
+    const SPEED_THRESHOLD = 0.5
+    const ROT_NOT_AVAILABLE = -128
+
+    if (this.options.speed < SPEED_THRESHOLD) {
+      return 'static'
     }
 
-    if (this.options.speed === 0 || !this.options.speed) return 'static'
-    if (_rateOfTurn === -128.0) return 'static' //-128为特殊值，无转向
-    if (_rateOfTurn < 0 && _rateOfTurn > -180) return 'left' //0到-180 左转，-127为每30秒5度以上右转
-    if (_rateOfTurn > 0 && _rateOfTurn <= 180) return 'right' //0到 180 右转，127为每30秒5度以上左转
-    if (_rateOfTurn === 0) return 'straight'
+    if (this.options.rot === ROT_NOT_AVAILABLE || this.options.rot === 0) {
+      return 'straight'
+    }
 
-    return 'static'
+    if (this.options.rot > 0) {
+      return 'right'
+    }
+
+    if (this.options.rot < 0) {
+      return 'left'
+    }
+
+    return 'straight'
   }
 
   override getShape(): Shape | null {
@@ -145,7 +151,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
       return {
         leftDirection: new Point(x - ex, y - ey * 2),
         rightDirection: new Point(x + ex, y - ey * 2),
-        turn: new Point(x, y - ey * 2),
+        turn: new Point(x, y - ey - this.options.speed * 3),
         head: new Point(x, y - ey),
         rightBow: new Point(x + ex, y - ey * 0.5),
         rightQuarter: new Point(x + ex, y + ey * 0.85),
@@ -158,12 +164,17 @@ export class AisShip extends BaseShip<IAisShipOptions> {
       return null
     }
   }
+
   override getFeature():
     | GeoJSON.Feature<GeoJSON.Polygon, IAisShipOptions>
     | GeoJSON.Feature<GeoJSON.Point, IAisShipOptions> {
     const zoom = this.options.realZoom ?? 16
 
-    return this.context.map.getZoom() >= zoom ? this.real() : this.icon()
+    if (this.context.map.getZoom() >= zoom) {
+      return this.real()
+    } else {
+      return this.icon()
+    }
   }
   override remove(): void {
     this.removeTooltip()
@@ -179,7 +190,14 @@ export class AisShip extends BaseShip<IAisShipOptions> {
       id: this.id,
       properties: {},
     }
-    this.context.register.setGeoJSONData(this.SOURCE, emptyFeature)
+
+    const emptyDirLineFeature: GeoJSON.Feature<null> = {
+      type: 'Feature',
+      geometry: null,
+      id: String(this.id) + '-direction-line',
+      properties: {},
+    }
+    this.context.register.setGeoJSONData(this.SOURCE, [emptyFeature, emptyDirLineFeature])
 
     this.context.map.triggerRepaint()
   }
@@ -296,6 +314,60 @@ export class AisShip extends BaseShip<IAisShipOptions> {
     }
   }
 
+  override headingLine(): GeoJSON.Feature<GeoJSON.LineString | null, { meta: 'directionLine' }> {
+    const head = rhumbDestination(
+      this.position().toArray(),
+      pixelsToMeters(this.context.map, this.position().toArray()[1], this.options.speed * 5),
+      this.direction,
+      {
+        units: 'meters',
+      },
+    )
+
+    const path: GeoJSON.Position[] = []
+    if (this.orientation === 'left') {
+      const turn = rhumbDestination(
+        head,
+        pixelsToMeters(this.context.map, this.position().toArray()[1], 10),
+        this.direction - 90,
+        {
+          units: 'meters',
+        },
+      )
+      path.push(this.position().toArray(), head.geometry.coordinates, turn.geometry.coordinates)
+    } else if (this.orientation === 'right') {
+      const turn = rhumbDestination(
+        head,
+        pixelsToMeters(this.context.map, this.position().toArray()[1], 10),
+        this.direction + 90,
+        {
+          units: 'meters',
+        },
+      )
+      path.push(this.position().toArray(), head.geometry.coordinates, turn.geometry.coordinates)
+    } else if (this.orientation === 'straight') {
+      path.push(this.position().toArray(), head.geometry.coordinates)
+    }
+
+    if (path.length === 0)
+      return {
+        type: 'Feature',
+        geometry: null,
+        id: String(this.id) + '-direction-line',
+        properties: {
+          meta: 'directionLine',
+        },
+      }
+
+    return lineString(
+      path,
+      {
+        meta: 'directionLine',
+      },
+      { id: String(this.id) + '-direction-line' },
+    )
+  }
+
   override render(): void {
     const bounds = this.context.map.getBounds()
     if (!bounds?.contains(this.position())) {
@@ -305,7 +377,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
 
     this.tooltip?.render()
 
-    this.context.register.setGeoJSONData(this.SOURCE, this.getFeature())
+    this.context.register.setGeoJSONData(this.SOURCE, [this.headingLine(), this.getFeature()])
 
     if (this.isFocus) {
       const icon = this.context.iconManage.getImage(this.getIconName())
@@ -314,6 +386,8 @@ export class AisShip extends BaseShip<IAisShipOptions> {
         armLength: 10,
         padding: 10,
       })
+    } else {
+      this.context.focus.remove(String(this.id))
     }
   }
   override label(): HTMLElement {

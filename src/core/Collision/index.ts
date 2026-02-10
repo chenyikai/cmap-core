@@ -9,7 +9,7 @@ import CollisionItem from './CollisionItem.ts'
 class Collision {
   _tree = new RBush<CollisionItem>()
 
-  _map: Map | undefined
+  _map: Map
 
   _collisionList: CollisionItem[] = []
 
@@ -41,13 +41,14 @@ class Collision {
   }
 
   collides(): CollisionItem[] {
-    // const dpr: number = window.devicePixelRatio || 1
-    // const canvas_bbox: BBox = {
+    // const { width, height } = this._map.getCanvas()
+    // const viewportBBox: BBox = {
     //   minX: 0,
     //   minY: 0,
-    //   maxX: this._map._canvas.width / dpr,
-    //   maxY: this._map._canvas.height / dpr,
+    //   maxX: width,
+    //   maxY: height,
     // }
+
     for (const item of this._collisionList) {
       for (const dir of item.dirs) {
         item.setDir(dir)

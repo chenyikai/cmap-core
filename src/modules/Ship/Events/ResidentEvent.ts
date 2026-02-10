@@ -118,10 +118,9 @@ export class ResidentEvent extends EventState {
       const id = e.features[0].id
       if (id) {
         const ship = this.findShip(id)
-        ship?.focus()
 
-        console.log(ship, 'ship')
         this.context.events.emit('click', ship)
+        this.context.map.fire('ship-click', ship)
       }
     }
   }
@@ -133,6 +132,7 @@ export class ResidentEvent extends EventState {
     ship?.setState({ hover: true })
     ship?.render()
     this.context.events.emit('hover', ship)
+    this.context.map.fire('ship-hover', ship)
   }
 
   unhover(): void {
@@ -142,6 +142,7 @@ export class ResidentEvent extends EventState {
     ship?.setState({ hover: false })
     ship?.render()
     this.context.events.emit('unhover', ship)
+    this.context.map.fire('ship-unhover', ship)
   }
 
   findShip(id: IAisShipOptions['id']): AisShip | undefined {

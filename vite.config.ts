@@ -31,6 +31,9 @@ export default defineConfig({
     minify: 'esbuild', // 压缩混淆
   },
   server: {
+    host: '0.0.0.0',
+    port: 5173,
+    allowedHosts: ['local.dev.com'],
     proxy: {
       '/ship': {
         target: 'http://web.aochensoft.com/hxld-back',

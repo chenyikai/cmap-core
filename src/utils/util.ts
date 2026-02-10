@@ -98,3 +98,21 @@ export async function convertSvgToImageObjects(
     imageData: imageData, // ImageData
   }
 }
+
+/**
+ * 将屏幕像素转换为地理距离（米）
+ * @param map Mapbox 地图实例
+ * @param lat 当前纬度
+ * @param pixels 想要显示的像素长度
+ */
+export function pixelsToMeters(map: Map, lat: number, pixels: number): number {
+  const EARTH_CIRCUMFERENCE = 40075017 // 地球赤道周长 (米)
+  const zoom = map.getZoom()
+  const latRad = (lat * Math.PI) / 180
+
+  // 计算当前纬度和缩放下的分辨率 (米/像素)
+  // Mapbox 使用 512px 的瓦片大小，所以是 2^(zoom + 9)
+  const metersPerPx = (EARTH_CIRCUMFERENCE * Math.cos(latRad)) / Math.pow(2, zoom + 9)
+
+  return pixels * metersPerPx
+}
