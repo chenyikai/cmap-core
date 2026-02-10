@@ -74,7 +74,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
 
   public override getIconName(): string {
     const state = this.getState()
-    let icon = null
+    let icon
 
     if (this.options.icon) {
       icon = this.options.icon
@@ -97,26 +97,46 @@ export class AisShip extends BaseShip<IAisShipOptions> {
   }
 
   override get direction(): number {
-    if (this.options.hdg && this.options.hdg >= 0 && this.options.hdg < 360) {
-      if (
-        this.options.statusId === 0 ||
-        this.options.statusId === 7 ||
-        this.options.statusId === 8
-      ) {
-        if (this.options.speed <= 0.5) {
-          return this.options.hdg || this.options.cog || 0
-        } else {
-          if (Math.abs(this.options.hdg - this.options.cog) > 30) {
-            return this.options.cog
-          }
-          return this.options.cog || this.options.hdg || 0
-        }
-      } else {
-        return this.options.hdg || this.options.cog || 0
-      }
-    } else {
-      return this.options.cog || 0
+    // AIS 标准：511 代表无效值
+    const HDG_INVALID = 511
+
+    // 1. 优先使用 艏向 (HDG)
+    // 只有当 hdg 不等于 511，且在 0-360 范围内时才使用
+    if (this.options.hdg !== HDG_INVALID && this.options.hdg > 0 && this.options.hdg < 360) {
+      return this.options.hdg
     }
+
+    // 2. 降级使用 航迹向 (COG)
+    // COG 有时会是 360，也代表正北，或者有些设备无效时也是 360+
+    if (
+      this.options.cog > 0 &&
+      this.options.cog < 360 // 360 在某些协议里也可能代表未知，通常取 [0, 360)
+    ) {
+      return this.options.cog
+    }
+
+    // 3. 实在没有数据，默认正北
+    return 0
+    // if (this.options.hdg && this.options.hdg >= 0 && this.options.hdg < 360) {
+    //   if (
+    //     this.options.statusId === 0 ||
+    //     this.options.statusId === 7 ||
+    //     this.options.statusId === 8
+    //   ) {
+    //     if (this.options.speed <= 0.5) {
+    //       return this.options.hdg || this.options.cog || 0
+    //     } else {
+    //       if (Math.abs(this.options.hdg - this.options.cog) > 30) {
+    //         return this.options.cog
+    //       }
+    //       return this.options.cog || this.options.hdg || 0
+    //     }
+    //   } else {
+    //     return this.options.hdg || this.options.cog || 0
+    //   }
+    // } else {
+    //   return this.options.cog || 0
+    // }
   }
 
   override get orientation(): Orientation {
