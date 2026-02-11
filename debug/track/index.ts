@@ -3,6 +3,7 @@ import { set } from "lodash-es";
 import { Track } from "../../src/modules/Track";
 import { LngLat, Map } from "mapbox-gl";
 import { TrackItem } from "../../src/types/Track";
+import { Tooltip } from "../../src";
 
 function kvToJson(k: any, v: any) {
   const list: any = [];
@@ -27,6 +28,8 @@ export function registerTack(map: Map) {
   const list = bdTrackData.data
   const id = `${list[0].terminal}-312312-3131312`
   const track = new Track(map, { startLabel: '起点', endLabel: '终点' })
+
+  Tooltip.DEBUG = false
 
   map.on('track-hover', e => {
     console.log(e, 'hover');

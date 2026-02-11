@@ -4,8 +4,21 @@ import { set } from "lodash-es";
 import { IAisShipOptions } from "../../src/types/Ship/AisShip";
 import Ship from "../../src/modules/Ship";
 import { CMap } from "../../src/modules/CMap"
-import { staticShipData } from "./mock";
+import { staticShipData, gjShipData } from "./mock";
 import { AisShip, Tooltip } from "../../src";
+import  IconManager from "../../src/core/IconManager";
+
+import wjhgyc from "./icon/wjhgyc.png";
+import yjhgyc from "./icon/yjhgyc.png";
+import wjhnmgyc from "./icon/wjhnmgyc.png";
+import yjhnmgyc from "./icon/yjhnmgyc.png";
+import yjhnmsyc from "./icon/yjhnmsyc.png";
+import yjhsyc from "./icon/yjhsyc.png";
+import zyzgyc from "./icon/zyzgyc.png";
+import zyznmgyc from "./icon/zyznmgyc.png";
+import zyznmsyc from "./icon/zyznmsyc.png";
+import zyzsyc from "./icon/zyzsyc.png";
+import qwc from "./icon/qwc.png";
 
 let ship: Ship | null = null
 
@@ -15,14 +28,64 @@ export function initShip(cMap: CMap) {
       plugins: [AisShip]
     });
 
+    const icon = new IconManager(map)
+    icon.load([
+      {
+        name: "wjhgyc",
+        url: wjhgyc,
+      },
+      {
+        name: "yjhgyc",
+        url: yjhgyc,
+      },
+      {
+        name: "zyzgyc",
+        url: zyzgyc,
+      },
+      {
+        name: "wjhnmgyc",
+        url: wjhnmgyc,
+      },
+      {
+        name: "yjhnmgyc",
+        url: yjhnmgyc,
+      },
+      {
+        name: "zyznmgyc",
+        url: zyznmgyc,
+      },
+      {
+        name: "yjhsyc",
+        url: yjhsyc,
+      },
+      {
+        name: "zyzsyc",
+        url: zyzsyc,
+      },
+      {
+        name: "yjhnmsyc",
+        url: yjhnmsyc,
+      },
+      {
+        name: "zyznmsyc",
+        url: zyznmsyc,
+      },
+      {
+        name: "qwc",
+        url: qwc,
+      },
+    ])
+
     setTimeout(() => {
       // ship!.select('413363020')
     }, 2000)
 
-    getShipData(map, false)
+    // getShipData(map, false)
+    getGjShipData(map)
 
     map.on('moveend', () => {
-      getShipData(map, false);
+      // getShipData(map, false);
+      getGjShipData(map);
     });
   })
 }
@@ -59,6 +122,44 @@ function kvToJson(k: any, v: any) {
   return list;
 }
 
+function getGjShipData(map: Map) {
+  // if (map.getZoom() < 12 && ship) {
+  //   // ship.removeAll()
+  //   return
+  // }
+
+  const list: Array<IAisShipOptions> = gjShipData.map((item: any) => {
+    const option: IAisShipOptions = {
+      type: "Ais",
+      direction: item.hdg || 0,
+      height: item.length,
+      id: item.mmsi,
+      icon: item.shipIcon,
+      name: item.shipName,
+      position: new LngLat(Number(item.lon), Number(item.lat)),
+      speed: item.sog > 50 ? 0 : item.sog,
+      hdg: item.hdg || 0,
+      cog: item.cog,
+      rot: item.rot,
+      statusId: item.statusId,
+      status: item.status,
+      time: item.updateTime,
+      width: item.width,
+      top: item.toBow,
+      bottom: item.toStern,
+      right: item.toStarboard,
+      left: item.toPort,
+      tooltip: true,
+    };
+
+    return option
+  });
+
+  if (ship) {
+    ship.load(list)
+  }
+}
+
 function getShipData(map: Map, isStatic: boolean = false) {
   if (isStatic) {
     renderShip(map, staticShipData)
@@ -68,7 +169,7 @@ function getShipData(map: Map, isStatic: boolean = false) {
   axios
     .post('/ship/rest/ehhship/getShipDataList', getBounds(map), {
       headers: {
-        Authorization: 'bearer 11c2b040-2857-4a0a-be32-5a4967be26e7',
+        Authorization: 'bearer 420e1725-cef0-4b33-93e7-608e83724d14',
       },
     })
     .then(({ data }) => {
@@ -94,7 +195,7 @@ function renderShip(_map: Map, data: any) {
      shipData  = data
   }
 
-  // Tooltip.DEBUG = true
+  Tooltip.DEBUG = false
 
   const list: Array<IAisShipOptions> = shipData.map((item: any) => {
     const [lat, lon] = item.location.split(',');
@@ -106,7 +207,7 @@ function renderShip(_map: Map, data: any) {
       id: item.mmsi,
       name: item.cnname || item.enname || item.mmsi,
       position: new LngLat(Number(lon), Number(lat)),
-      speed: item.sog,
+      speed: item.sog > 20 ? 0 : item.sog,
       hdg: item.hdg || 0,
       cog: item.cog,
       rot: item.rot,
@@ -119,7 +220,6 @@ function renderShip(_map: Map, data: any) {
       right: item.toStarboard,
       left: item.toPort,
       tooltip: true,
-      immediate: true
     };
 
     return option

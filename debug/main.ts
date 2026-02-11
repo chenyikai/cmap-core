@@ -11,19 +11,31 @@ const cMap = new CMap({
   zoom: 14,
 });
 
+setTimeout(() => {
+  // cMap.change(CMap.LAND)
+}, 2000)
+
 cMap.on('loaded', (map) => {
 
   window.map = map
 
   // console.log(map.showCollisionBoxes = true);
+  // map.showCollisionBoxes = true
   const flag = true
 
   if (flag) {
     initShip(cMap)
   }
 
+  const trackFlag = false
 
-  registerTack(map)
+  if (trackFlag) {
+    registerTack(map)
+  }
+
+  map.on('ship-hover', e => {
+    console.log(e, 'hover');
+  })
 
   // const tooltip = new Tooltip(map)
 
