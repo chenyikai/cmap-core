@@ -37,7 +37,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
   public override onAdd(): void {
     this.context.register.addSource(SHIP_SOURCE_NAME, {
       type: 'geojson',
-      dynamic: true,
+      // dynamic: true,
       data: {
         type: 'FeatureCollection',
         features: [],
@@ -337,7 +337,8 @@ export class AisShip extends BaseShip<IAisShipOptions> {
   override headingLine(): GeoJSON.Feature<GeoJSON.LineString | null, { meta: 'directionLine' }> {
     const head = rhumbDestination(
       this.position().toArray(),
-      pixelsToMeters(this.context.map, this.position().toArray()[1], this.options.speed * 5),
+      // pixelsToMeters(this.context.map, this.position().toArray()[1], this.options.speed * 92.52),
+      this.options.speed * 92.52,
       this.direction,
       {
         units: 'meters',
