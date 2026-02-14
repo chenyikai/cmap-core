@@ -155,12 +155,14 @@ export class PointResidentEvent extends PointBaseEvent {
   private onMouseEnter = (e: MapMouseEvent): void => {
     this.context.map.getCanvasContainer().style.cursor = 'pointer'
     const message = this.message<Point>(e, this.point)
+    this.point.setState({ hover: true })
     this.point.emit('hover', message)
   }
 
   private onMouseLeave = (e: MapMouseEvent): void => {
     this.context.map.getCanvasContainer().style.cursor = ''
     const message = this.message<Point>(e, this.point)
+    this.point.setState({ hover: false })
     this.point.emit('unhover', message)
   }
 
@@ -338,11 +340,11 @@ export class Point extends Poi<IPointOptions, GeoJSON.Point> {
 
     nameBox = document.createElement('div')
     nameBox.id = id
-    nameBox.classList.add('ship-name-box')
+    nameBox.classList.add('plot-name-box')
 
     const plotName = document.createElement('div')
     plotName.innerText = this.options.name
-    plotName.classList.add('ship-name')
+    plotName.classList.add('text')
 
     nameBox.appendChild(plotName)
 

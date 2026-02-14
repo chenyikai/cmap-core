@@ -15,18 +15,28 @@ export const DEFAULT_CIRCLE_STROKE_WIDTH = 2
 
 export const DEFAULT_CIRCLE_STROKE_COLOR = '#f00'
 
+const circleRadius = ['coalesce', ['get', 'circle-radius'], DEFAULT_CIRCLE_RADIUS]
+
+const circleStrokeWidth = ['coalesce', ['get', 'circle-stroke-width'], DEFAULT_CIRCLE_STROKE_WIDTH]
+
 export const SHIP_ICON_DIRECTION_LAYER: LayerSpecification = {
   id: POINT_ICON_LAYER_NAME,
   type: 'circle',
   filter: ['all', ['==', '$type', 'Point'], ['==', 'meta', 'circle']],
   source: PLOT_SOURCE_NAME,
   paint: {
-    'circle-radius': ['coalesce', ['get', 'circle-radius'], DEFAULT_CIRCLE_RADIUS],
+    'circle-radius': [
+      'case',
+      ['boolean', ['feature-state', 'hover'], false],
+      ['+', circleRadius, ['%', circleRadius, 0.6]],
+      circleRadius,
+    ],
     'circle-color': ['coalesce', ['get', 'circle-color'], DEFAULT_CIRCLE_COLOR],
     'circle-stroke-width': [
-      'coalesce',
-      ['get', 'circle-stroke-width'],
-      DEFAULT_CIRCLE_STROKE_WIDTH,
+      'case',
+      ['boolean', ['feature-state', 'hover'], false],
+      ['+', circleStrokeWidth, ['%', circleStrokeWidth, 0.6]],
+      circleStrokeWidth,
     ],
     'circle-stroke-color': [
       'coalesce',
