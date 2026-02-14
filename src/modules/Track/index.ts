@@ -47,13 +47,13 @@ export class TrackEvent extends EventState {
     this.track = track
   }
 
-  off(): void {
+  public override disabled(): void {
     this.context.map.off('mousemove', TRACK_ICON_LAYER_NAME, this._move)
     this.context.map.off('mouseleave', TRACK_ICON_LAYER_NAME, this._leave)
     this.context.map.off('moveend', this._moveEnd)
   }
 
-  on(): void {
+  public override able(): void {
     this.context.map.on('mousemove', TRACK_ICON_LAYER_NAME, this._move)
     this.context.map.on('mouseleave', TRACK_ICON_LAYER_NAME, this._leave)
     this.context.map.on('moveend', this._moveEnd)
@@ -65,11 +65,11 @@ export class TrackEvent extends EventState {
     this._leave = this.onLeave.bind(this)
     this._moveEnd = this.onMoveEnd.bind(this)
 
-    this.on()
+    this.able()
   }
 
   onRemove(): void {
-    this.off()
+    this.disabled()
   }
 
   onMoveEnd(): void {
@@ -176,7 +176,7 @@ export class Track extends Module {
   }
 
   override onRemove(): void {
-    this.event.off()
+    this.event.disabled()
   }
 
   load(items: TrackItem[]): void {
@@ -192,7 +192,7 @@ export class Track extends Module {
 
   remove(): void {
     this.removeAllTooltip()
-    this.event.off()
+    this.event.disabled()
     this.context.register.setGeoJSONData(TRACK_SOURCE_NAME, this.getFeature())
   }
 

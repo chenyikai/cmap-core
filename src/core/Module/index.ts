@@ -1,9 +1,10 @@
+import EventEmitter from 'eventemitter3'
 import type { Map } from 'mapbox-gl'
 
 import type { Context } from './Context.ts'
 import { getOrCreateContext } from './Context.ts'
 
-export abstract class Module {
+export abstract class Module extends EventEmitter {
   protected context: Context
 
   /**
@@ -11,6 +12,8 @@ export abstract class Module {
    * @param map - 地图实例对象
    */
   protected constructor(map: Map) {
+    super()
+
     this.context = getOrCreateContext(map)
 
     this.onAdd()
@@ -18,11 +21,6 @@ export abstract class Module {
     this.context.map.once('beforeRemove', () => {
       this.onRemove()
     })
-  }
-
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  public emit() {
-    this.context.events.emit('')
   }
 
   public mount(): void {

@@ -1,4 +1,4 @@
-import type { Map } from 'mapbox-gl'
+import type { Map, MapMouseEvent } from 'mapbox-gl'
 
 import { Module } from '@/core/Module'
 import { EventStatus } from '@/types/EventState'
@@ -19,16 +19,23 @@ export abstract class EventState extends Module {
   public switch(): EventStatus {
     if (this.status === EventState.ON) {
       this.status = EventState.OFF
-      this.off()
+      this.disabled()
     } else if (this.status === EventState.OFF) {
       this.status = EventState.ON
-      this.on()
+      this.able()
     }
 
     return this.status
   }
 
-  public abstract on(): void
+  public message<T>(e: MapMouseEvent, instance: T): { originEvent: MapMouseEvent; instance: T } {
+    return {
+      originEvent: e,
+      instance,
+    }
+  }
 
-  public abstract off(): void
+  public abstract able(): void
+
+  public abstract disabled(): void
 }

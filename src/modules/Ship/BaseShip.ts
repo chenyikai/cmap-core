@@ -36,6 +36,15 @@ export abstract class BaseShip<T extends IBaseShipOptions> extends Module {
     }
   }
 
+  get isHover(): boolean {
+    const state = this.getState()
+    if (state) {
+      return !!state.hover
+    } else {
+      return false
+    }
+  }
+
   public abstract override onAdd(): void
 
   public abstract override onRemove(): void
@@ -76,7 +85,10 @@ export abstract class BaseShip<T extends IBaseShipOptions> extends Module {
 
   abstract real(): GeoJSON.Feature<GeoJSON.Polygon, T> | GeoJSON.Feature<GeoJSON.Point, T>
 
-  abstract headingLine(): GeoJSON.Feature<GeoJSON.LineString | null, { meta: 'directionLine' }>
+  abstract headingLine(): GeoJSON.Feature<
+    GeoJSON.LineString | null,
+    { meta: 'directionLine'; 'line-color': string }
+  >
 
   abstract render(): void
 

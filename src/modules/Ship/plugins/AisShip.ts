@@ -28,6 +28,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
           offsetY: 25,
           element: this.label(),
           anchor: 'bottom-right',
+          line: true,
           visible: false,
         }),
       )
@@ -334,7 +335,10 @@ export class AisShip extends BaseShip<IAisShipOptions> {
     }
   }
 
-  override headingLine(): GeoJSON.Feature<GeoJSON.LineString | null, { meta: 'directionLine' }> {
+  override headingLine(): GeoJSON.Feature<
+    GeoJSON.LineString | null,
+    { meta: 'directionLine'; 'line-color': string }
+  > {
     const head = rhumbDestination(
       this.position().toArray(),
       // pixelsToMeters(this.context.map, this.position().toArray()[1], this.options.speed * 92.52),
@@ -377,6 +381,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
         id: String(this.id) + '-direction-line',
         properties: {
           meta: 'directionLine',
+          'line-color': '#f00',
         },
       }
 
@@ -384,6 +389,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
       path,
       {
         meta: 'directionLine',
+        'line-color': this.isFocus || this.isHover ? '#f00' : '#000',
       },
       { id: String(this.id) + '-direction-line' },
     )

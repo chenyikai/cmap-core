@@ -10,7 +10,7 @@ import type { AllAnchor, ITooltipOptions, SimpleAnchor } from '@/types/Toolip'
 import { LAYERS, TOOLTIP_SOURCE_NAME } from './vars.ts'
 
 export class Tooltip extends Module {
-  static DEBUG = false
+  static DEBUG = true
 
   options: ITooltipOptions
 
@@ -91,6 +91,11 @@ export class Tooltip extends Module {
     this.context.map.on('zoomend', this.zoom)
   }
 
+  update(options: ITooltipOptions): void {
+    this.options = options
+    this.render()
+  }
+
   setAnchor(anchor: ITooltipOptions['anchor']): void {
     if (this.mark) {
       this.mark.remove()
@@ -113,11 +118,11 @@ export class Tooltip extends Module {
 
   getAllBbox(): AllAnchor {
     return {
-      // center: this.getBbox('center'),
-      // top: this.getBbox('top'),
-      // bottom: this.getBbox('bottom'),
-      // left: this.getBbox('left'),
-      // right: this.getBbox('right'),
+      center: this.getBbox('center'),
+      top: this.getBbox('top'),
+      bottom: this.getBbox('bottom'),
+      left: this.getBbox('left'),
+      right: this.getBbox('right'),
       'top-left': this.getBbox('top-left'),
       'top-right': this.getBbox('top-right'),
       'bottom-left': this.getBbox('bottom-left'),
@@ -246,23 +251,22 @@ export class Tooltip extends Module {
 
   _getOffsetByAnchor(): Point {
     const offset = new Point(0, 0)
-    // if (this.options.anchor === 'center') {
-    //   offset.x = 0
-    //   offset.y = 0
-    // } else if (this.options.anchor === 'top') {
-    //   offset.x = 0
-    //   offset.y = this.options.offsetY ?? 0
-    // } else if (this.options.anchor === 'bottom') {
-    //   offset.x = 0
-    //   offset.y = -(this.options.offsetY ?? 0)
-    // } else if (this.options.anchor === 'left') {
-    //   offset.x = this.options.offsetX ?? 0
-    //   offset.y = 0
-    // } else if (this.options.anchor === 'right') {
-    //   offset.x = -(this.options.offsetX ?? 0)
-    //   offset.y = 0
-    // } else
-    if (this.options.anchor === 'top-left') {
+    if (this.options.anchor === 'center') {
+      offset.x = 0
+      offset.y = 0
+    } else if (this.options.anchor === 'top') {
+      offset.x = 0
+      offset.y = this.options.offsetY ?? 0
+    } else if (this.options.anchor === 'bottom') {
+      offset.x = 0
+      offset.y = -(this.options.offsetY ?? 0)
+    } else if (this.options.anchor === 'left') {
+      offset.x = this.options.offsetX ?? 0
+      offset.y = 0
+    } else if (this.options.anchor === 'right') {
+      offset.x = -(this.options.offsetX ?? 0)
+      offset.y = 0
+    } else if (this.options.anchor === 'top-left') {
       offset.x = this.options.offsetX ?? 0
       offset.y = this.options.offsetY ?? 0
     } else if (this.options.anchor === 'top-right') {
@@ -290,6 +294,8 @@ export class Tooltip extends Module {
   }
 
   connectLine(): void {
+    if (!this.options.line) return
+
     const id = `${String(this.options.id)}-tooltip-connect-line`
 
     const endPoint = this.connectPoint()
@@ -353,6 +359,7 @@ export class Tooltip extends Module {
 
       this.mark?.addTo(this.context.map)
 
+      console.log(Tooltip.DEBUG)
       if (Tooltip.DEBUG) {
         this.debug()
       }

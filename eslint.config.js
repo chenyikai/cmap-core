@@ -43,6 +43,7 @@ export default tseslint.config(
         '@typescript-eslint/consistent-type-exports': 'error',
         '@typescript-eslint/no-floating-promises': 'off', // 必须处理异步
         '@typescript-eslint/no-confusing-void-expression': 'error',
+        '@typescript-eslint/no-useless-constructor': 'off',
 
         // --- 🧹 自动清理与排序 ---
         'simple-import-sort/imports': 'error',

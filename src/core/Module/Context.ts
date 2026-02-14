@@ -1,6 +1,7 @@
 import EventEmitter from 'eventemitter3'
 import type { Map } from 'mapbox-gl'
 
+import { EventManager } from '@/core/EventManager'
 import Focus from '@/core/Focus'
 import IconManager from '@/core/IconManager'
 import ResourceRegister from '@/core/ResourceRegister'
@@ -12,6 +13,7 @@ export class Context {
   public readonly register: ResourceRegister
   public readonly iconManage: IconManager
   public readonly focus: Focus
+  public readonly eventManager: EventManager
 
   // 4. 一个通用的状态存储 (替代原来的 Store._listeners 等)
   // public readonly state: Map<string, any> = new Map();
@@ -22,6 +24,7 @@ export class Context {
     this.register = new ResourceRegister(this.map)
     this.iconManage = new IconManager(this.map)
     this.focus = new Focus(this.map)
+    this.eventManager = new EventManager(this.map)
 
     // this.map.on('load', () => {
     //   this.focus.onAdd()

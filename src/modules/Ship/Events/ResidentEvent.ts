@@ -29,7 +29,7 @@ export class ResidentEvent extends EventState {
     }
   }
 
-  override on(): void {
+  override able(): void {
     this.context.map.on('click', SHIP_ICON_LAYER_NAME, this._click)
     this.context.map.on('mousemove', SHIP_ICON_LAYER_NAME, this._move)
     this.context.map.on('mouseleave', SHIP_ICON_LAYER_NAME, this._leave)
@@ -41,7 +41,7 @@ export class ResidentEvent extends EventState {
     this.context.map.on('zoomend', this._zoomEnd)
   }
 
-  override off(): void {
+  override disabled(): void {
     this.context.map.off('click', SHIP_ICON_LAYER_NAME, this._click)
     this.context.map.off('mousemove', SHIP_ICON_LAYER_NAME, this._move)
     this.context.map.off('mouseleave', SHIP_ICON_LAYER_NAME, this._leave)
@@ -59,11 +59,11 @@ export class ResidentEvent extends EventState {
     this._leave = this.onLeave.bind(this)
     this._zoomEnd = this.onZoomEnd.bind(this)
 
-    this.on()
+    this.able()
   }
 
   onRemove(): void {
-    this.off()
+    this.disabled()
   }
 
   add(ship: AisShip): void {

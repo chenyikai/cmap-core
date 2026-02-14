@@ -2,7 +2,9 @@ import { CMap } from "../src/modules/CMap";
 import '../src/styles/index.scss'
 import { initShip } from "./ship";
 import { registerTack } from "./track";
-// import { Tooltip } from '@/core/Tooltip'
+import { Point } from '@/modules/Plot/plugins/Point'
+import { LngLat } from 'mapbox-gl'
+import { Tooltip } from '@/core/Tooltip'
 
 const cMap = new CMap({
   container: 'map',
@@ -19,9 +21,8 @@ cMap.on('loaded', (map) => {
 
   window.map = map
 
-  // console.log(map.showCollisionBoxes = true);
   // map.showCollisionBoxes = true
-  const flag = true
+  const flag = false
 
   if (flag) {
     initShip(cMap)
@@ -33,25 +34,46 @@ cMap.on('loaded', (map) => {
     registerTack(map)
   }
 
-  map.on('ship-hover', e => {
-    console.log(e, 'hover');
+  const point = new Point(map, {
+    id: '3',
+    name: '测试' + Date.now(),
+    tooltip: true,
   })
 
-  // const tooltip = new Tooltip(map)
+  point.start()
 
-  // tooltip.add([
-  //   {
-  //     id: 'ship-1',
-  //     position: [122.1, 30.0],
-  //     anchor: 'top-right',
-  //     priority: 10,
-  //     content: `重要船舶`
-  //   },
-  //   {
-  //     id: 'ship-2',
-  //     position: [122.102, 30.0], // 位置很近
-  //     priority: 1, // 优先级低，会被自动隐藏
-  //     content: '小船'
-  //   }
-  // ])
+  point.once('Point.create', (data) => {
+    console.log(data, 'dakdhajhdja');
+    point.edit()
+  })
+
+  // Tooltip.DEBUG = true
+  //
+  // const point = new Point(map, {
+  //   id: '1',
+  //   name: '浙江宝驿4s店',
+  //   tooltip: true,
+  //   position: new LngLat(122.09160659512042, 30.004767949301183)
+  // })
+  //
+  // point.render()
+  //
+  // point.edit()
+  //
+  // point.on('hover', (data) => {
+  //   console.log(data, 'point');
+  // })
+  //
+  // const point1= new Point(map, {
+  //   id: '12',
+  //   name: '23',
+  //   tooltip: true,
+  //   position: new LngLat(122.09560659512042, 30.004767949301183)
+  // })
+  //
+  // point1.on('hover', (data) => {
+  //   console.log(data, 'point1');
+  // })
+  //
+  // point1.render()
 })
