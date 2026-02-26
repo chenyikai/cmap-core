@@ -5,7 +5,7 @@ import { PlotType } from '@/types/Plot/Poi.ts'
 
 export const NAME = PlotType.POINT
 
-export const POINT_ICON_LAYER_NAME = 'mapbox-gl-plot-point-icon-layer'
+export const POINT_CIRCLE_LAYER_NAME = 'mapbox-gl-plot-point-circle-layer'
 
 export const DEFAULT_CIRCLE_RADIUS = 10
 
@@ -20,9 +20,10 @@ const circleRadius = ['coalesce', ['get', 'circle-radius'], DEFAULT_CIRCLE_RADIU
 const circleStrokeWidth = ['coalesce', ['get', 'circle-stroke-width'], DEFAULT_CIRCLE_STROKE_WIDTH]
 
 export const SHIP_ICON_DIRECTION_LAYER: LayerSpecification = {
-  id: POINT_ICON_LAYER_NAME,
+  id: POINT_CIRCLE_LAYER_NAME,
   type: 'circle',
-  filter: ['all', ['==', '$type', 'Point'], ['==', 'meta', 'circle']],
+  // filter: ['all', ['==', '$type', 'Point'], ['==', 'meta', 'circle']],
+  filter: ['all', ['==', '$type', 'Point']],
   source: PLOT_SOURCE_NAME,
   paint: {
     'circle-radius': [

@@ -83,7 +83,6 @@ class ResourceRegister {
     })
 
     this.dirtySourceIds.add(id)
-
     this.scheduleRender()
   }
 

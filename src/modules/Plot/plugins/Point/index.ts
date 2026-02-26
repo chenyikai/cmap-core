@@ -5,7 +5,7 @@ import type { LngLat, Map, MapMouseEvent } from 'mapbox-gl'
 import { EventState } from '@/core/EventState'
 import { Tooltip } from '@/core/Tooltip'
 import { Poi } from '@/modules/Plot/plugins/Poi.ts'
-import { LAYER_LIST, NAME, POINT_ICON_LAYER_NAME } from '@/modules/Plot/plugins/Point/vars.ts'
+import { LAYER_LIST, NAME, POINT_CIRCLE_LAYER_NAME } from '@/modules/Plot/plugins/Point/vars.ts'
 import { EMPTY_SOURCE, PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
 import type { PlotType } from '@/types/Plot/Poi.ts'
 import type { IPointOptions } from '@/types/Plot/Point.ts'
@@ -30,19 +30,21 @@ export abstract class PointBaseEvent extends EventState {
 
 export class PointCreateEvent extends PointBaseEvent {
   private onClick = (e: MapMouseEvent): void => {
-    this.point.setTooltip(
-      new Tooltip(this.context.map, {
-        id: this.point.id,
-        position: e.lngLat,
-        className: 'mapbox-gl-tooltip',
-        offsetX: 0,
-        offsetY: 18,
-        element: this.point.label(),
-        anchor: 'top',
-        line: false,
-        visible: true,
-      }),
-    )
+    if (this.point.options.tooltip) {
+      this.point.setTooltip(
+        new Tooltip(this.context.map, {
+          id: this.point.id,
+          position: e.lngLat,
+          className: 'mapbox-gl-tooltip',
+          offsetX: 0,
+          offsetY: 18,
+          element: this.point.label(),
+          anchor: 'top',
+          line: false,
+          visible: true,
+        }),
+      )
+    }
 
     this.point.update({
       ...this.point.options,
@@ -104,7 +106,7 @@ export class PointUpdateEvent extends PointBaseEvent {
     // this.disabled()
     this.context.map.off('mousemove', this.onMousemove)
 
-    if (this.point.center) {
+    if (this.point.center && this.point.options.tooltip) {
       this.point.setTooltip(
         new Tooltip(this.context.map, {
           id: this.point.id,
@@ -140,7 +142,7 @@ export class PointUpdateEvent extends PointBaseEvent {
   public override able(): void {
     this.context.eventManager.on(
       this.point.id,
-      POINT_ICON_LAYER_NAME,
+      POINT_CIRCLE_LAYER_NAME,
       'mousedown',
       this.onMousedown,
     )
@@ -171,6 +173,12 @@ export class PointResidentEvent extends PointBaseEvent {
     this.point.emit('click', message)
   }
 
+  private onDblclick = (e: MapMouseEvent): void => {
+    e.preventDefault()
+    const message = this.message<Point>(e, this.point)
+    this.point.emit('dblclick', message)
+  }
+
   constructor(map: Map, point: Point) {
     super(map, point)
   }
@@ -186,22 +194,31 @@ export class PointResidentEvent extends PointBaseEvent {
   public override able(): void {
     this.context.eventManager.on(
       this.point.id,
-      POINT_ICON_LAYER_NAME,
+      POINT_CIRCLE_LAYER_NAME,
+      'dblclick',
+      this.onDblclick,
+    )
+
+    this.context.eventManager.on(
+      this.point.id,
+      POINT_CIRCLE_LAYER_NAME,
       'mouseenter',
       this.onMouseEnter,
     )
 
     this.context.eventManager.on(
       this.point.id,
-      POINT_ICON_LAYER_NAME,
+      POINT_CIRCLE_LAYER_NAME,
       'mouseleave',
       this.onMouseLeave,
     )
 
-    this.context.eventManager.on(this.point.id, POINT_ICON_LAYER_NAME, 'click', this.onClick)
+    this.context.eventManager.on(this.point.id, POINT_CIRCLE_LAYER_NAME, 'click', this.onClick)
   }
 
   public override disabled(): void {
+    this.context.eventManager.off(this.point.id, 'dblclick', this.onDblclick)
+
     this.context.eventManager.off(this.point.id, 'mouseenter', this.onMouseEnter)
 
     this.context.eventManager.off(this.point.id, 'mouseleave', this.onMouseLeave)
@@ -210,7 +227,7 @@ export class PointResidentEvent extends PointBaseEvent {
   }
 }
 
-export class Point extends Poi<IPointOptions, GeoJSON.Point> {
+export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJSON.Point> {
   static NAME: PlotType = NAME
 
   protected residentEvent: PointResidentEvent
@@ -219,7 +236,7 @@ export class Point extends Poi<IPointOptions, GeoJSON.Point> {
 
   protected createEvent: PointCreateEvent
 
-  constructor(map: Map, options: IPointOptions) {
+  constructor(map: Map, options: T) {
     super(map, options)
 
     this.residentEvent = new PointResidentEvent(map, this)
@@ -304,7 +321,7 @@ export class Point extends Poi<IPointOptions, GeoJSON.Point> {
 
   public override getFeature(): GeoJSON.Feature<
     GeoJSON.Point,
-    IPointOptions['style'] & IPointOptions['properties']
+    T['style'] & T['properties']
   > | null {
     if (!this.options.position) {
       return null
@@ -351,11 +368,11 @@ export class Point extends Poi<IPointOptions, GeoJSON.Point> {
     return nameBox
   }
 
-  public override move(position: IPointOptions['position']): void {
+  public override move(position: T['position']): void {
     this.options.position = position
     this.render()
   }
-  public override update(options: IPointOptions): void {
+  public override update(options: T): void {
     this.options = options
     this.render()
   }
