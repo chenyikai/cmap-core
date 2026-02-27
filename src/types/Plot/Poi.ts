@@ -9,6 +9,7 @@ export type PolygonPosition = LineStringPosition[]
 export enum PlotType {
   POINT = 'Point',
   INDEX_POINT = 'IndexPoint',
+  ICON_POINT = 'IconPoint',
   LINE = 'LineString',
   POLYGON = 'Polygon',
   CIRCLE = 'Circle',

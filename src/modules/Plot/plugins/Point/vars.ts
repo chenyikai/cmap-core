@@ -19,11 +19,10 @@ const circleRadius = ['coalesce', ['get', 'circle-radius'], DEFAULT_CIRCLE_RADIU
 
 const circleStrokeWidth = ['coalesce', ['get', 'circle-stroke-width'], DEFAULT_CIRCLE_STROKE_WIDTH]
 
-export const SHIP_ICON_DIRECTION_LAYER: LayerSpecification = {
+export const POINT_CIRCLE_LAYER: LayerSpecification = {
   id: POINT_CIRCLE_LAYER_NAME,
   type: 'circle',
-  // filter: ['all', ['==', '$type', 'Point'], ['==', 'meta', 'circle']],
-  filter: ['all', ['==', '$type', 'Point']],
+  filter: ['all', ['==', '$type', 'Point'], ['==', 'meta', 'circle']],
   source: PLOT_SOURCE_NAME,
   paint: {
     'circle-radius': [
@@ -47,4 +46,4 @@ export const SHIP_ICON_DIRECTION_LAYER: LayerSpecification = {
   },
 }
 
-export const LAYER_LIST: LayerSpecification[] = [SHIP_ICON_DIRECTION_LAYER]
+export const LAYER_LIST: LayerSpecification[] = [POINT_CIRCLE_LAYER]

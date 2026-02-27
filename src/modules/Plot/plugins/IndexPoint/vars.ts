@@ -9,10 +9,15 @@ export const POINT_INDEX_LAYER_NAME = 'mapbox-gl-plot-point-index-layer'
 
 export const DEFAULT_TEXT_COLOR = '#333'
 
-export const SHIP_ICON_DIRECTION_LAYER: LayerSpecification = {
+export const POINT_INDEX_LAYER: LayerSpecification = {
   id: POINT_INDEX_LAYER_NAME,
   type: 'symbol',
-  filter: ['all', ['==', '$type', 'Point'], ['==', 'meta', 'indexPoint']],
+  filter: [
+    'all',
+    ['==', '$type', 'Point'],
+    ['==', 'meta', 'circle'],
+    ['==', 'subMeta', 'indexPoint'],
+  ],
   source: PLOT_SOURCE_NAME,
   paint: {
     'text-color': ['coalesce', ['get', 'text-color'], DEFAULT_TEXT_COLOR],
@@ -26,4 +31,4 @@ export const SHIP_ICON_DIRECTION_LAYER: LayerSpecification = {
   },
 }
 
-export const LAYER_LIST: LayerSpecification[] = [SHIP_ICON_DIRECTION_LAYER]
+export const LAYER_LIST: LayerSpecification[] = [POINT_INDEX_LAYER]
