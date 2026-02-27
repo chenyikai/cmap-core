@@ -67,41 +67,43 @@ cMap.on('loaded', (map) => {
     style: {
       "icon-anchor": 'bottom',
     },
-    position: new LngLat(122.09760659512042, 30.004767949301183)
+    position: new LngLat(122.09860659512042, 30.004767949301183)
   })
 
   icon.render()
   icon.edit()
 
-  // const index = new IndexPoint(map, {
-  //   id: '1',
-  //   name: '浙江宝驿4s店',
-  //   index: 1,
-  //   tooltip: false,
-  //   style: {
-  //     'text-color': '#f00'
-  //   },
-  //   position: new LngLat(122.09660659512042, 30.004767949301183)
-  // })
-  //
-  // index.render()
-  //
-  // // index.on('dblclick', () => {
-  // //   index.edit()
-  // // })
-  //
-  // index.edit()
+  const index = new IndexPoint(map, {
+    id: '2',
+    name: '浙江宝驿4s店',
+    index: 1,
+    tooltip: false,
+    style: {
+      'text-color': '#f00'
+    },
+    position: new LngLat(122.09660659512042, 30.004767949301183)
+  })
 
-  // const point = new Point(map, {
-  //   id: '12',
-  //   name: '浙江宝驿4s店',
-  //   tooltip: true,
-  //   position: new LngLat(122.09160659512042, 30.004767949301183)
-  // })
+  index.render()
+  index.edit()
   //
-  // point.render()
+  // //
+  // // // index.on('dblclick', () => {
+  // // //   index.edit()
+  // // // })
+  // //
+  // // index.edit()
   //
-  // point.edit()
+  const point = new Point(map, {
+    id: '3',
+    name: '浙江宝驿4s店',
+    tooltip: true,
+    position: new LngLat(122.09360659512042, 30.004767949301183)
+  })
+
+  point.render()
+
+  point.edit()
   //
   // point.on('hover', (data) => {
   //   console.log(data, 'point');

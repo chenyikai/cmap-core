@@ -14,8 +14,6 @@ export class IndexPoint extends Point<IIndexPointOptions> {
 
   constructor(map: Map, options: IIndexPointOptions) {
     super(map, options)
-
-    this.removeTooltip()
   }
 
   public override onAdd(): void {
@@ -39,6 +37,7 @@ export class IndexPoint extends Point<IIndexPointOptions> {
       {
         ...this.options.style,
         ...this.options.properties,
+        isName: false,
         index: this.options.index,
         meta: 'circle',
         subMeta: 'indexPoint',

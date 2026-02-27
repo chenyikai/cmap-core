@@ -2,10 +2,18 @@ import { point } from '@turf/turf'
 import type * as GeoJSON from 'geojson'
 import type { LngLat, Map } from 'mapbox-gl'
 
-import { Tooltip } from '@/core/Tooltip'
 import { Poi } from '@/modules/Plot/plugins/Poi.ts'
-import { LAYER_LIST, NAME, POINT_CIRCLE_LAYER_NAME } from '@/modules/Plot/plugins/Point/vars.ts'
+import {
+  DEFAULT_CIRCLE_RADIUS,
+  DEFAULT_CIRCLE_STROKE_WIDTH,
+  DEFAULT_TEXT_SIZE,
+  GAP_PX,
+  LAYER_LIST,
+  NAME,
+  POINT_CIRCLE_LAYER_NAME,
+} from '@/modules/Plot/plugins/Point/vars.ts'
 import { EMPTY_SOURCE, PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
+import type { CalcOffsetParams } from '@/types/Plot/IconPoint.ts'
 import type { PlotType } from '@/types/Plot/Poi.ts'
 import type { IPointOptions } from '@/types/Plot/Point.ts'
 
@@ -29,22 +37,6 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
     this.updateEvent = new PointUpdateEvent(map, this)
     this.createEvent = new PointCreateEvent(map, this)
     this.residentEvent.able()
-
-    if (this.options.tooltip && this.center) {
-      this.setTooltip(
-        new Tooltip(this.context.map, {
-          id: this.id,
-          position: this.center,
-          className: 'mapbox-gl-plot-name-tooltip',
-          offsetX: 0,
-          offsetY: 18,
-          element: this.label(),
-          anchor: 'top',
-          line: false,
-          visible: false,
-        }),
-      )
-    }
   }
 
   public override onAdd(): void {
@@ -70,18 +62,6 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
     this.setState({ edit: true })
     this.residentEvent.able()
     this.updateEvent.disabled()
-  }
-
-  override setTooltip(tooltip: Tooltip): void {
-    if (this.tooltip) {
-      this.removeTooltip()
-    }
-
-    this.tooltip = tooltip
-  }
-  override removeTooltip(): void {
-    this.tooltip?.remove()
-    this.tooltip = null
   }
 
   public override focus(): void {
@@ -113,11 +93,28 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
       return null
     }
 
+    const h = (DEFAULT_CIRCLE_RADIUS + DEFAULT_CIRCLE_STROKE_WIDTH) * 2
+    // const h = DEFAULT_CIRCLE_RADIUS ?? 0
+    const scale = 1
+    const anchor = 'center'
+    const tSize = DEFAULT_TEXT_SIZE
+
+    const calculatedOffset = this.calculateTextOffset({
+      iconHeight: h,
+      iconScale: scale,
+      iconAnchor: anchor,
+      textSize: tSize,
+      gap: GAP_PX,
+    })
+
     return point(
       this.options.position.toArray(),
       {
         ...this.options.style,
         ...this.options.properties,
+        isName: true,
+        text: this.options.name,
+        _calcTextOffset: calculatedOffset,
         meta: 'circle',
       },
       {
@@ -167,15 +164,43 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
   }
   public override render(): void {
     if (this.getFeature()) {
-      const bounds = this.context.map.getBounds()
-      if (this.center && !bounds?.contains(this.center)) {
-        this.tooltip?.hide()
-        return
-      }
-
-      this.tooltip?.show()
-
       this.context.register.setGeoJSONData(PLOT_SOURCE_NAME, this.getFeature() as GeoJSON.Feature)
     }
+  }
+
+  /**
+   * 计算文字相对于图标的偏移量
+   * 返回单位为 em (Mapbox text-offset 标准单位)
+   */
+  protected calculateTextOffset(params: CalcOffsetParams): [number, number] {
+    const { iconHeight, iconScale = 1, iconAnchor = 'bottom', textSize = 12, gap = GAP_PX } = params
+
+    // 1. 计算图标在屏幕上的实际像素高度
+    const actualHeight = iconHeight * iconScale
+
+    // 2. 计算需要的垂直偏移像素 (Pixel)
+    let offsetY_px = 0
+
+    // 根据锚点判断图标占据了坐标点下方多少空间
+    if (iconAnchor.includes('bottom')) {
+      // A. 底部对齐 (bottom, bottom-left, bottom-right)
+      // 图标在坐标点上方，完全不挡路，只需要加个间距
+      offsetY_px = gap
+    } else if (iconAnchor.includes('top')) {
+      // B. 顶部对齐 (top, top-left, top-right)
+      // 图标挂在坐标点下方，文字要躲开整个图标的高度
+      offsetY_px = actualHeight + gap
+    } else {
+      // C. 居中对齐 (center, left, right)
+      // 图标跨越坐标点，文字要躲开半个图标的高度
+      offsetY_px = actualHeight / 2 + gap
+    }
+
+    // 3. 转换为 em 单位 (Mapbox 要求)
+    // 公式: 像素 / 字体大小
+    const offsetY_em = offsetY_px / textSize
+
+    // 返回 [x, y]，这里我们只处理垂直偏移
+    return [0, offsetY_em]
   }
 }

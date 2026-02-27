@@ -2,7 +2,6 @@ import type * as GeoJSON from 'geojson'
 import type { LngLat, Map } from 'mapbox-gl'
 
 import { Module } from '@/core/Module'
-import type { Tooltip } from '@/core/Tooltip'
 import { PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
 import type { IPoiOptions } from '@/types/Plot/Poi.ts'
 
@@ -13,8 +12,6 @@ export abstract class Poi<
   public options: T
 
   readonly SOURCE: string = PLOT_SOURCE_NAME
-
-  public tooltip: Tooltip | null = null
 
   protected constructor(map: Map, options: T) {
     super(map)
@@ -42,10 +39,6 @@ export abstract class Poi<
   public abstract start(): void
 
   public abstract stop(): void
-
-  abstract setTooltip(tooltip: Tooltip): void
-
-  abstract removeTooltip(): void
 
   abstract label(): HTMLElement
 

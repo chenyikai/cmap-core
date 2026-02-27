@@ -1,7 +1,6 @@
 import type { Map, MapMouseEvent } from 'mapbox-gl'
 
 import { EventState } from '@/core/EventState'
-import { Tooltip } from '@/core/Tooltip'
 import { Point } from '@/modules/Plot/plugins/Point'
 
 export abstract class PointBaseEvent extends EventState {
@@ -24,22 +23,6 @@ export abstract class PointBaseEvent extends EventState {
 
 export class PointCreateEvent extends PointBaseEvent {
   private onClick = (e: MapMouseEvent): void => {
-    if (this.point.options.tooltip) {
-      this.point.setTooltip(
-        new Tooltip(this.context.map, {
-          id: this.point.id,
-          position: e.lngLat,
-          className: 'mapbox-gl-tooltip',
-          offsetX: 0,
-          offsetY: 18,
-          element: this.point.label(),
-          anchor: 'top',
-          line: false,
-          visible: true,
-        }),
-      )
-    }
-
     this.point.update({
       ...this.point.options,
       position: e.lngLat,
@@ -84,7 +67,6 @@ export class PointUpdateEvent extends PointBaseEvent {
     this.context.map.on('mousemove', this.onMousemove)
     this.context.map.once('mouseup', this.onMouseup)
 
-    this.point.removeTooltip()
     this.point.emit(`${Point.NAME}.beforeUpdate`, this.message<Point>(e, this.point))
   }
 
@@ -99,22 +81,6 @@ export class PointUpdateEvent extends PointBaseEvent {
     this.context.map.getCanvasContainer().style.cursor = ''
     // this.disabled()
     this.context.map.off('mousemove', this.onMousemove)
-
-    if (this.point.center && this.point.options.tooltip) {
-      this.point.setTooltip(
-        new Tooltip(this.context.map, {
-          id: this.point.id,
-          position: this.point.center,
-          className: 'mapbox-gl-tooltip',
-          offsetX: 0,
-          offsetY: 18,
-          element: this.point.label(),
-          anchor: 'top',
-          line: false,
-          visible: false,
-        }),
-      )
-    }
 
     this.point.render()
 
@@ -134,6 +100,7 @@ export class PointUpdateEvent extends PointBaseEvent {
   }
 
   public override able(): void {
+    console.log(this.point.LAYER, 'able')
     this.context.eventManager.on(this.point.id, this.point.LAYER, 'mousedown', this.onMousedown)
   }
 

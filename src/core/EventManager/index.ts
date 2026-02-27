@@ -119,7 +119,7 @@ export class EventManager {
     this.map.on(eventType, layerId, handler)
     this.activeLayerListeners.set(key, handler)
 
-    console.log(`[EventManager] 激活底层监听: ${key}`)
+    console.warn(`[EventManager] 激活底层监听: ${key}`)
   }
 
   /**
