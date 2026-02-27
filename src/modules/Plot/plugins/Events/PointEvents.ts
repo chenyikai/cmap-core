@@ -100,7 +100,6 @@ export class PointUpdateEvent extends PointBaseEvent {
   }
 
   public override able(): void {
-    console.log(this.point.LAYER, 'able')
     this.context.eventManager.on(this.point.id, this.point.LAYER, 'mousedown', this.onMousedown)
   }
 
