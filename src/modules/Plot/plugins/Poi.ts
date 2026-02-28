@@ -40,8 +40,6 @@ export abstract class Poi<
 
   public abstract stop(): void
 
-  abstract label(): HTMLElement
-
   public abstract edit(): void
 
   public abstract unedit(): void

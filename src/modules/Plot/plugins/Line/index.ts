@@ -1,0 +1,249 @@
+import { lineString } from '@turf/turf'
+import type * as GeoJSON from 'geojson'
+import type { Map } from 'mapbox-gl'
+import { LngLat } from 'mapbox-gl'
+
+import {
+  LineCreateEvent,
+  LineResidentEvent,
+  LineUpdateEvent,
+} from '@/modules/Plot/plugins/Events/LineEvents.ts'
+import { Poi } from '@/modules/Plot/plugins/Poi.ts'
+import { Point } from '@/modules/Plot/plugins/Point'
+import { EMPTY_SOURCE, PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
+import type { ILineOptions } from '@/types/Plot/Line.ts'
+import { PointType } from '@/types/Plot/Line.ts'
+
+import { LAYER_LIST } from './vars.ts'
+
+export class Line extends Poi<ILineOptions, GeoJSON.LineString> {
+  public points: Point[]
+  public midPoints: Point[]
+
+  public modifyMid: Point | null | undefined
+
+  protected residentEvent: LineResidentEvent
+  protected updateEvent: LineUpdateEvent
+  protected createEvent: LineCreateEvent
+
+  constructor(map: Map, options: ILineOptions) {
+    super(map, options)
+
+    this.residentEvent = new LineResidentEvent(map, this)
+    this.updateEvent = new LineUpdateEvent(map, this)
+    this.createEvent = new LineCreateEvent(map, this)
+
+    this.points = []
+    this.midPoints = []
+    this.createPoint()
+  }
+
+  public createPoint(): void {
+    const positions = this.options.position ?? []
+
+    for (let i = 0; i < positions.length; i++) {
+      const current = positions[i]
+
+      const vertex = new Point(this.context.map, {
+        id: `${this.id}-node-${String(i)}`, // 建议 ID 加上 node 标识
+        isName: false,
+        position: current,
+        style: this.options.vertexStyle,
+        properties: {
+          id: `${this.id}-node-${String(i)}`,
+          index: i,
+          type: PointType.VERTEX, // 标记类型，方便点击事件区分
+        },
+      })
+      this.points.push(vertex)
+
+      if (i < positions.length - 1) {
+        const next = positions[i + 1]
+
+        const midLng = (current.lng + next.lng) / 2
+        const midLat = (current.lat + next.lat) / 2
+        const midPos = new LngLat(midLng, midLat)
+
+        const mid = new Point(this.context.map, {
+          id: `${this.id}-mid-${String(i)}`, // 建议 ID 加上 mid 标识
+          isName: false,
+          position: midPos,
+          style: this.options.midStyle,
+          properties: {
+            id: `${this.id}-mid-${String(i)}`, // 建议 ID 加上 mid 标识
+            index: i, // 这里的 index 代表它是第几段线上的中点
+            type: PointType.MIDPOINT,
+          },
+        })
+        this.midPoints.push(mid)
+      }
+    }
+  }
+
+  public removePoint(): void {
+    this.points.forEach((point) => {
+      point.remove()
+    })
+    this.points = []
+    this.midPoints.forEach((mid) => {
+      mid.remove()
+    })
+    this.midPoints = []
+  }
+
+  public override onAdd(): void {
+    this.context.register.addSource(PLOT_SOURCE_NAME, EMPTY_SOURCE)
+
+    LAYER_LIST.forEach((layer) => {
+      this.context.register.addLayer(layer)
+    })
+  }
+  public override onRemove(): void {
+    throw new Error('Method not implemented.')
+  }
+  public override get id(): string {
+    return this.options.id
+  }
+  public override get center(): LngLat | undefined {
+    throw new Error('Method not implemented.')
+  }
+  public override get geometry(): GeoJSON.LineString | null {
+    if (this.getFeature() === null) {
+      return null
+    } else {
+      return this.getFeature()!.geometry
+    }
+  }
+  public override getFeature(): GeoJSON.Feature<
+    GeoJSON.LineString,
+    ILineOptions['style'] | ILineOptions['properties']
+  > | null {
+    if (!this.options.position) {
+      return null
+    }
+
+    const coordinates = this.points.map((point) => {
+      if (point.center) {
+        return point.center.toArray()
+      } else {
+        return []
+      }
+    })
+
+    if (this.modifyMid) {
+      const { index } = this.modifyMid.options.properties ?? {}
+      if (typeof index === 'number' && this.modifyMid.center) {
+        coordinates.splice(index + 1, 0, this.modifyMid.center.toArray())
+      }
+    }
+
+    return lineString(
+      coordinates,
+      {
+        ...this.options.properties,
+        ...this.options.style,
+      },
+      {
+        id: this.id,
+      },
+    )
+  }
+  public override start(): void {
+    throw new Error('Method not implemented.')
+  }
+  public override stop(): void {
+    throw new Error('Method not implemented.')
+  }
+  public override edit(): void {
+    this.setState({ edit: true })
+
+    this.points.forEach((point) => {
+      point.edit()
+    })
+
+    this.midPoints.forEach((midPoint) => {
+      midPoint.edit()
+    })
+
+    this.residentEvent.disabled()
+    this.updateEvent.able()
+
+    this.render()
+  }
+
+  public override unedit(): void {
+    this.setState({ edit: false })
+    this.points.forEach((point) => {
+      point.unedit()
+    })
+    this.midPoints.forEach((midPoint) => {
+      midPoint.unedit()
+    })
+
+    this.residentEvent.able()
+    this.updateEvent.disabled()
+
+    this.render()
+  }
+
+  public override focus(): void {
+    throw new Error('Method not implemented.')
+  }
+  public override unfocus(): void {
+    throw new Error('Method not implemented.')
+  }
+  public override select(): void {
+    throw new Error('Method not implemented.')
+  }
+  public override unselect(): void {
+    throw new Error('Method not implemented.')
+  }
+  public override move(position: LngLat): void {
+    console.log(position, 'position')
+  }
+  public override update(options: ILineOptions): void {
+    this.options = options
+    this.removePoint()
+    this.createPoint()
+    this.render()
+  }
+  public override remove(): void {
+    throw new Error('Method not implemented.')
+  }
+  public override render(): void {
+    if (this.getFeature()) {
+      this.points.map((point) => {
+        point.render()
+      })
+
+      if (this.isEdit) {
+        this.midPoints.map((minPoint) => {
+          minPoint.render()
+        })
+      }
+      this.context.register.setGeoJSONData(PLOT_SOURCE_NAME, this.getFeature() as GeoJSON.Feature)
+    }
+  }
+
+  public getMidPoint(index: number): Point | null {
+    if (this.midPoints.length === 0) return null
+
+    const data = this.midPoints[index]
+    if (Number(data.options.properties?.index) === index) {
+      return data
+    } else {
+      return null
+    }
+  }
+
+  public getPoint(index: number): Point | null {
+    if (this.points.length === 0) return null
+
+    const data = this.points[index]
+    if (Number(data.options.properties?.index) === index) {
+      return data
+    } else {
+      return null
+    }
+  }
+}

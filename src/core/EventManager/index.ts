@@ -140,8 +140,8 @@ export class EventManager {
       if (e.features && e.features.length > 0) {
         // 优先取最顶层的 feature
         const feature = e.features[0]
-        // targetId = feature.id ?? feature.properties?.id
-        targetId = feature.id
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        targetId = feature.id ?? feature.properties?.id
       }
     }
 

@@ -45,17 +45,19 @@ export class PointCreateEvent extends PointBaseEvent {
     /* empty */
   }
   public override onRemove(): void {
-    /* empty */
+    this.disabled()
   }
 
   public override able(): void {
     this.context.map.on('click', this.onClick)
     this.context.map.on('mousemove', this.onMousemove)
+    this.changeStatus()
   }
   public override disabled(): void {
     this.context.map.getCanvasContainer().style.cursor = ''
     this.context.map.off('click', this.onClick)
     this.context.map.off('mousemove', this.onMousemove)
+    this.changeStatus()
   }
 }
 
@@ -96,15 +98,17 @@ export class PointUpdateEvent extends PointBaseEvent {
   }
 
   public override onRemove(): void {
-    throw new Error('Method not implemented.')
+    this.disabled()
   }
 
   public override able(): void {
     this.context.eventManager.on(this.point.id, this.point.LAYER, 'mousedown', this.onMousedown)
+    this.changeStatus()
   }
 
   public override disabled(): void {
     this.context.eventManager.off(this.point.id, 'mousedown', this.onMousedown)
+    this.changeStatus()
   }
 }
 
@@ -143,7 +147,7 @@ export class PointResidentEvent extends PointBaseEvent {
   }
 
   public override onRemove(): void {
-    throw new Error('Method not implemented.')
+    this.disabled()
   }
 
   public override able(): void {
@@ -154,6 +158,7 @@ export class PointResidentEvent extends PointBaseEvent {
     this.context.eventManager.on(this.point.id, this.point.LAYER, 'mouseleave', this.onMouseLeave)
 
     this.context.eventManager.on(this.point.id, this.point.LAYER, 'click', this.onClick)
+    this.changeStatus()
   }
 
   public override disabled(): void {
@@ -164,5 +169,6 @@ export class PointResidentEvent extends PointBaseEvent {
     this.context.eventManager.off(this.point.id, 'mouseleave', this.onMouseLeave)
 
     this.context.eventManager.off(this.point.id, 'click', this.onClick)
+    this.changeStatus()
   }
 }

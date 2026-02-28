@@ -17,7 +17,7 @@ export enum PlotType {
 
 export interface IPoiOptions {
   id: string
-  name: string
+  name?: string
   isName?: boolean
   style?: any
   properties?: Record<string, any>

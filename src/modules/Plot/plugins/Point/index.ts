@@ -59,7 +59,7 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
     this.updateEvent.able()
   }
   public override unedit(): void {
-    this.setState({ edit: true })
+    this.setState({ edit: false })
     this.residentEvent.able()
     this.updateEvent.disabled()
   }
@@ -94,16 +94,14 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
     }
 
     const h = (DEFAULT_CIRCLE_RADIUS + DEFAULT_CIRCLE_STROKE_WIDTH) * 2
-    // const h = DEFAULT_CIRCLE_RADIUS ?? 0
     const scale = 1
     const anchor = 'center'
-    const tSize = DEFAULT_TEXT_SIZE
 
     const calculatedOffset = this.calculateTextOffset({
       iconHeight: h,
       iconScale: scale,
       iconAnchor: anchor,
-      textSize: tSize,
+      textSize: DEFAULT_TEXT_SIZE,
       gap: GAP_PX,
     })
 
@@ -131,26 +129,6 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
     this.createEvent.disabled()
   }
 
-  override label(): HTMLElement {
-    const id = `${this.id}-plot-name-box`
-    let nameBox = document.getElementById(id)
-    if (nameBox) {
-      return nameBox
-    }
-
-    nameBox = document.createElement('div')
-    nameBox.id = id
-    nameBox.classList.add('plot-name-box')
-
-    const plotName = document.createElement('div')
-    plotName.innerText = this.options.name
-    plotName.classList.add('text')
-
-    nameBox.appendChild(plotName)
-
-    return nameBox
-  }
-
   public override move(position: T['position']): void {
     this.options.position = position
     this.render()
@@ -160,7 +138,20 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
     this.render()
   }
   public override remove(): void {
-    throw new Error('Method not implemented.')
+    this.residentEvent.disabled()
+    this.updateEvent.disabled()
+    this.createEvent.disabled()
+
+    this.removeAllListeners()
+
+    const emptyFeature: GeoJSON.Feature<null> = {
+      type: 'Feature',
+      geometry: null,
+      id: this.id,
+      properties: {},
+    }
+
+    this.context.register.setGeoJSONData(PLOT_SOURCE_NAME, emptyFeature)
   }
   public override render(): void {
     if (this.getFeature()) {
