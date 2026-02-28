@@ -44,6 +44,7 @@ export default tseslint.config(
         '@typescript-eslint/no-floating-promises': 'off', // 必须处理异步
         '@typescript-eslint/no-confusing-void-expression': 'error',
         '@typescript-eslint/no-useless-constructor': 'off',
+        '@typescript-eslint/no-non-null-assertion': 'off',
 
         // --- 🧹 自动清理与排序 ---
         'simple-import-sort/imports': 'error',
