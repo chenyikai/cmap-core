@@ -1,4 +1,4 @@
-import { lineString } from '@turf/turf'
+import { along, length, lineString } from '@turf/turf'
 import type * as GeoJSON from 'geojson'
 import type { Map } from 'mapbox-gl'
 import { LngLat } from 'mapbox-gl'
@@ -103,17 +103,21 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString | null> {
     })
   }
   public override onRemove(): void {
-    throw new Error('Method not implemented.')
+    this.remove()
   }
   public override get id(): string {
     return this.options.id
   }
-  public override get center(): LngLat | undefined {
+  public override get center(): LngLat | null {
     if (!Array.isArray(this.options.position) || this.options.position.length === 0) {
-      return undefined
+      return null
     }
-    return undefined
-    // throw new Error('Method not implemented.')
+
+    const feature = this.getFeature() as GeoJSON.Feature<GeoJSON.LineString>
+    const distance = length(feature)
+    const coordinates = along(feature, distance / 2).geometry.coordinates
+
+    return new LngLat(coordinates[0], coordinates[1])
   }
   public override get geometry(): GeoJSON.LineString | null {
     return this.getFeature().geometry
@@ -166,7 +170,7 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString | null> {
     )
   }
   public override start(): void {
-    if (this.center === undefined) {
+    if (this.center === null) {
       this.createEvent.able()
       this.updateEvent.disabled()
       this.residentEvent.disabled()

@@ -3,7 +3,7 @@ import type { Map, MapMouseEvent } from 'mapbox-gl'
 import { LngLat } from 'mapbox-gl'
 
 import { EventState } from '@/core/EventState'
-import type { Line } from '@/modules/Plot/plugins/Line'
+import { Line } from '@/modules/Plot/plugins/Line'
 import { Point } from '@/modules/Plot/plugins/Point'
 import type { EventMessage } from '@/types/EventState'
 import { PointType } from '@/types/Plot/Line.ts'
@@ -100,6 +100,8 @@ export class LineCreateEvent extends LineBaseEvent {
   }
 
   public override able(): void {
+    this.context.map.doubleClickZoom.disable()
+
     this.context.map.on('click', this.onClick)
     this.context.map.on('mousemove', this.onMousemove)
     this.context.map.on('dblclick', this.stop)
@@ -109,6 +111,10 @@ export class LineCreateEvent extends LineBaseEvent {
     this.context.map.off('click', this.onClick)
     this.context.map.off('mousemove', this.onMousemove)
     this.context.map.off('dblclick', this.stop)
+
+    setTimeout(() => {
+      this.context.map.doubleClickZoom.enable()
+    }, 0)
     this.changeStatus()
   }
 }
@@ -172,37 +178,39 @@ export class LineUpdateEvent extends LineBaseEvent {
     }
   }
 
-  // private onLineMouseenter = (): void => {
-  //   this.context.map.getCanvasContainer().style.cursor = 'pointer'
-  //   this.context.map.once('mousedown', this.line.LAYER, (e: MapMouseEvent) => {
-  //     e.preventDefault()
-  //     this.context.map.getCanvasContainer().style.cursor = 'move'
-  //
-  //     this.context.map.on('mousemove', this.onMousemove)
-  //     this.context.map.once('mouseup', this.onMouseup)
-  //
-  //     this.line.emit(`${Line.NAME}.beforeUpdate`, this.message<Line>(e, this.line))
-  //   })
-  // }
-  //
-  // private onLineMouseLeave = (): void => {
-  //   this.context.map.getCanvasContainer().style.cursor = ''
-  // }
+  private onLineMouseenter = (): void => {
+    this.context.map.getCanvasContainer().style.cursor = 'pointer'
+    this.context.map.once('mousedown', this.line.LAYER, (e: MapMouseEvent) => {
+      e.preventDefault()
+      this.context.map.getCanvasContainer().style.cursor = 'move'
+      this.line.drawPoint = e.lngLat
 
-  // private onMousemove = (e: MapMouseEvent): void => {
-  //   this.context.map.getCanvasContainer().style.cursor = 'move'
-  //   this.line.move(e.lngLat)
-  //
-  //   this.line.emit(`${Line.NAME}.update`, this.message<Line>(e, this.line))
-  // }
+      this.context.map.on('mousemove', this.onMousemove)
+      this.context.map.once('mouseup', this.onMouseup)
 
-  // private onMouseup = (e: MapMouseEvent): void => {
-  //   this.context.map.getCanvasContainer().style.cursor = ''
-  //   this.context.map.off('mousemove', this.onMousemove)
-  //   this.line.render()
-  //
-  //   this.line.emit(`${Line.NAME}.doneUpdate`, this.message<Line>(e, this.line))
-  // }
+      this.line.emit(`${Line.NAME}.beforeUpdate`, this.message<Line>(e, this.line))
+    })
+  }
+
+  private onLineMouseLeave = (): void => {
+    this.context.map.getCanvasContainer().style.cursor = ''
+    this.line.drawPoint = null
+  }
+
+  private onMousemove = (e: MapMouseEvent): void => {
+    this.context.map.getCanvasContainer().style.cursor = 'move'
+    this.line.move(e.lngLat)
+
+    this.line.emit(`${Line.NAME}.update`, this.message<Line>(e, this.line))
+  }
+
+  private onMouseup = (e: MapMouseEvent): void => {
+    this.context.map.getCanvasContainer().style.cursor = ''
+    this.context.map.off('mousemove', this.onMousemove)
+    this.line.render()
+
+    this.line.emit(`${Line.NAME}.doneUpdate`, this.message<Line>(e, this.line))
+  }
 
   constructor(map: Map, line: Line) {
     super(map, line)
@@ -226,8 +234,8 @@ export class LineUpdateEvent extends LineBaseEvent {
       mid.on('Point.doneUpdate', this.onMidDone)
     })
 
-    // this.context.eventManager.on(this.line.id, this.line.LAYER, 'mouseenter', this.onLineMouseenter)
-    // this.context.eventManager.on(this.line.id, this.line.LAYER, 'mouseleave', this.onLineMouseLeave)
+    this.context.eventManager.on(this.line.id, this.line.LAYER, 'mouseenter', this.onLineMouseenter)
+    this.context.eventManager.on(this.line.id, this.line.LAYER, 'mouseleave', this.onLineMouseLeave)
 
     this.changeStatus()
   }
@@ -242,7 +250,8 @@ export class LineUpdateEvent extends LineBaseEvent {
       mid.off('Point.doneUpdate', this.onMidDone)
     })
 
-    // this.context.eventManager.off(this.line.id, 'mouseenter', this.onLineMouseenter)
+    this.context.eventManager.off(this.line.id, 'mouseenter', this.onLineMouseenter)
+    this.context.eventManager.off(this.line.id, 'mouseleave', this.onLineMouseLeave)
     this.changeStatus()
   }
 }

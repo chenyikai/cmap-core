@@ -77,7 +77,9 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
     throw new Error('Method not implemented.')
   }
 
-  public override get center(): LngLat | undefined {
+  public override get center(): LngLat | null {
+    if (!this.options.position) return null
+
     return this.options.position
   }
 
@@ -128,7 +130,7 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
     )
   }
   public override start(): void {
-    if (this.center === undefined) {
+    if (this.center === null) {
       this.createEvent.able()
     }
   }

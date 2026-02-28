@@ -32,7 +32,7 @@ export abstract class Poi<
     return !!state?.edit
   }
 
-  public abstract get center(): LngLat | undefined
+  public abstract get center(): LngLat | null
 
   public abstract get geometry(): G | null
 
