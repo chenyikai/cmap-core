@@ -19,16 +19,16 @@ import type { IPointOptions } from '@/types/Plot/Point.ts'
 
 import { PointCreateEvent, PointResidentEvent, PointUpdateEvent } from '../Events/PointEvents'
 
-export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJSON.Point> {
+export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJSON.Point | null> {
   static NAME: PlotType = NAME
 
-  readonly LAYER: string = POINT_CIRCLE_LAYER_NAME
+  override readonly LAYER: string = POINT_CIRCLE_LAYER_NAME
 
-  protected residentEvent: PointResidentEvent
+  public residentEvent: PointResidentEvent
 
-  protected updateEvent: PointUpdateEvent
+  public updateEvent: PointUpdateEvent
 
-  protected createEvent: PointCreateEvent
+  public createEvent: PointCreateEvent
 
   constructor(map: Map, options: T) {
     super(map, options)
@@ -86,11 +86,18 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
   }
 
   public override getFeature(): GeoJSON.Feature<
-    GeoJSON.Point,
+    GeoJSON.Point | null,
     T['style'] & T['properties']
-  > | null {
+  > {
     if (!this.options.position) {
-      return null
+      const emptyFeature: GeoJSON.Feature<null, T['style'] & T['properties']> = {
+        type: 'Feature',
+        geometry: null,
+        id: this.id,
+        properties: {},
+      }
+
+      return emptyFeature
     }
 
     const h = (DEFAULT_CIRCLE_RADIUS + DEFAULT_CIRCLE_STROKE_WIDTH) * 2
@@ -154,9 +161,7 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
     this.context.register.setGeoJSONData(PLOT_SOURCE_NAME, emptyFeature)
   }
   public override render(): void {
-    if (this.getFeature()) {
-      this.context.register.setGeoJSONData(PLOT_SOURCE_NAME, this.getFeature() as GeoJSON.Feature)
-    }
+    this.context.register.setGeoJSONData(PLOT_SOURCE_NAME, this.getFeature() as GeoJSON.Feature)
   }
 
   /**

@@ -1,11 +1,12 @@
 import { cloneDeep, set } from 'lodash-es'
-import type { Map } from 'mapbox-gl'
+import type { Map, MapMouseEvent } from 'mapbox-gl'
 import { LngLat } from 'mapbox-gl'
 
 import { EventState } from '@/core/EventState'
 import type { Line } from '@/modules/Plot/plugins/Line'
-import type { Point } from '@/modules/Plot/plugins/Point'
+import { Point } from '@/modules/Plot/plugins/Point'
 import type { EventMessage } from '@/types/EventState'
+import { PointType } from '@/types/Plot/Line.ts'
 
 export abstract class LineBaseEvent extends EventState {
   protected line: Line
@@ -26,6 +27,67 @@ export abstract class LineBaseEvent extends EventState {
 }
 
 export class LineCreateEvent extends LineBaseEvent {
+  private count = 0
+
+  private onClick = (e: MapMouseEvent): void => {
+    // 点击过一次之后 计算结束事件
+    if (this.count >= 1) {
+      const features = this.context.map.queryRenderedFeatures(e.point, {
+        layers: [this.line.points[0].LAYER],
+      })
+
+      if (features.length > 0) {
+        this.stop(e)
+        return
+      }
+    }
+
+    if (!Array.isArray(this.line.options.position)) {
+      this.line.options.position = []
+    }
+
+    this.line.options.position.push(e.lngLat)
+
+    const point = new Point(this.context.map, {
+      id: `${this.line.id}-node-${String(this.count)}`,
+      isName: false,
+      position: e.lngLat,
+      style: this.line.options.vertexStyle,
+      properties: {
+        id: `${this.line.id}-node-${String(this.count)}`,
+        index: this.count,
+        type: PointType.VERTEX,
+      },
+    })
+
+    point.residentEvent.disabled()
+    this.line.points.push(point)
+
+    this.line.render()
+    this.count++
+  }
+
+  private onMousemove = (e: MapMouseEvent): void => {
+    this.context.map.getCanvasContainer().style.cursor = 'crosshair'
+    if (!this.line.options.position) return
+
+    this.line.drawPoint = e.lngLat
+    this.line.render()
+  }
+
+  private stop = (e: MapMouseEvent): void => {
+    e.preventDefault()
+
+    this.context.map.getCanvasContainer().style.cursor = ''
+    this.line.drawPoint = null
+    this.count = 0
+    this.disabled()
+
+    this.line.removePoint()
+    this.line.createPoint()
+    this.line.edit()
+  }
+
   constructor(map: Map, line: Line) {
     super(map, line)
   }
@@ -38,9 +100,15 @@ export class LineCreateEvent extends LineBaseEvent {
   }
 
   public override able(): void {
+    this.context.map.on('click', this.onClick)
+    this.context.map.on('mousemove', this.onMousemove)
+    this.context.map.on('dblclick', this.stop)
     this.changeStatus()
   }
   public override disabled(): void {
+    this.context.map.off('click', this.onClick)
+    this.context.map.off('mousemove', this.onMousemove)
+    this.context.map.off('dblclick', this.stop)
     this.changeStatus()
   }
 }
@@ -100,15 +168,41 @@ export class LineUpdateEvent extends LineBaseEvent {
         position,
       })
 
-      this.line.points.forEach((point) => {
-        point.edit()
-      })
-      this.line.midPoints.forEach((mid) => {
-        mid.edit()
-      })
-      this.able()
+      this.line.edit()
     }
   }
+
+  // private onLineMouseenter = (): void => {
+  //   this.context.map.getCanvasContainer().style.cursor = 'pointer'
+  //   this.context.map.once('mousedown', this.line.LAYER, (e: MapMouseEvent) => {
+  //     e.preventDefault()
+  //     this.context.map.getCanvasContainer().style.cursor = 'move'
+  //
+  //     this.context.map.on('mousemove', this.onMousemove)
+  //     this.context.map.once('mouseup', this.onMouseup)
+  //
+  //     this.line.emit(`${Line.NAME}.beforeUpdate`, this.message<Line>(e, this.line))
+  //   })
+  // }
+  //
+  // private onLineMouseLeave = (): void => {
+  //   this.context.map.getCanvasContainer().style.cursor = ''
+  // }
+
+  // private onMousemove = (e: MapMouseEvent): void => {
+  //   this.context.map.getCanvasContainer().style.cursor = 'move'
+  //   this.line.move(e.lngLat)
+  //
+  //   this.line.emit(`${Line.NAME}.update`, this.message<Line>(e, this.line))
+  // }
+
+  // private onMouseup = (e: MapMouseEvent): void => {
+  //   this.context.map.getCanvasContainer().style.cursor = ''
+  //   this.context.map.off('mousemove', this.onMousemove)
+  //   this.line.render()
+  //
+  //   this.line.emit(`${Line.NAME}.doneUpdate`, this.message<Line>(e, this.line))
+  // }
 
   constructor(map: Map, line: Line) {
     super(map, line)
@@ -122,8 +216,6 @@ export class LineUpdateEvent extends LineBaseEvent {
     this.disabled()
   }
 
-  // public updateMidPoint(index: number): void {}
-
   public override able(): void {
     this.line.points.forEach((point) => {
       point.on('Point.update', this.onVertexUpdate)
@@ -133,6 +225,10 @@ export class LineUpdateEvent extends LineBaseEvent {
       mid.on('Point.update', this.onMidUpdate)
       mid.on('Point.doneUpdate', this.onMidDone)
     })
+
+    // this.context.eventManager.on(this.line.id, this.line.LAYER, 'mouseenter', this.onLineMouseenter)
+    // this.context.eventManager.on(this.line.id, this.line.LAYER, 'mouseleave', this.onLineMouseLeave)
+
     this.changeStatus()
   }
 
@@ -145,6 +241,8 @@ export class LineUpdateEvent extends LineBaseEvent {
       mid.off('Point.update', this.onMidUpdate)
       mid.off('Point.doneUpdate', this.onMidDone)
     })
+
+    // this.context.eventManager.off(this.line.id, 'mouseenter', this.onLineMouseenter)
     this.changeStatus()
   }
 }

@@ -13,14 +13,20 @@ import { Point } from '@/modules/Plot/plugins/Point'
 import { EMPTY_SOURCE, PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
 import type { ILineOptions } from '@/types/Plot/Line.ts'
 import { PointType } from '@/types/Plot/Line.ts'
+import type { PlotType } from '@/types/Plot/Poi.ts'
 
-import { LAYER_LIST } from './vars.ts'
+import { LAYER_LIST, LINE_LAYER_NAME, NAME } from './vars.ts'
 
-export class Line extends Poi<ILineOptions, GeoJSON.LineString> {
-  public points: Point[]
-  public midPoints: Point[]
+export class Line extends Poi<ILineOptions, GeoJSON.LineString | null> {
+  static NAME: PlotType = NAME
+  override readonly LAYER: string = LINE_LAYER_NAME
+
+  public points: Point[] = []
+  public midPoints: Point[] = []
 
   public modifyMid: Point | null | undefined
+
+  public drawPoint: LngLat | null = null
 
   protected residentEvent: LineResidentEvent
   protected updateEvent: LineUpdateEvent
@@ -33,8 +39,6 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString> {
     this.updateEvent = new LineUpdateEvent(map, this)
     this.createEvent = new LineCreateEvent(map, this)
 
-    this.points = []
-    this.midPoints = []
     this.createPoint()
   }
 
@@ -105,21 +109,30 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString> {
     return this.options.id
   }
   public override get center(): LngLat | undefined {
-    throw new Error('Method not implemented.')
+    if (!Array.isArray(this.options.position) || this.options.position.length === 0) {
+      return undefined
+    }
+    return undefined
+    // throw new Error('Method not implemented.')
   }
   public override get geometry(): GeoJSON.LineString | null {
-    if (this.getFeature() === null) {
-      return null
-    } else {
-      return this.getFeature()!.geometry
-    }
+    return this.getFeature().geometry
   }
   public override getFeature(): GeoJSON.Feature<
-    GeoJSON.LineString,
+    GeoJSON.LineString | null,
     ILineOptions['style'] | ILineOptions['properties']
-  > | null {
-    if (!this.options.position) {
-      return null
+  > {
+    if ((!this.options.position || this.options.position.length < 2) && !this.drawPoint) {
+      const emptyFeature: GeoJSON.Feature<
+        null,
+        ILineOptions['style'] | ILineOptions['properties']
+      > = {
+        type: 'Feature',
+        geometry: null,
+        id: this.id,
+        properties: {},
+      }
+      return emptyFeature
     }
 
     const coordinates = this.points.map((point) => {
@@ -137,6 +150,10 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString> {
       }
     }
 
+    if (this.drawPoint) {
+      coordinates.push(this.drawPoint.toArray())
+    }
+
     return lineString(
       coordinates,
       {
@@ -149,10 +166,15 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString> {
     )
   }
   public override start(): void {
-    throw new Error('Method not implemented.')
+    if (this.center === undefined) {
+      this.createEvent.able()
+      this.updateEvent.disabled()
+      this.residentEvent.disabled()
+    }
   }
   public override stop(): void {
-    throw new Error('Method not implemented.')
+    this.createEvent.disabled()
+    this.residentEvent.able()
   }
   public override edit(): void {
     this.setState({ edit: true })
@@ -200,6 +222,14 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString> {
   }
   public override move(position: LngLat): void {
     console.log(position, 'position')
+    // if (!this.center) return
+    // const dir = bearing(this.center.toArray(), position.toArray())
+    // const dir = bearing(
+    //   new LngLat(122.09860659512042, 30.004767949301183).toArray(),
+    //   position.toArray(),
+    // )
+    //
+    // console.log(dir, 'dirdadkajk')
   }
   public override update(options: ILineOptions): void {
     this.options = options
@@ -211,24 +241,25 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString> {
     throw new Error('Method not implemented.')
   }
   public override render(): void {
-    if (this.getFeature()) {
-      this.points.map((point) => {
-        point.render()
-      })
+    this.points.map((point) => {
+      point.render()
+    })
 
-      if (this.isEdit) {
-        this.midPoints.map((minPoint) => {
-          minPoint.render()
-        })
-      }
-      this.context.register.setGeoJSONData(PLOT_SOURCE_NAME, this.getFeature() as GeoJSON.Feature)
+    if (this.isEdit) {
+      this.midPoints.map((minPoint) => {
+        minPoint.render()
+      })
     }
+    this.context.register.setGeoJSONData(PLOT_SOURCE_NAME, this.getFeature() as GeoJSON.Feature)
   }
 
   public getMidPoint(index: number): Point | null {
     if (this.midPoints.length === 0) return null
 
     const data = this.midPoints[index]
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (!data) return null
+
     if (Number(data.options.properties?.index) === index) {
       return data
     } else {
@@ -240,6 +271,9 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString> {
     if (this.points.length === 0) return null
 
     const data = this.points[index]
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (!data) return null
+
     if (Number(data.options.properties?.index) === index) {
       return data
     } else {

@@ -125,12 +125,12 @@ cMap.on('loaded', (map) => {
 
   const line = new Line(map, {
     id: '1234',
-    position: [
-      new LngLat(122.09860659512042, 30.004767949301183),
-      new LngLat(122.09660659512042, 30.004767949301183),
-      new LngLat(122.09360659512042, 30.004767949301183),
-      new LngLat(122.08960659512042, 30.004767949301183),
-    ],
+    // position: [
+    //   new LngLat(122.09860659512042, 30.004767949301183),
+    //   new LngLat(122.09660659512042, 30.004767949301183),
+    //   new LngLat(122.09360659512042, 30.004767949301183),
+    //   new LngLat(122.08960659512042, 30.004767949301183),
+    // ],
     vertexStyle: {
       'circle-radius': 5,
     },
@@ -141,7 +141,8 @@ cMap.on('loaded', (map) => {
   })
 
   line.render()
-  line.edit()
+  line.start()
+  // line.edit()
   // setTimeout(() => {
   //   line.unedit()
   // }, 3000)

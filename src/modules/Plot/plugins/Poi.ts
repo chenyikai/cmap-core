@@ -7,11 +7,13 @@ import type { IPoiOptions } from '@/types/Plot/Poi.ts'
 
 export abstract class Poi<
   T extends IPoiOptions = IPoiOptions,
-  G extends GeoJSON.Geometry = GeoJSON.Geometry,
+  G extends GeoJSON.Geometry | null = GeoJSON.Geometry,
 > extends Module {
   public options: T
 
   readonly SOURCE: string = PLOT_SOURCE_NAME
+
+  readonly LAYER: string = ''
 
   protected constructor(map: Map, options: T) {
     super(map)
