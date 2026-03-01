@@ -4,6 +4,7 @@ import type { LngLat, Map } from 'mapbox-gl'
 import { Module } from '@/core/Module'
 import { PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
 import type { IPoiOptions } from '@/types/Plot/Poi.ts'
+import type { PlotVisibility } from '@/types/Plot/Poi.ts'
 
 export abstract class Poi<
   T extends IPoiOptions = IPoiOptions,
@@ -30,6 +31,10 @@ export abstract class Poi<
   public get isEdit(): boolean {
     const state = this.getState()
     return !!state?.edit
+  }
+
+  public get visibility(): PlotVisibility {
+    return this.options.visibility
   }
 
   public abstract get center(): LngLat | null
@@ -61,6 +66,16 @@ export abstract class Poi<
   public abstract remove(): void
 
   public abstract render(): void
+
+  public show(): void {
+    this.options.visibility = 'visible'
+    this.render()
+  }
+
+  public hide(): void {
+    this.options.visibility = 'none'
+    this.render()
+  }
 
   public setState(states: Record<string, unknown>): void {
     this.context.map.setFeatureState(

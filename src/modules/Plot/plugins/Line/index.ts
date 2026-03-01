@@ -51,6 +51,7 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString | null> {
       const vertex = new Point(this.context.map, {
         id: `${this.id}-node-${String(i)}`, // 建议 ID 加上 node 标识
         isName: false,
+        visibility: 'visible',
         position: current,
         style: this.options.vertexStyle,
         properties: {
@@ -71,6 +72,7 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString | null> {
         const mid = new Point(this.context.map, {
           id: `${this.id}-mid-${String(i)}`, // 建议 ID 加上 mid 标识
           isName: false,
+          visibility: 'visible',
           position: midPos,
           style: this.options.midStyle,
           properties: {
@@ -163,6 +165,7 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString | null> {
       {
         ...this.options.properties,
         ...this.options.style,
+        visibility: this.options.visibility,
       },
       {
         id: this.id,
@@ -180,6 +183,29 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString | null> {
     this.createEvent.disabled()
     this.residentEvent.able()
   }
+
+  public override show(): void {
+    this.points.forEach((point) => {
+      point.show()
+    })
+    this.midPoints.forEach((mid) => {
+      mid.show()
+    })
+
+    super.show()
+  }
+
+  public override hide(): void {
+    this.points.forEach((point) => {
+      point.hide()
+    })
+    this.midPoints.forEach((mid) => {
+      mid.hide()
+    })
+
+    super.hide()
+  }
+
   public override edit(): void {
     this.setState({ edit: true })
 

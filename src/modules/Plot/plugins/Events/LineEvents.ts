@@ -51,6 +51,7 @@ export class LineCreateEvent extends LineBaseEvent {
     const point = new Point(this.context.map, {
       id: `${this.line.id}-node-${String(this.count)}`,
       isName: false,
+      visibility: 'visible',
       position: e.lngLat,
       style: this.line.options.vertexStyle,
       properties: {
@@ -120,6 +121,8 @@ export class LineCreateEvent extends LineBaseEvent {
 }
 
 export class LineUpdateEvent extends LineBaseEvent {
+  protected dragStartLngLat: LngLat | null = null
+
   private onVertexUpdate = (e: EventMessage<Point>): void => {
     const current = e.instance
     const { index } = current.options.properties ?? {}
@@ -178,35 +181,74 @@ export class LineUpdateEvent extends LineBaseEvent {
     }
   }
 
+  private onLineMousedown = (e: MapMouseEvent): void => {
+    const features = this.context.map.queryRenderedFeatures(e.point, {
+      layers: [this.line.points[0].LAYER],
+    })
+
+    if (features.length > 0) {
+      return
+    }
+
+    e.preventDefault()
+    this.context.map.getCanvasContainer().style.cursor = 'move'
+    this.dragStartLngLat = e.lngLat
+
+    this.context.map.on('mousemove', this.onMousemove)
+    this.context.map.once('mouseup', this.onMouseup)
+
+    this.line.emit(`${Line.NAME}.beforeUpdate`, this.message<Line>(e, this.line))
+  }
+
   private onLineMouseenter = (): void => {
     this.context.map.getCanvasContainer().style.cursor = 'pointer'
-    this.context.map.once('mousedown', this.line.LAYER, (e: MapMouseEvent) => {
-      e.preventDefault()
-      this.context.map.getCanvasContainer().style.cursor = 'move'
-      this.line.drawPoint = e.lngLat
-
-      this.context.map.on('mousemove', this.onMousemove)
-      this.context.map.once('mouseup', this.onMouseup)
-
-      this.line.emit(`${Line.NAME}.beforeUpdate`, this.message<Line>(e, this.line))
-    })
+    this.context.map.on('mousedown', this.line.LAYER, this.onLineMousedown)
   }
 
   private onLineMouseLeave = (): void => {
     this.context.map.getCanvasContainer().style.cursor = ''
+    this.context.map.off('mousedown', this.line.LAYER, this.onLineMousedown)
     this.line.drawPoint = null
   }
 
   private onMousemove = (e: MapMouseEvent): void => {
     this.context.map.getCanvasContainer().style.cursor = 'move'
-    this.line.move(e.lngLat)
+    const current = e.lngLat
+    if (this.dragStartLngLat) {
+      const lngDiff = current.lng - this.dragStartLngLat.lng
+      const latDiff = current.lat - this.dragStartLngLat.lat
+      // this.line.move(e.lngLat)
+      this.line.options.position?.forEach((item) => {
+        item.lng += lngDiff
+        item.lat += latDiff
+      })
 
+      this.line.points.forEach((point) => {
+        if (point.center) {
+          const newPos = new LngLat(point.center.lng + lngDiff, point.center.lat + latDiff)
+          point.move(newPos)
+        }
+      })
+
+      this.line.midPoints.forEach((mid) => {
+        if (mid.center) {
+          const newPos = new LngLat(mid.center.lng + lngDiff, mid.center.lat + latDiff)
+          mid.move(newPos)
+        }
+      })
+
+      this.line.render()
+    }
+
+    this.dragStartLngLat = current
     this.line.emit(`${Line.NAME}.update`, this.message<Line>(e, this.line))
   }
 
   private onMouseup = (e: MapMouseEvent): void => {
     this.context.map.getCanvasContainer().style.cursor = ''
     this.context.map.off('mousemove', this.onMousemove)
+    this.context.map.off('mousedown', this.line.LAYER, this.onLineMousedown)
+    this.dragStartLngLat = null
     this.line.render()
 
     this.line.emit(`${Line.NAME}.doneUpdate`, this.message<Line>(e, this.line))

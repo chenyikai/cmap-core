@@ -1,14 +1,11 @@
 import { CMap } from "../src/modules/CMap";
-import '../src/styles/index.scss'
+import "../src/styles/index.scss";
 import { initShip } from "./ship";
 import { registerTack } from "./track";
-import { Point } from '@/modules/Plot/plugins/Point'
-import { IndexPoint } from '@/modules/Plot/plugins/IndexPoint'
-import { IconPoint } from '@/modules/Plot/plugins/IconPoint'
-import { LngLat } from 'mapbox-gl'
-import { Tooltip } from '@/core/Tooltip'
+import { LngLat } from "mapbox-gl";
 import IconManager from "../src/core/IconManager";
-import { Line } from '../src/modules/Plot/plugins/Line'
+import { Line } from "../src/modules/Plot/plugins/Line";
+import { PlotVisibility } from "../src/types/Plot/Poi";
 
 const cMap = new CMap({
   container: 'map',
@@ -125,12 +122,13 @@ cMap.on('loaded', (map) => {
 
   const line = new Line(map, {
     id: '1234',
-    // position: [
-    //   new LngLat(122.09860659512042, 30.004767949301183),
-    //   new LngLat(122.09660659512042, 30.004767949301183),
-    //   new LngLat(122.09360659512042, 30.004767949301183),
-    //   new LngLat(122.08960659512042, 30.004767949301183),
-    // ],
+    visibility: 'visible',
+    position: [
+      new LngLat(122.09860659512042, 30.004767949301183),
+      new LngLat(122.09660659512042, 30.004767949301183),
+      new LngLat(122.09360659512042, 30.004767949301183),
+      new LngLat(122.08960659512042, 30.004767949301183),
+    ],
     vertexStyle: {
       'circle-radius': 5,
     },
@@ -140,9 +138,11 @@ cMap.on('loaded', (map) => {
     },
   })
 
+  window.test = line
+
   line.render()
-  line.start()
-  // line.edit()
+  // line.start()
+  line.edit()
   // setTimeout(() => {
   //   line.unedit()
   // }, 3000)

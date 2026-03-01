@@ -14,7 +14,7 @@ export const DEFAULT_LINE_WIDTH = 3
 export const LINE_LAYER: LayerSpecification = {
   id: LINE_LAYER_NAME,
   type: 'line',
-  filter: ['all', ['==', '$type', 'LineString']],
+  filter: ['all', ['==', '$type', 'LineString'], ['==', 'visibility', 'visible']],
   source: PLOT_SOURCE_NAME,
   paint: {
     'line-color': ['coalesce', ['get', 'line-color'], DEFAULT_LINE_COLOR],

@@ -29,7 +29,12 @@ const circleStrokeWidth = ['coalesce', ['get', 'circle-stroke-width'], DEFAULT_C
 export const POINT_CIRCLE_LAYER: LayerSpecification = {
   id: POINT_CIRCLE_LAYER_NAME,
   type: 'circle',
-  filter: ['all', ['==', '$type', 'Point'], ['==', 'meta', 'circle']],
+  filter: [
+    'all',
+    ['==', '$type', 'Point'],
+    ['==', 'meta', 'circle'],
+    ['==', 'visibility', 'visible'],
+  ],
   source: PLOT_SOURCE_NAME,
   paint: {
     'circle-radius': [
@@ -56,7 +61,12 @@ export const POINT_CIRCLE_LAYER: LayerSpecification = {
 export const POINT_TEXT_LAYER: LayerSpecification = {
   id: POINT_TEXT_LAYER_NAME,
   type: 'symbol',
-  filter: ['all', ['==', '$type', 'Point'], ['==', 'isName', true]],
+  filter: [
+    'all',
+    ['==', '$type', 'Point'],
+    ['==', 'isName', true],
+    ['==', 'visibility', 'visible'],
+  ],
   source: PLOT_SOURCE_NAME,
   layout: {
     'text-field': ['get', 'text'],
