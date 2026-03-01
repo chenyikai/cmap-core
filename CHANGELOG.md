@@ -4,6 +4,12 @@
 
 ### Minor Changes
 
+- 706f418: 添加轨迹模块 重构船舶 Tooltip
+
+## 0.1.0
+
+### Minor Changes
+
 - 6080f57: 测试
 
 ## 0.5.0
