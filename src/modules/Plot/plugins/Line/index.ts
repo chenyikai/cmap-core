@@ -38,8 +38,9 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString | null> {
     this.residentEvent = new LineResidentEvent(map, this)
     this.updateEvent = new LineUpdateEvent(map, this)
     this.createEvent = new LineCreateEvent(map, this)
-
     this.createPoint()
+
+    this.residentEvent.able()
   }
 
   public createPoint(): void {
@@ -166,6 +167,7 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString | null> {
         ...this.options.properties,
         ...this.options.style,
         visibility: this.options.visibility,
+        'line-dasharray': this.isEdit || this.isCreate ? [2, 2] : [99999, 99999],
       },
       {
         id: this.id,
@@ -177,11 +179,13 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString | null> {
       this.createEvent.able()
       this.updateEvent.disabled()
       this.residentEvent.disabled()
+      this.setState({ create: true })
     }
   }
   public override stop(): void {
     this.createEvent.disabled()
     this.residentEvent.able()
+    this.setState({ create: false })
   }
 
   public override show(): void {

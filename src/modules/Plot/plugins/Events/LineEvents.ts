@@ -217,7 +217,6 @@ export class LineUpdateEvent extends LineBaseEvent {
     if (this.dragStartLngLat) {
       const lngDiff = current.lng - this.dragStartLngLat.lng
       const latDiff = current.lat - this.dragStartLngLat.lat
-      // this.line.move(e.lngLat)
       this.line.options.position?.forEach((item) => {
         item.lng += lngDiff
         item.lat += latDiff
@@ -299,6 +298,40 @@ export class LineUpdateEvent extends LineBaseEvent {
 }
 
 export class LineResidentEvent extends LineBaseEvent {
+  private onLineMouseenter = (e: MapMouseEvent): void => {
+    this.context.map.getCanvasContainer().style.cursor = 'pointer'
+    this.line.setState({ hover: true })
+    this.line.points.forEach((point) => {
+      point.setState({ hover: true })
+    })
+    this.line.emit('hover', this.message<Line>(e, this.line))
+  }
+
+  private onLineMouseLeave = (e: MapMouseEvent): void => {
+    this.context.map.getCanvasContainer().style.cursor = ''
+    this.line.setState({ hover: false })
+    this.line.points.forEach((point) => {
+      point.setState({ hover: false })
+    })
+    this.line.emit('unhover', this.message<Line>(e, this.line))
+  }
+
+  private onClick = (e: EventMessage<Point>): void => {
+    this.line.emit('click', this.message<Line>(e.originEvent, this.line))
+  }
+
+  private onLineClick = (e: MapMouseEvent): void => {
+    const features = this.context.map.queryRenderedFeatures(e.point, {
+      layers: [this.line.points[0].LAYER],
+    })
+
+    if (features.length > 0) {
+      return
+    }
+
+    this.line.emit('click', this.message<Line>(e, this.line))
+  }
+
   constructor(map: Map, line: Line) {
     super(map, line)
   }
@@ -308,14 +341,27 @@ export class LineResidentEvent extends LineBaseEvent {
   }
 
   public override onRemove(): void {
-    throw new Error('Method not implemented.')
+    this.disabled()
   }
 
   public override able(): void {
+    this.line.points.forEach((point) => {
+      point.on('click', this.onClick)
+    })
+    this.context.eventManager.on(this.line.id, this.line.LAYER, 'mouseenter', this.onLineMouseenter)
+    this.context.eventManager.on(this.line.id, this.line.LAYER, 'mouseleave', this.onLineMouseLeave)
+    this.context.eventManager.on(this.line.id, this.line.LAYER, 'click', this.onLineClick)
     this.changeStatus()
   }
 
   public override disabled(): void {
+    this.line.points.forEach((point) => {
+      point.off('click', this.onClick)
+    })
+
+    this.context.eventManager.off(this.line.id, 'mouseenter', this.onLineMouseenter)
+    this.context.eventManager.off(this.line.id, 'mouseleave', this.onLineMouseLeave)
+    this.context.eventManager.off(this.line.id, 'click', this.onLineClick)
     this.changeStatus()
   }
 }

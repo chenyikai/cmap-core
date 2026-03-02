@@ -33,6 +33,11 @@ export abstract class Poi<
     return !!state?.edit
   }
 
+  public get isCreate(): boolean {
+    const state = this.getState()
+    return !!state?.create
+  }
+
   public get visibility(): PlotVisibility {
     return this.options.visibility
   }
