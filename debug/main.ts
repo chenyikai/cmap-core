@@ -7,6 +7,7 @@ import IconManager from "../src/core/IconManager";
 import { Line } from "../src/modules/Plot/plugins/Line";
 import { IndexPoint } from "../src/modules/Plot/plugins/IndexPoint";
 import { IndexLine } from "../src/modules/Plot/plugins/IndexLine";
+import { ArrowLine } from "../src/modules/Plot/plugins/ArrowLine";
 
 const cMap = new CMap({
   container: 'map',
@@ -73,19 +74,19 @@ cMap.on('loaded', (map) => {
   // icon.edit()
   //
 
-  const index = new IndexPoint(map, {
-    id: '2',
-    name: '浙江宝驿4s店',
-    visibility: 'visible',
-    index: 1,
-    style: {
-      'text-color': '#f00'
-    },
-    position: new LngLat(122.09660659512042, 30.004767949301183)
-  })
-
-  index.render()
-  index.edit()
+  // const index = new ArrowLine(map, {
+  //   id: '2',
+  //   name: '浙江宝驿4s店',
+  //   visibility: 'visible',
+  //   index: 1,
+  //   style: {
+  //     'text-color': '#f00'
+  //   },
+  //   position: new LngLat(122.09660659512042, 30.004767949301183)
+  // })
+  //
+  // index.render()
+  // index.edit()
 
   // //
   // // //
@@ -174,13 +175,14 @@ cMap.on('loaded', (map) => {
     ]
   ].map(item => new LngLat(item[0], item[1]))
 
-  const line = new IndexLine(map, {
+  const line = new ArrowLine(map, {
     id: '1234',
     visibility: 'visible',
     // position,
     vertexStyle: {
       // 'circle-radius': 5,
-      'text-color': '#f00'
+      // 'text-color': '#f00'
+      'icon-rotate': 0
     },
     midStyle: {
       'circle-radius': 2, // 中点通常画小一点
@@ -188,7 +190,7 @@ cMap.on('loaded', (map) => {
     },
   })
 
-  line.render()
+  // line.render()
   // line.on('click', e => {
   //   console.log(e, 'dajdakjdkla');
   // })

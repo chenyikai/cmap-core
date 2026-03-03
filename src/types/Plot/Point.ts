@@ -38,7 +38,7 @@ export interface PointInstance<T extends IPointOptions = any> {
   // --- 基础属性 (源自 A 与 C) ---
   options: T
   readonly SOURCE: string
-  readonly LAYER: string
+  LAYER: string
 
   // --- 事件属性 (源自 C) ---
   residentEvent: PointResidentEvent

@@ -31,8 +31,12 @@ export class LineCreateEvent extends LineBaseEvent {
   private onClick = (e: MapMouseEvent): void => {
     // 点击过一次之后 计算结束事件
     if (this.count >= 1) {
+      const layers = new Set(
+        [...this.line.points, ...this.line.midPoints].map((item) => item.LAYER),
+      )
+
       const features = this.context.map.queryRenderedFeatures(e.point, {
-        layers: [this.line.points[0].LAYER],
+        layers: [...layers],
       })
 
       if (features.length > 0) {
@@ -187,8 +191,10 @@ export class LineUpdateEvent extends LineBaseEvent {
   }
 
   private onLineMousedown = (e: MapMouseEvent): void => {
+    const layers = new Set([...this.line.points, ...this.line.midPoints].map((item) => item.LAYER))
+
     const features = this.context.map.queryRenderedFeatures(e.point, {
-      layers: [this.line.points[0].LAYER],
+      layers: [...layers],
     })
 
     if (features.length > 0) {
@@ -326,8 +332,10 @@ export class LineResidentEvent extends LineBaseEvent {
   }
 
   private onLineClick = (e: MapMouseEvent): void => {
+    const layers = new Set([...this.line.points, ...this.line.midPoints].map((item) => item.LAYER))
+
     const features = this.context.map.queryRenderedFeatures(e.point, {
-      layers: [this.line.points[0].LAYER],
+      layers: [...layers],
     })
 
     if (features.length > 0) {

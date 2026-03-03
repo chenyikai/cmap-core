@@ -5,7 +5,7 @@ import type { EventMessage } from '@/types/EventState'
 import { EventStatus } from '@/types/EventState'
 
 export abstract class EventState extends Module {
-  private status: EventStatus = EventStatus.OFF
+  public status: EventStatus = EventStatus.OFF
   static ON: EventStatus = EventStatus.ON
   static OFF: EventStatus = EventStatus.OFF
 
