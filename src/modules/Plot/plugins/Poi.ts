@@ -46,7 +46,7 @@ export abstract class Poi<
 
   public abstract get geometry(): G | null
 
-  public abstract getFeature(): GeoJSON.Feature<G, T['style'] & T['properties']> | null
+  public abstract getFeature(): GeoJSON.Feature<G, T['style'] & T['properties']>
 
   public abstract start(): void
 

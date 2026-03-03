@@ -178,12 +178,13 @@ export class LineUpdateEvent extends LineBaseEvent {
   private onMidDone = (): void => {
     if (this.line.geometry?.coordinates) {
       const lonLat = this.line.geometry.coordinates
-      const position = lonLat.map((item) => new LngLat(item[0], item[1]))
 
+      this.line.options.position = lonLat.map((item) => new LngLat(item[0], item[1]))
       this.line.modifyMid = null
+
+      console.log(this.line.options, 'this.line.options')
       this.line.update({
         ...this.line.options,
-        position,
       })
 
       this.line.edit()
@@ -203,7 +204,7 @@ export class LineUpdateEvent extends LineBaseEvent {
 
     e.preventDefault()
     this.context.map.getCanvasContainer().style.cursor = 'move'
-    this.dragStartLngLat = e.lngLat
+    this.line.dragStartLngLat = e.lngLat
 
     this.context.map.on('mousemove', this.onMousemove)
     this.context.map.once('mouseup', this.onMouseup)
@@ -225,32 +226,8 @@ export class LineUpdateEvent extends LineBaseEvent {
   private onMousemove = (e: MapMouseEvent): void => {
     this.context.map.getCanvasContainer().style.cursor = 'move'
     const current = e.lngLat
-    if (this.dragStartLngLat) {
-      const lngDiff = current.lng - this.dragStartLngLat.lng
-      const latDiff = current.lat - this.dragStartLngLat.lat
-      this.line.options.position?.forEach((item) => {
-        item.lng += lngDiff
-        item.lat += latDiff
-      })
-
-      this.line.points.forEach((point) => {
-        if (point.center) {
-          const newPos = new LngLat(point.center.lng + lngDiff, point.center.lat + latDiff)
-          point.move(newPos)
-        }
-      })
-
-      this.line.midPoints.forEach((mid) => {
-        if (mid.center) {
-          const newPos = new LngLat(mid.center.lng + lngDiff, mid.center.lat + latDiff)
-          mid.move(newPos)
-        }
-      })
-
-      this.line.render()
-    }
-
-    this.dragStartLngLat = current
+    this.line.move(current)
+    this.line.dragStartLngLat = current
     this.line.emit(`${Line.NAME}.update`, this.message<Line>(e, this.line))
   }
 

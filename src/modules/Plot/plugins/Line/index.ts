@@ -27,6 +27,8 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
 
   public modifyMid: Point | null | undefined
 
+  public dragStartLngLat: LngLat | null = null
+
   public drawPoint: LngLat | null = null
 
   protected residentEvent: LineResidentEvent
@@ -78,6 +80,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
   public createPoint(): void {
     const positions = this.options.position ?? []
 
+    console.log(positions, 'positions')
     for (let i = 0; i < positions.length; i++) {
       const current = positions[i]
 
@@ -260,20 +263,41 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
     throw new Error('Method not implemented.')
   }
   public override move(position: LngLat): void {
-    console.log(position, 'position')
-    // if (!this.center) return
-    // const dir = bearing(this.center.toArray(), position.toArray())
-    // const dir = bearing(
-    //   new LngLat(122.09860659512042, 30.004767949301183).toArray(),
-    //   position.toArray(),
-    // )
-    //
-    // console.log(dir, 'dirdadkajk')
+    if (this.center === null) return
+
+    this.dragStartLngLat ??= this.center
+
+    const lngDiff = position.lng - this.dragStartLngLat.lng
+    const latDiff = position.lat - this.dragStartLngLat.lat
+    this.options.position?.forEach((item) => {
+      item.lng += lngDiff
+      item.lat += latDiff
+    })
+
+    this.points.forEach((point) => {
+      if (point.center) {
+        const newPos = new LngLat(point.center.lng + lngDiff, point.center.lat + latDiff)
+        point.move(newPos)
+      }
+    })
+
+    this.midPoints.forEach((mid) => {
+      if (mid.center) {
+        const newPos = new LngLat(mid.center.lng + lngDiff, mid.center.lat + latDiff)
+        mid.move(newPos)
+      }
+    })
+
+    this.render()
+
+    this.dragStartLngLat = null
   }
   public override update(options: T): void {
     this.options = options
     this.removePoint()
     this.createPoint()
+
+    console.log(this.points, this.midPoints, 'dalsjdjkla')
     this.render()
   }
   public override remove(): void {
