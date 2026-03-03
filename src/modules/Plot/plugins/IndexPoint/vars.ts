@@ -1,5 +1,6 @@
 import type { LayerSpecification } from 'mapbox-gl'
 
+import type { SortLayer } from '@/core/ResourceRegister'
 import { PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
 import { PlotType } from '@/types/Plot/Poi.ts'
 
@@ -17,6 +18,7 @@ export const POINT_INDEX_LAYER: LayerSpecification = {
     ['==', '$type', 'Point'],
     ['==', 'meta', 'circle'],
     ['==', 'subMeta', 'indexPoint'],
+    ['==', 'visibility', 'visible'],
   ],
   source: PLOT_SOURCE_NAME,
   paint: {
@@ -31,4 +33,10 @@ export const POINT_INDEX_LAYER: LayerSpecification = {
   },
 }
 
-export const LAYER_LIST: LayerSpecification[] = [POINT_INDEX_LAYER]
+export const LAYER_LIST: SortLayer[] = [
+  {
+    layer: POINT_INDEX_LAYER,
+    // zIndex: TEXT_Z_INDEX,
+    zIndex: 11,
+  },
+]

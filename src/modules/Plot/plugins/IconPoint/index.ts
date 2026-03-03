@@ -30,9 +30,9 @@ export class IconPoint extends Point<IIconPointOptions> {
   constructor(map: Map, options: IIconPointOptions) {
     super(map, options)
 
-    this.residentEvent = new PointResidentEvent(map, this)
-    this.updateEvent = new PointUpdateEvent(map, this)
-    this.createEvent = new PointCreateEvent(map, this)
+    this.residentEvent = new PointResidentEvent<IconPoint>(map, this)
+    this.updateEvent = new PointUpdateEvent<IconPoint>(map, this)
+    this.createEvent = new PointCreateEvent<IconPoint>(map, this)
     this.residentEvent.able()
   }
 
@@ -45,11 +45,21 @@ export class IconPoint extends Point<IIconPointOptions> {
   }
 
   public override getFeature(): GeoJSON.Feature<
-    GeoJSON.Point,
+    GeoJSON.Point | null,
     IIconPointOptions['style'] & IIconPointOptions['properties']
-  > | null {
+  > {
     if (!this.options.position) {
-      return null
+      const emptyFeature: GeoJSON.Feature<
+        null,
+        IIconPointOptions['style'] & IIconPointOptions['properties']
+      > = {
+        type: 'Feature',
+        geometry: null,
+        id: this.id,
+        properties: {},
+      }
+
+      return emptyFeature
     }
 
     const h = this.context.iconManage.getImage(this.options.icon)?.height ?? 0

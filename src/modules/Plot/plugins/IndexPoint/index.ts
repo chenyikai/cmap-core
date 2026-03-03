@@ -25,11 +25,21 @@ export class IndexPoint extends Point<IIndexPointOptions> {
   }
 
   public override getFeature(): GeoJSON.Feature<
-    GeoJSON.Point,
+    GeoJSON.Point | null,
     IIndexPointOptions['style'] & IIndexPointOptions['properties']
-  > | null {
+  > {
     if (!this.options.position) {
-      return null
+      const emptyFeature: GeoJSON.Feature<
+        null,
+        IIndexPointOptions['style'] & IIndexPointOptions['properties']
+      > = {
+        type: 'Feature',
+        geometry: null,
+        id: this.id,
+        properties: {},
+      }
+
+      return emptyFeature
     }
 
     return point(
@@ -37,6 +47,7 @@ export class IndexPoint extends Point<IIndexPointOptions> {
       {
         ...this.options.style,
         ...this.options.properties,
+        visibility: this.options.visibility,
         isName: false,
         index: this.options.index,
         meta: 'circle',

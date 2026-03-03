@@ -267,12 +267,12 @@ export class LineUpdateEvent extends LineBaseEvent {
 
   public override able(): void {
     this.line.points.forEach((point) => {
-      point.on('Point.update', this.onVertexUpdate)
+      point.on('update', this.onVertexUpdate)
     })
     this.line.midPoints.forEach((mid) => {
-      mid.on('Point.beforeUpdate', this.onMidBeforeUpdate)
-      mid.on('Point.update', this.onMidUpdate)
-      mid.on('Point.doneUpdate', this.onMidDone)
+      mid.on('beforeUpdate', this.onMidBeforeUpdate)
+      mid.on('update', this.onMidUpdate)
+      mid.on('doneUpdate', this.onMidDone)
     })
 
     this.context.eventManager.on(this.line.id, this.line.LAYER, 'mouseenter', this.onLineMouseenter)
@@ -283,12 +283,12 @@ export class LineUpdateEvent extends LineBaseEvent {
 
   public override disabled(): void {
     this.line.points.forEach((point) => {
-      point.off('Point.update', this.onVertexUpdate)
+      point.off('update', this.onVertexUpdate)
     })
     this.line.midPoints.forEach((mid) => {
-      mid.off('Point.beforeUpdate', this.onMidBeforeUpdate)
-      mid.off('Point.update', this.onMidUpdate)
-      mid.off('Point.doneUpdate', this.onMidDone)
+      mid.off('beforeUpdate', this.onMidBeforeUpdate)
+      mid.off('update', this.onMidUpdate)
+      mid.off('doneUpdate', this.onMidDone)
     })
 
     this.context.eventManager.off(this.line.id, 'mouseenter', this.onLineMouseenter)

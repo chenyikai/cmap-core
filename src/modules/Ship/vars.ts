@@ -1,8 +1,11 @@
 import type { LayerSpecification } from 'mapbox-gl'
 
+import type { SortLayer } from '@/core/ResourceRegister'
 import type { SvgIcon } from '@/types/IconManager'
 
 export const NAME = 'Ais'
+
+export const Z_INDEX = 300
 
 export const SHIP_SOURCE_NAME = 'mapbox-gl-ship-source'
 
@@ -102,11 +105,23 @@ export const SHIP_REAL_OUTLINE_LAYER: LayerSpecification = {
   },
 }
 
-export const LAYER_LIST: LayerSpecification[] = [
-  SHIP_ICON_DIRECTION_LAYER,
-  SHIP_ICON_LAYER,
-  SHIP_REAL_LAYER,
-  SHIP_REAL_OUTLINE_LAYER,
+export const LAYER_LIST: SortLayer[] = [
+  {
+    layer: SHIP_ICON_DIRECTION_LAYER,
+    zIndex: Z_INDEX,
+  },
+  {
+    layer: SHIP_ICON_LAYER,
+    zIndex: Z_INDEX,
+  },
+  {
+    layer: SHIP_REAL_LAYER,
+    zIndex: Z_INDEX,
+  },
+  {
+    layer: SHIP_REAL_OUTLINE_LAYER,
+    zIndex: Z_INDEX,
+  },
 ]
 
 export const SHIP_ICON: SvgIcon[] = [

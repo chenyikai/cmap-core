@@ -1,5 +1,7 @@
 import type { DataDrivenPropertyValueSpecification, LayerSpecification } from 'mapbox-gl'
 
+import type { SortLayer } from '@/core/ResourceRegister'
+import { Z_INDEX } from '@/modules/Plot/plugins/Point/vars.ts'
 import { PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
 import { PlotType } from '@/types/Plot/Poi.ts'
 
@@ -40,4 +42,9 @@ export const POINT_ICON_LAYER: LayerSpecification = {
   paint: {},
 }
 
-export const LAYER_LIST: LayerSpecification[] = [POINT_ICON_LAYER]
+export const LAYER_LIST: SortLayer[] = [
+  {
+    layer: POINT_ICON_LAYER,
+    zIndex: Z_INDEX,
+  },
+]

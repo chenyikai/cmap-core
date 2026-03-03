@@ -1,6 +1,10 @@
 import type { LayerSpecification } from 'mapbox-gl'
 
+import type { SortLayer } from '@/core/ResourceRegister'
+
 export const NAME = 'Track'
+
+export const Z_INDEX = 290
 
 export const TRACK_SOURCE_NAME = 'mapbox-gl-track-source'
 
@@ -70,8 +74,17 @@ export const TRACK_LINE_LAYER: LayerSpecification = {
   layout: {},
 }
 
-export const LAYER_LIST: LayerSpecification[] = [
-  TRACK_LINE_LAYER,
-  TRACK_ARROW_LAYER,
-  TRACK_ICON_LAYER,
+export const LAYER_LIST: SortLayer[] = [
+  {
+    layer: TRACK_LINE_LAYER,
+    zIndex: Z_INDEX,
+  },
+  {
+    layer: TRACK_ARROW_LAYER,
+    zIndex: Z_INDEX,
+  },
+  {
+    layer: TRACK_ICON_LAYER,
+    zIndex: Z_INDEX,
+  },
 ]

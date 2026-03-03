@@ -1,10 +1,15 @@
 import type { LayerSpecification } from 'mapbox-gl'
 
+import type { SortLayer } from '@/core/ResourceRegister'
 import { DEFAULT_TEXT_COLOR } from '@/modules/Plot/plugins/IndexPoint/vars.ts'
 import { PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
 import { PlotType } from '@/types/Plot/Poi.ts'
 
 export const NAME = PlotType.POINT
+
+export const Z_INDEX = 10
+
+export const TEXT_Z_INDEX = Z_INDEX + 1
 
 export const POINT_CIRCLE_LAYER_NAME = 'mapbox-gl-plot-point-circle-layer'
 
@@ -82,4 +87,13 @@ export const POINT_TEXT_LAYER: LayerSpecification = {
   },
 }
 
-export const LAYER_LIST: LayerSpecification[] = [POINT_CIRCLE_LAYER, POINT_TEXT_LAYER]
+export const LAYER_LIST: SortLayer[] = [
+  {
+    layer: POINT_CIRCLE_LAYER,
+    zIndex: Z_INDEX,
+  },
+  {
+    layer: POINT_TEXT_LAYER,
+    zIndex: TEXT_Z_INDEX,
+  },
+]

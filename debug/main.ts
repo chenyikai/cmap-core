@@ -5,7 +5,7 @@ import { registerTack } from "./track";
 import { LngLat } from "mapbox-gl";
 import IconManager from "../src/core/IconManager";
 import { Line } from "../src/modules/Plot/plugins/Line";
-import { PlotVisibility } from "../src/types/Plot/Poi";
+import { IndexPoint } from "../src/modules/Plot/plugins/IndexPoint";
 
 const cMap = new CMap({
   container: 'map',
@@ -20,6 +20,7 @@ setTimeout(() => {
 
 cMap.on('loaded', (map) => {
 
+  // @ts-ignore
   window.map = map
 
   // map.showCollisionBoxes = true
@@ -71,18 +72,19 @@ cMap.on('loaded', (map) => {
   // icon.edit()
   //
 
-  // const index = new IndexPoint(map, {
-  //   id: '2',
-  //   name: '浙江宝驿4s店',
-  //   index: 1,
-  //   style: {
-  //     'text-color': '#f00'
-  //   },
-  //   position: new LngLat(122.09660659512042, 30.004767949301183)
-  // })
-  //
-  // index.render()
-  // index.edit()
+  const index = new IndexPoint(map, {
+    id: '2',
+    name: '浙江宝驿4s店',
+    visibility: 'visible',
+    index: 1,
+    style: {
+      'text-color': '#f00'
+    },
+    position: new LngLat(122.09660659512042, 30.004767949301183)
+  })
+
+  index.render()
+  index.edit()
 
   // //
   // // //
@@ -120,15 +122,61 @@ cMap.on('loaded', (map) => {
   //
   // point1.render()
 
+  const position = [
+    [
+      122.06229541500755,
+      30.016232378547613
+    ],
+    [
+      122.06045005520554,
+      30.008948810372544
+    ],
+    [
+      122.05937717160049,
+      30.003039808597222
+    ],
+    [
+      122.0640978594655,
+      29.993822549884555
+    ],
+    [
+      122.07272384365695,
+      30.007759605597727
+    ],
+    [
+      122.08443973263377,
+      30.00935759622199
+    ],
+    [
+      122.09104869564726,
+      30.01522906163511
+    ],
+    [
+      122.11422298153701,
+      30.022660797882523
+    ],
+    [
+      122.12100360592638,
+      30.01169879181488
+    ],
+    [
+      122.12362144192292,
+      30.001664707394724
+    ],
+    [
+      122.12804172237986,
+      30.001664707394724
+    ],
+    [
+      122.12851379116631,
+      30.01656681526326
+    ]
+  ].map(item => new LngLat(item[0], item[1]))
+
   const line = new Line(map, {
     id: '1234',
     visibility: 'visible',
-    // position: [
-    //   new LngLat(122.09860659512042, 30.004767949301183),
-    //   new LngLat(122.09660659512042, 30.004767949301183),
-    //   new LngLat(122.09360659512042, 30.004767949301183),
-    //   new LngLat(122.08960659512042, 30.004767949301183),
-    // ],
+    position,
     vertexStyle: {
       'circle-radius': 5,
     },
@@ -138,12 +186,12 @@ cMap.on('loaded', (map) => {
     },
   })
 
-  // line.render()
+  line.render()
   // line.on('click', e => {
   //   console.log(e, 'dajdakjdkla');
   // })
-  line.start()
-  // line.edit()
+  // line.start()
+  line.edit()
   // setTimeout(() => {
   //   line.unedit()
   // }, 3000)

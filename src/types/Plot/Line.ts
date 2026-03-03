@@ -13,6 +13,5 @@ export interface ILineOptions extends IPoiOptions {
   style?: LineStyle
   vertexStyle?: PointStyle
   midStyle?: PointStyle
-  index?: boolean
   properties?: Record<string, any>
 }

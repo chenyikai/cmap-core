@@ -1,5 +1,7 @@
 import type { LayerSpecification } from 'mapbox-gl'
 
+import type { SortLayer } from '@/core/ResourceRegister'
+
 export const CONNECT_LINE_LAYER_NAME = 'mapbox-gl-tooltip-connect-line'
 
 export const CONNECT_DEBUG_LINE_LAYER_NAME = 'mapbox-gl-tooltip-connect-debug-line'
@@ -40,4 +42,17 @@ export const CONNECT_DEBUG_FILL_LAYER: LayerSpecification = {
   },
 }
 
-export const LAYERS = [CONNECT_LINE_LAYER, CONNECT_DEBUG_FILL_LAYER, CONNECT_DEBUG_LINE_LAYER]
+export const LAYERS: SortLayer[] = [
+  {
+    layer: CONNECT_LINE_LAYER,
+    zIndex: 9999,
+  },
+  {
+    layer: CONNECT_DEBUG_FILL_LAYER,
+    zIndex: 9999,
+  },
+  {
+    layer: CONNECT_DEBUG_LINE_LAYER,
+    zIndex: 9999,
+  },
+]

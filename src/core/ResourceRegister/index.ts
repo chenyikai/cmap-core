@@ -2,11 +2,17 @@ import type * as GeoJSON from 'geojson'
 import { isEmpty } from 'lodash-es'
 import type { LayerSpecification, Map as MapboxGlMap, Source, SourceSpecification } from 'mapbox-gl'
 
+export interface SortLayer {
+  zIndex: number
+  layer: LayerSpecification
+}
+
 class ResourceRegister {
   private map: MapboxGlMap
   private sourceData = new Map<string, GeoJSON.FeatureCollection>()
   private dirtySourceIds = new Set<string>()
   private renderFrameId: number | null = null
+  private layerList: SortLayer[] = []
 
   constructor(map: MapboxGlMap) {
     this.map = map
@@ -27,9 +33,19 @@ class ResourceRegister {
   /**
    * 幂等地添加 Layer
    */
-  public addLayer(layer: LayerSpecification, beforeId?: string): void {
+  public addLayer(sortLayer: SortLayer): void {
+    const { layer, zIndex } = sortLayer
+
     if (!this.map.getLayer(layer.id)) {
-      this.map.addLayer(layer, beforeId)
+      const i = this.layerList.findIndex((item) => item.zIndex > zIndex)
+      if (i === -1) {
+        this.map.addLayer(layer)
+        this.layerList.push({ zIndex, layer })
+      } else {
+        const beforeLayer = this.layerList[i].layer
+        this.map.addLayer(layer, beforeLayer.id)
+        this.layerList.splice(i, 0, { layer, zIndex })
+      }
     }
   }
 

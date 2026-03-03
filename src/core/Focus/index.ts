@@ -10,7 +10,7 @@ import ResourceRegister from '@/core/ResourceRegister'
 import type { FocusItem, IFocusOptions } from '@/types/Focus'
 import { distanceToPx } from '@/utils/util.ts'
 
-import { FOCUS_LAYER, FOCUS_SOURCE_NAME } from './vars.ts'
+import { FOCUS_LAYER, FOCUS_SOURCE_NAME, FOCUS_Z_INDEX } from './vars.ts'
 
 class Focus extends EventEmitter {
   private readonly map: Map
@@ -41,7 +41,7 @@ class Focus extends EventEmitter {
       },
     })
 
-    this.register.addLayer(FOCUS_LAYER)
+    this.register.addLayer({ layer: FOCUS_LAYER, zIndex: FOCUS_Z_INDEX })
   }
   onRemove(): void {
     this.removeAll()

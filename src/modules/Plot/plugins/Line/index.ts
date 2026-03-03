@@ -17,7 +17,7 @@ import type { PlotType } from '@/types/Plot/Poi.ts'
 
 import { LAYER_LIST, LINE_LAYER_NAME, NAME } from './vars.ts'
 
-export class Line extends Poi<ILineOptions, GeoJSON.LineString | null> {
+export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.LineString | null> {
   static NAME: PlotType = NAME
   override readonly LAYER: string = LINE_LAYER_NAME
 
@@ -32,7 +32,7 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString | null> {
   protected updateEvent: LineUpdateEvent
   protected createEvent: LineCreateEvent
 
-  constructor(map: Map, options: ILineOptions) {
+  constructor(map: Map, options: T) {
     super(map, options)
 
     this.residentEvent = new LineResidentEvent(map, this)
@@ -127,13 +127,10 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString | null> {
   }
   public override getFeature(): GeoJSON.Feature<
     GeoJSON.LineString | null,
-    ILineOptions['style'] | ILineOptions['properties']
+    T['style'] | T['properties']
   > {
     if ((!this.options.position || this.options.position.length < 2) && !this.drawPoint) {
-      const emptyFeature: GeoJSON.Feature<
-        null,
-        ILineOptions['style'] | ILineOptions['properties']
-      > = {
+      const emptyFeature: GeoJSON.Feature<null, T['style'] | T['properties']> = {
         type: 'Feature',
         geometry: null,
         id: this.id,
@@ -265,7 +262,7 @@ export class Line extends Poi<ILineOptions, GeoJSON.LineString | null> {
     //
     // console.log(dir, 'dirdadkajk')
   }
-  public override update(options: ILineOptions): void {
+  public override update(options: T): void {
     this.options = options
     this.removePoint()
     this.createPoint()

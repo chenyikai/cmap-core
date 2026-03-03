@@ -1,12 +1,12 @@
 import type { Map, MapMouseEvent } from 'mapbox-gl'
 
 import { EventState } from '@/core/EventState'
-import { Point } from '@/modules/Plot/plugins/Point'
+import type { Point } from '@/modules/Plot/plugins/Point'
 
-export abstract class PointBaseEvent extends EventState {
-  protected point: Point
+export abstract class PointBaseEvent<T extends Point = Point> extends EventState {
+  protected point: T
 
-  protected constructor(map: Map, point: Point) {
+  protected constructor(map: Map, point: T) {
     super(map)
 
     this.point = point
@@ -21,14 +21,14 @@ export abstract class PointBaseEvent extends EventState {
   public abstract override disabled(): void
 }
 
-export class PointCreateEvent extends PointBaseEvent {
+export class PointCreateEvent<T extends Point = Point> extends PointBaseEvent<T> {
   private onClick = (e: MapMouseEvent): void => {
     this.point.update({
       ...this.point.options,
       position: e.lngLat,
     })
 
-    this.point.emit(`${Point.NAME}.create`, this.message<Point>(e, this.point))
+    this.point.emit(`create`, this.message<Point>(e, this.point))
 
     this.disabled()
   }
@@ -37,7 +37,7 @@ export class PointCreateEvent extends PointBaseEvent {
     this.context.map.getCanvasContainer().style.cursor = 'crosshair'
   }
 
-  constructor(map: Map, point: Point) {
+  constructor(map: Map, point: T) {
     super(map, point)
   }
 
@@ -61,7 +61,7 @@ export class PointCreateEvent extends PointBaseEvent {
   }
 }
 
-export class PointUpdateEvent extends PointBaseEvent {
+export class PointUpdateEvent<T extends Point = Point> extends PointBaseEvent<T> {
   private onMousedown = (e: MapMouseEvent): void => {
     e.preventDefault()
     this.context.map.getCanvasContainer().style.cursor = 'move'
@@ -69,14 +69,14 @@ export class PointUpdateEvent extends PointBaseEvent {
     this.context.map.on('mousemove', this.onMousemove)
     this.context.map.once('mouseup', this.onMouseup)
 
-    this.point.emit(`${Point.NAME}.beforeUpdate`, this.message<Point>(e, this.point))
+    this.point.emit(`beforeUpdate`, this.message<Point>(e, this.point))
   }
 
   private onMousemove = (e: MapMouseEvent): void => {
     this.context.map.getCanvasContainer().style.cursor = 'move'
     this.point.move(e.lngLat)
 
-    this.point.emit(`${Point.NAME}.update`, this.message<Point>(e, this.point))
+    this.point.emit(`update`, this.message<Point>(e, this.point))
   }
 
   private onMouseup = (e: MapMouseEvent): void => {
@@ -86,10 +86,10 @@ export class PointUpdateEvent extends PointBaseEvent {
 
     this.point.render()
 
-    this.point.emit(`${Point.NAME}.doneUpdate`, this.message<Point>(e, this.point))
+    this.point.emit(`doneUpdate`, this.message<Point>(e, this.point))
   }
 
-  constructor(map: Map, point: Point) {
+  constructor(map: Map, point: T) {
     super(map, point)
   }
 
@@ -112,7 +112,7 @@ export class PointUpdateEvent extends PointBaseEvent {
   }
 }
 
-export class PointResidentEvent extends PointBaseEvent {
+export class PointResidentEvent<T extends Point = Point> extends PointBaseEvent<T> {
   private onMouseEnter = (e: MapMouseEvent): void => {
     this.context.map.getCanvasContainer().style.cursor = 'pointer'
     const message = this.message<Point>(e, this.point)
@@ -138,7 +138,7 @@ export class PointResidentEvent extends PointBaseEvent {
     this.point.emit('dblclick', message)
   }
 
-  constructor(map: Map, point: Point) {
+  constructor(map: Map, point: T) {
     super(map, point)
   }
 

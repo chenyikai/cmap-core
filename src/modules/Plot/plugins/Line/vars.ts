@@ -4,10 +4,13 @@ import type {
   LayerSpecification,
 } from 'mapbox-gl'
 
+import type { SortLayer } from '@/core/ResourceRegister'
 import { PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
 import { PlotType } from '@/types/Plot/Poi.ts'
 
 export const NAME = PlotType.LINE
+
+export const Z_INDEX = 5
 
 export const LINE_LAYER_NAME = 'mapbox-gl-plot-line-layer'
 
@@ -51,4 +54,9 @@ export const LINE_LAYER: LayerSpecification = {
   layout: {},
 }
 
-export const LAYER_LIST: LayerSpecification[] = [LINE_LAYER]
+export const LAYER_LIST: SortLayer[] = [
+  {
+    layer: LINE_LAYER,
+    zIndex: Z_INDEX,
+  },
+]

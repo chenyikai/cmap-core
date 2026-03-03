@@ -6,6 +6,8 @@ export const FOCUS_SOURCE_NAME = 'mapbox-gl-focus-source'
 
 export const FOCUS_LAYER_NAME = 'mapbox-gl-focus-layer'
 
+export const FOCUS_Z_INDEX = 99999
+
 export const FOCUS_LAYER: LayerSpecification = {
   id: FOCUS_LAYER_NAME,
   type: 'line',
