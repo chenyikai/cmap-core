@@ -177,7 +177,7 @@ cMap.on('loaded', (map) => {
   const line = new IndexLine(map, {
     id: '1234',
     visibility: 'visible',
-    position,
+    // position,
     vertexStyle: {
       // 'circle-radius': 5,
       'text-color': '#f00'
@@ -192,8 +192,8 @@ cMap.on('loaded', (map) => {
   // line.on('click', e => {
   //   console.log(e, 'dajdakjdkla');
   // })
-  // line.start()
-  line.edit()
+  line.start()
+  // line.edit()
   // setTimeout(() => {
   //   line.unedit()
   // }, 3000)

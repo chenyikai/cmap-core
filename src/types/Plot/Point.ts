@@ -1,3 +1,4 @@
+import type EventEmitter from 'eventemitter3'
 import type * as GeoJSON from 'geojson'
 import type { ColorSpecification, LngLat } from 'mapbox-gl'
 
@@ -82,4 +83,17 @@ export interface PointInstance<T extends IPointOptions = any> {
   // --- Mapbox 状态管理方法 (源自 A) ---
   setState(states: Record<string, unknown>): void
   getState(): Record<string, unknown> | null | undefined
+
+  on<T extends EventEmitter.EventNames<string>>(
+    event: T,
+    fn: EventEmitter.EventListener<string, T>,
+    context?: any,
+  ): this
+
+  off<T extends EventEmitter.EventNames<string>>(
+    event: T,
+    fn?: EventEmitter.EventListener<string, T>,
+    context?: any,
+    once?: boolean,
+  ): this
 }

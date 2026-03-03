@@ -44,25 +44,44 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
     this.residentEvent.able()
   }
 
+  public createVertex(id: string, index: number, position: LngLat): PointInstance {
+    return new Point(this.context.map, {
+      // id: `${this.id}-node-${String(index)}`, // 建议 ID 加上 node 标识
+      id, // 建议 ID 加上 node 标识
+      isName: false,
+      visibility: 'visible',
+      position,
+      style: this.options.vertexStyle,
+      properties: {
+        id: `${this.id}-node-${String(index)}`,
+        index,
+        type: PointType.VERTEX, // 标记类型，方便点击事件区分
+      },
+    })
+  }
+
+  public createMid(id: string, index: number, position: LngLat): Point {
+    return new Point(this.context.map, {
+      id, // 建议 ID 加上 mid 标识
+      isName: false,
+      visibility: 'visible',
+      position,
+      style: this.options.midStyle,
+      properties: {
+        id: `${this.id}-mid-${String(index)}`, // 建议 ID 加上 mid 标识
+        index, // 这里的 index 代表它是第几段线上的中点
+        type: PointType.MIDPOINT,
+      },
+    })
+  }
+
   public createPoint(): void {
     const positions = this.options.position ?? []
 
     for (let i = 0; i < positions.length; i++) {
       const current = positions[i]
 
-      const vertex = new Point(this.context.map, {
-        id: `${this.id}-node-${String(i)}`, // 建议 ID 加上 node 标识
-        isName: false,
-        visibility: 'visible',
-        position: current,
-        style: this.options.vertexStyle,
-        properties: {
-          id: `${this.id}-node-${String(i)}`,
-          index: i,
-          type: PointType.VERTEX, // 标记类型，方便点击事件区分
-        },
-      })
-      this.points.push(vertex)
+      this.points.push(this.createVertex(`${this.id}-node-${String(i)}`, i, current))
 
       if (i < positions.length - 1) {
         const next = positions[i + 1]
@@ -71,19 +90,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
         const midLat = (current.lat + next.lat) / 2
         const midPos = new LngLat(midLng, midLat)
 
-        const mid = new Point(this.context.map, {
-          id: `${this.id}-mid-${String(i)}`, // 建议 ID 加上 mid 标识
-          isName: false,
-          visibility: 'visible',
-          position: midPos,
-          style: this.options.midStyle,
-          properties: {
-            id: `${this.id}-mid-${String(i)}`, // 建议 ID 加上 mid 标识
-            index: i, // 这里的 index 代表它是第几段线上的中点
-            type: PointType.MIDPOINT,
-          },
-        })
-        this.midPoints.push(mid)
+        this.midPoints.push(this.createMid(`${this.id}-mid-${String(i)}`, i, midPos))
       }
     }
   }

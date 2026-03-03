@@ -4,9 +4,8 @@ import { LngLat } from 'mapbox-gl'
 
 import { EventState } from '@/core/EventState'
 import { Line } from '@/modules/Plot/plugins/Line'
-import { Point } from '@/modules/Plot/plugins/Point'
+import type { Point } from '@/modules/Plot/plugins/Point'
 import type { EventMessage } from '@/types/EventState'
-import { PointType } from '@/types/Plot/Line.ts'
 
 export abstract class LineBaseEvent extends EventState {
   protected line: Line
@@ -48,18 +47,24 @@ export class LineCreateEvent extends LineBaseEvent {
 
     this.line.options.position.push(e.lngLat)
 
-    const point = new Point(this.context.map, {
-      id: `${this.line.id}-node-${String(this.count)}`,
-      isName: false,
-      visibility: 'visible',
-      position: e.lngLat,
-      style: this.line.options.vertexStyle,
-      properties: {
-        id: `${this.line.id}-node-${String(this.count)}`,
-        index: this.count,
-        type: PointType.VERTEX,
-      },
-    })
+    // const point = new Point(this.context.map, {
+    //   id: `${this.line.id}-node-${String(this.count)}`,
+    //   isName: false,
+    //   visibility: 'visible',
+    //   position: e.lngLat,
+    //   style: this.line.options.vertexStyle,
+    //   properties: {
+    //     id: `${this.line.id}-node-${String(this.count)}`,
+    //     index: this.count,
+    //     type: PointType.VERTEX,
+    //   },
+    // })
+
+    const point = this.line.createVertex(
+      `${this.line.id}-node-${String(this.count)}`,
+      this.count,
+      e.lngLat,
+    )
 
     point.residentEvent.disabled()
     this.line.points.push(point)
