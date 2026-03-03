@@ -14,6 +14,7 @@ import { EMPTY_SOURCE, PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
 import type { ILineOptions } from '@/types/Plot/Line.ts'
 import { PointType } from '@/types/Plot/Line.ts'
 import type { PlotType } from '@/types/Plot/Poi.ts'
+import type { PointInstance } from '@/types/Plot/Point.ts'
 
 import { LAYER_LIST, LINE_LAYER_NAME, NAME } from './vars.ts'
 
@@ -21,7 +22,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
   static NAME: PlotType = NAME
   override readonly LAYER: string = LINE_LAYER_NAME
 
-  public points: Point[] = []
+  public points: PointInstance[] = []
   public midPoints: Point[] = []
 
   public modifyMid: Point | null | undefined
@@ -298,15 +299,16 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
     }
   }
 
-  public getPoint(index: number): Point | null {
+  public getPoint(index: number): PointInstance | null {
     if (this.points.length === 0) return null
 
-    const data = this.points[index]
+    const point: PointInstance | undefined = this.points[index]
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!data) return null
+    if (!point) return null
 
-    if (Number(data.options.properties?.index) === index) {
-      return data
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (Number(point.options.properties?.index) === index) {
+      return point
     } else {
       return null
     }

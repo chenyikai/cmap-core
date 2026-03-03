@@ -6,6 +6,7 @@ import { LngLat } from "mapbox-gl";
 import IconManager from "../src/core/IconManager";
 import { Line } from "../src/modules/Plot/plugins/Line";
 import { IndexPoint } from "../src/modules/Plot/plugins/IndexPoint";
+import { IndexLine } from "../src/modules/Plot/plugins/IndexLine";
 
 const cMap = new CMap({
   container: 'map',
@@ -173,12 +174,13 @@ cMap.on('loaded', (map) => {
     ]
   ].map(item => new LngLat(item[0], item[1]))
 
-  const line = new Line(map, {
+  const line = new IndexLine(map, {
     id: '1234',
     visibility: 'visible',
     position,
     vertexStyle: {
-      'circle-radius': 5,
+      // 'circle-radius': 5,
+      'text-color': '#f00'
     },
     midStyle: {
       'circle-radius': 2, // 中点通常画小一点
