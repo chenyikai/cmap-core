@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 import { resolve } from 'path'
+import legacy from '@vitejs/plugin-legacy';
 
 export default defineConfig({
   plugins: [
@@ -8,6 +9,9 @@ export default defineConfig({
       rollupTypes: true, // 将所有类型合并为 index.d.ts，对使用者非常友好
       tsconfigPath: './tsconfig.json',
     }),
+    legacy({
+      targets:['defaults', 'not IE 11'] // 根据你的需求设定浏览器范围
+    })
   ],
   resolve: {
     alias: {

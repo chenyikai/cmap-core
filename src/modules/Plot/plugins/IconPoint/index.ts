@@ -82,6 +82,7 @@ export class IconPoint extends Point<IIconPointOptions> {
         ...this.options.properties,
         icon: this.options.icon,
         text: this.options.name,
+        visibility: this.options.visibility,
         isName: true,
         _calcTextOffset: calculatedOffset,
         meta: 'icon',

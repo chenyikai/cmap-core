@@ -8,6 +8,7 @@ import { Line } from "../src/modules/Plot/plugins/Line";
 import { IndexPoint } from "../src/modules/Plot/plugins/IndexPoint";
 import { IndexLine } from "../src/modules/Plot/plugins/IndexLine";
 import { ArrowLine } from "../src/modules/Plot/plugins/ArrowLine";
+import { Fill } from "../src/modules/Plot/plugins/Fill";
 
 const cMap = new CMap({
   container: 'map',
@@ -126,76 +127,67 @@ cMap.on('loaded', (map) => {
 
   const position = [
     [
-      122.06229541500755,
-      30.016232378547613
+      122.08448264797659,
+      30.001274472502857
     ],
     [
-      122.06045005520554,
-      30.008948810372544
+      122.08246562679733,
+      29.99499333786683
     ],
     [
-      122.05937717160049,
-      30.003039808597222
+      122.0861992617468,
+      29.991202164842264
     ],
     [
-      122.0640978594655,
-      29.993822549884555
+      122.09615562161054,
+      29.990681796460322
     ],
     [
-      122.07272384365695,
-      30.007759605597727
+      122.10714194973406,
+      29.990421611246077
     ],
     [
-      122.08443973263377,
-      30.00935759622199
+      122.10834357937438,
+      29.998487035779164
     ],
     [
-      122.09104869564726,
-      30.01522906163511
+      122.09877345760799,
+      30.003764516428134
     ],
-    [
-      122.11422298153701,
-      30.022660797882523
-    ],
-    [
-      122.12100360592638,
-      30.01169879181488
-    ],
-    [
-      122.12362144192292,
-      30.001664707394724
-    ],
-    [
-      122.12804172237986,
-      30.001664707394724
-    ],
-    [
-      122.12851379116631,
-      30.01656681526326
-    ]
   ].map(item => new LngLat(item[0], item[1]))
 
-  const line = new ArrowLine(map, {
-    id: '1234',
+  const fill = new Fill(map, {
+    id: '2345',
+    name: '测试面',
     visibility: 'visible',
-    // position,
-    vertexStyle: {
-      // 'circle-radius': 5,
-      // 'text-color': '#f00'
-      'icon-rotate': 0
-    },
-    midStyle: {
-      'circle-radius': 2, // 中点通常画小一点
-      'circle-color': '#f00', // 颜色区分，比如灰色
-    },
+    position,
   })
 
-  // line.render()
-  // line.on('click', e => {
-  //   console.log(e, 'dajdakjdkla');
+  fill.render()
+  fill.edit()
+
+  // const line = new ArrowLine(map, {
+  //   id: '1234',
+  //   visibility: 'visible',
+  //   // position: position,
+  //   vertexStyle: {
+  //     // 'circle-radius': 5,
+  //     // 'text-color': '#f00'
+  //     'icon-rotate': 0
+  //   },
+  //   midStyle: {
+  //     'circle-radius': 2, // 中点通常画小一点
+  //     'circle-color': '#f00', // 颜色区分，比如灰色
+  //   },
   // })
-  line.start()
-  // line.edit()
+  //
+  // line.render()
+  // // line.edit()
+  // line.start()
+  // // // line.on('click', e => {
+  // // //   console.log(e, 'dajdakjdkla');
+  // // // })
+  // // line.start()
   // setTimeout(() => {
   //   line.unedit()
   // }, 3000)

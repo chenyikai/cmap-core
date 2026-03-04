@@ -1,4 +1,4 @@
-import { cloneDeep, set } from 'lodash-es'
+import { cloneDeep } from 'lodash-es'
 import type { Map, MapMouseEvent } from 'mapbox-gl'
 import { LngLat } from 'mapbox-gl'
 
@@ -45,35 +45,7 @@ export class LineCreateEvent extends LineBaseEvent {
       }
     }
 
-    if (!Array.isArray(this.line.options.position)) {
-      this.line.options.position = []
-    }
-
-    this.line.options.position.push(e.lngLat)
-
-    // const point = new Point(this.context.map, {
-    //   id: `${this.line.id}-node-${String(this.count)}`,
-    //   isName: false,
-    //   visibility: 'visible',
-    //   position: e.lngLat,
-    //   style: this.line.options.vertexStyle,
-    //   properties: {
-    //     id: `${this.line.id}-node-${String(this.count)}`,
-    //     index: this.count,
-    //     type: PointType.VERTEX,
-    //   },
-    // })
-
-    const point = this.line.createVertex(
-      `${this.line.id}-node-${String(this.count)}`,
-      this.count,
-      e.lngLat,
-    )
-
-    point.residentEvent.disabled()
-    this.line.points.push(point)
-
-    this.line.render()
+    this.line.insertPoint(this.count, e.lngLat)
     this.count++
   }
 
@@ -135,36 +107,17 @@ export class LineUpdateEvent extends LineBaseEvent {
   private onVertexUpdate = (e: EventMessage<Point>): void => {
     const current = e.instance
     const { index } = current.options.properties ?? {}
-    const positions = this.line.options.position
 
-    if (!positions || typeof index !== 'number' || !current.center) return
+    if (typeof index !== 'number' || !current.center) return
 
-    set(positions, index, current.center)
+    this.line.updatePoint(index, current.center)
 
-    // targetVertexIdx: 相邻顶点的索引
-    // targetMidIdx: 需要更新的中点索引
-    const updateMidpoint = (targetVertexIdx: number, targetMidIdx: number): void => {
-      const targetVertex = this.line.getPoint(targetVertexIdx)
-      if (targetVertex?.center) {
-        const lng = (current.center!.lng + targetVertex.center.lng) / 2
-        const lat = (current.center!.lat + targetVertex.center.lat) / 2
-        this.line.getMidPoint(targetMidIdx)?.move(new LngLat(lng, lat))
-      }
-    }
-
-    if (index < positions.length - 1) {
-      updateMidpoint(index + 1, index)
-    }
-
-    if (index > 0) {
-      updateMidpoint(index - 1, index - 1)
-    }
-
-    this.line.render()
+    this.line.emit('update', this.message<Line>(e.originEvent, this.line), current)
   }
 
   private onMidBeforeUpdate = (e: EventMessage<Point>): void => {
     this.line.modifyMid = e.instance
+    this.line.emit('midBeforeUpdate', this.message<Line>(e.originEvent, this.line), e.instance)
   }
 
   private onMidUpdate = (e: EventMessage<Point>): void => {
@@ -172,22 +125,24 @@ export class LineUpdateEvent extends LineBaseEvent {
     const { position } = cloneDeep(this.line.options)
     if (position && typeof index === 'number' && e.instance.center) {
       this.line.render()
+      this.line.emit('midUpdate', this.message<Line>(e.originEvent, this.line), e.instance)
     }
   }
 
-  private onMidDone = (): void => {
+  private onMidDone = (e: MapMouseEvent): void => {
     if (this.line.geometry?.coordinates) {
       const lonLat = this.line.geometry.coordinates
 
       this.line.options.position = lonLat.map((item) => new LngLat(item[0], item[1]))
       this.line.modifyMid = null
 
-      console.log(this.line.options, 'this.line.options')
       this.line.update({
         ...this.line.options,
       })
 
       this.line.edit()
+
+      this.line.emit('midDoneUpdate', this.message<Line>(e, this.line))
     }
   }
 

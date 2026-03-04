@@ -27,7 +27,7 @@ export interface IPointOptions extends IPoiOptions {
   properties?: Record<string, any>
 }
 
-export interface PointInstance<T extends IPointOptions = any> {
+export interface PointInstance<T extends IPointOptions = IPointOptions> {
   // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // // @ts-expect-error
   // new (map: Map, options: T): this
