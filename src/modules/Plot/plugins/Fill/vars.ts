@@ -1,4 +1,8 @@
-import type { LayerSpecification } from 'mapbox-gl'
+import type {
+  ColorSpecification,
+  DataDrivenPropertyValueSpecification,
+  LayerSpecification,
+} from 'mapbox-gl'
 
 import type { SortLayer } from '@/core/ResourceRegister'
 import { PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
@@ -10,9 +14,23 @@ export const Z_INDEX = 3
 
 export const FILL_LAYER_NAME = 'mapbox-gl-plot-fill-layer'
 
-export const DEFAULT_LINE_COLOR = '#f00'
+export const FILL_CLOSED_LINE_LAYER_NAME = 'mapbox-gl-plot-closed-line-layer'
 
-export const DEFAULT_LINE_WIDTH = 3
+export const DEFAULT_FILL_COLOR = '#009dff'
+
+export const DEFAULT_FILL_OPACITY = 0.3
+
+const fillColor: DataDrivenPropertyValueSpecification<ColorSpecification> = [
+  'coalesce',
+  ['get', 'fill-color'],
+  DEFAULT_FILL_COLOR,
+]
+
+const fillOpacity: DataDrivenPropertyValueSpecification<number> = [
+  'coalesce',
+  ['get', 'fill-opacity'],
+  DEFAULT_FILL_OPACITY,
+]
 
 export const FILL_LAYER: LayerSpecification = {
   id: FILL_LAYER_NAME,
@@ -20,8 +38,20 @@ export const FILL_LAYER: LayerSpecification = {
   filter: ['all', ['==', '$type', 'Polygon'], ['==', 'visibility', 'visible']],
   source: PLOT_SOURCE_NAME,
   paint: {
-    'fill-color': '#f00',
-    'fill-opacity': 0.3,
+    'fill-color': fillColor,
+    'fill-opacity': fillOpacity,
+  },
+  layout: {},
+}
+
+export const FILL_CLOSED_LINE_LAYER: LayerSpecification = {
+  id: FILL_CLOSED_LINE_LAYER_NAME,
+  type: 'line',
+  filter: ['all', ['==', 'visibility', 'visible']],
+  source: PLOT_SOURCE_NAME,
+  paint: {
+    'line-color': fillColor,
+    'line-width': ['case', ['boolean', ['feature-state', 'create'], false], 3, 0],
   },
   layout: {},
 }
@@ -29,6 +59,10 @@ export const FILL_LAYER: LayerSpecification = {
 export const LAYER_LIST: SortLayer[] = [
   {
     layer: FILL_LAYER,
+    zIndex: Z_INDEX,
+  },
+  {
+    layer: FILL_CLOSED_LINE_LAYER,
     zIndex: Z_INDEX,
   },
 ]

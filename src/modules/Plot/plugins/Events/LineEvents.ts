@@ -27,6 +27,7 @@ export abstract class LineBaseEvent extends EventState {
 
 export class LineCreateEvent extends LineBaseEvent {
   private count = 0
+  private drawPoint: LngLat | null = null
 
   private onClick = (e: MapMouseEvent): void => {
     // 点击过一次之后 计算结束事件
@@ -53,7 +54,7 @@ export class LineCreateEvent extends LineBaseEvent {
     this.context.map.getCanvasContainer().style.cursor = 'crosshair'
     if (!this.line.options.position) return
 
-    this.line.drawPoint = e.lngLat
+    this.setDrawLngLat(e.lngLat)
     this.line.render()
   }
 
@@ -61,11 +62,10 @@ export class LineCreateEvent extends LineBaseEvent {
     e.preventDefault()
 
     this.context.map.getCanvasContainer().style.cursor = ''
-    this.line.drawPoint = null
+    this.setDrawLngLat(null)
     this.count = 0
     this.disabled()
 
-    this.line.removePoint()
     this.line.createPoint()
     this.line.edit()
   }
@@ -79,6 +79,14 @@ export class LineCreateEvent extends LineBaseEvent {
   }
   public override onRemove(): void {
     /* empty */
+  }
+
+  public setDrawLngLat(position: LngLat | null): void {
+    this.drawPoint = position
+  }
+
+  public getDrawLngLat(): LngLat | null {
+    return this.drawPoint
   }
 
   public override able(): void {
@@ -103,6 +111,7 @@ export class LineCreateEvent extends LineBaseEvent {
 
 export class LineUpdateEvent extends LineBaseEvent {
   protected dragStartLngLat: LngLat | null = null
+  protected modifyMid: Point | null = null
 
   private onVertexUpdate = (e: EventMessage<Point>): void => {
     const current = e.instance
@@ -116,7 +125,7 @@ export class LineUpdateEvent extends LineBaseEvent {
   }
 
   private onMidBeforeUpdate = (e: EventMessage<Point>): void => {
-    this.line.modifyMid = e.instance
+    this.setModifyLngLat(e.instance)
     this.line.emit('midBeforeUpdate', this.message<Line>(e.originEvent, this.line), e.instance)
   }
 
@@ -134,7 +143,7 @@ export class LineUpdateEvent extends LineBaseEvent {
       const lonLat = this.line.geometry.coordinates
 
       this.line.options.position = lonLat.map((item) => new LngLat(item[0], item[1]))
-      this.line.modifyMid = null
+      this.setModifyLngLat(null)
 
       this.line.update({
         ...this.line.options,
@@ -159,7 +168,7 @@ export class LineUpdateEvent extends LineBaseEvent {
 
     e.preventDefault()
     this.context.map.getCanvasContainer().style.cursor = 'move'
-    this.line.dragStartLngLat = e.lngLat
+    this.dragStartLngLat = e.lngLat
 
     this.context.map.on('mousemove', this.onMousemove)
     this.context.map.once('mouseup', this.onMouseup)
@@ -175,14 +184,13 @@ export class LineUpdateEvent extends LineBaseEvent {
   private onLineMouseLeave = (): void => {
     this.context.map.getCanvasContainer().style.cursor = ''
     this.context.map.off('mousedown', this.line.LAYER, this.onLineMousedown)
-    this.line.drawPoint = null
   }
 
   private onMousemove = (e: MapMouseEvent): void => {
     this.context.map.getCanvasContainer().style.cursor = 'move'
     const current = e.lngLat
     this.line.move(current)
-    this.line.dragStartLngLat = current
+    this.dragStartLngLat = current
     this.line.emit(`${Line.NAME}.update`, this.message<Line>(e, this.line))
   }
 
@@ -206,6 +214,22 @@ export class LineUpdateEvent extends LineBaseEvent {
 
   public override onRemove(): void {
     this.disabled()
+  }
+
+  public setModifyLngLat(point: Point | null): void {
+    this.modifyMid = point
+  }
+
+  public getModifyLngLat(): Point | null {
+    return this.modifyMid
+  }
+
+  public setDragLngLat(position: LngLat | null): void {
+    this.dragStartLngLat ??= position
+  }
+
+  public getDragLngLat(): LngLat | null {
+    return this.dragStartLngLat
   }
 
   public override able(): void {

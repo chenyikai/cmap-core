@@ -1,3 +1,5 @@
+import type { ColorSpecification, DataDrivenPropertyValueSpecification } from 'mapbox-gl'
+
 import type { IPoiOptions, LineStringPosition } from '@/types/Plot/Poi.ts'
 import type { PointStyle } from '@/types/Plot/Point.ts'
 
@@ -6,7 +8,10 @@ export enum PointType {
   MIDPOINT = 'MidPoint',
 }
 
-export type LineStyle = object
+export interface LineStyle {
+  'line-color'?: DataDrivenPropertyValueSpecification<ColorSpecification>
+  'line-width'?: DataDrivenPropertyValueSpecification<number>
+}
 
 export interface ILineOptions extends IPoiOptions {
   position?: LineStringPosition

@@ -27,44 +27,67 @@ export abstract class FillBaseEvent extends EventState {
 
 export class FillCreateEvent extends FillBaseEvent {
   private count = 0
+  private drawPoint: LngLat | null = null
 
   private onClick = (e: MapMouseEvent): void => {
     // 点击过一次之后 计算结束事件
-    if (this.count >= 1) {
-      // const layers = new Set(
-      //   [...this.fill.points, ...this.line.midPoints].map((item) => item.LAYER),
-      // )
-      //
-      // const features = this.context.map.queryRenderedFeatures(e.point, {
-      //   layers: [...layers],
-      // })
-      //
-      // if (features.length > 0) {
-      //   this.stop(e)
-      //   return
-      // }
+    if (this.count > 1) {
+      const layers = new Set(
+        [...(this.fill.line?.points ?? []), ...(this.fill.line?.midPoints ?? [])].map(
+          (item) => item.LAYER,
+        ),
+      )
+
+      const features = this.context.map.queryRenderedFeatures(e.point, {
+        layers: [...layers],
+      })
+
+      if (features.length > 0) {
+        this.stop(e)
+        return
+      }
     }
 
-    // if (!Array.isArray(this.line.options.position)) {
-    //   this.line.options.position = []
-    // }
+    if (!Array.isArray(this.fill.options.position)) {
+      this.fill.options.position = []
+      this.fill.createLine()
+    }
 
-    // this.line.options.position.push(e.lngLat)
+    this.fill.line!.insertPoint(this.count, e.lngLat)
+    this.fill.options.position = this.fill.line?.options.position
+
     this.count++
   }
 
   private onMousemove = (e: MapMouseEvent): void => {
+    console.log('onMousemove')
     this.context.map.getCanvasContainer().style.cursor = 'crosshair'
-    console.log(e, 'e')
+    this.setDrawLngLat(e.lngLat)
+    this.fill.render()
+  }
+
+  private onContextmenu = (e: MapMouseEvent): void => {
+    this.fill.line!.insertPoint(this.count, e.lngLat)
+    this.stop(e)
   }
 
   private stop = (e: MapMouseEvent): void => {
     e.preventDefault()
+    const firstPoint = this.fill.line?.points.at(0)
+
+    if (this.fill.line && firstPoint?.center) {
+      const point = this.fill.line.insertPoint(this.count + 1, firstPoint.center)
+      point.hide()
+    }
 
     this.context.map.getCanvasContainer().style.cursor = ''
-    // this.line.drawPoint = null
-    // this.count = 0
-    // this.disabled()
+    // this.fill.stop()
+    this.setDrawLngLat(null)
+    this.count = 0
+    this.fill.setState({ create: false })
+    this.disabled()
+
+    this.fill.edit()
     //
     // this.line.removePoint()
     // this.line.createPoint()
@@ -73,6 +96,15 @@ export class FillCreateEvent extends FillBaseEvent {
 
   constructor(map: Map, fill: Fill) {
     super(map, fill)
+  }
+
+  public setDrawLngLat(position: LngLat | null): void {
+    this.drawPoint = position
+    this.fill.line?.createEvent.setDrawLngLat(position)
+  }
+
+  public getDrawLngLat(): LngLat | null {
+    return this.drawPoint
   }
 
   public override onAdd(): void {
@@ -85,15 +117,17 @@ export class FillCreateEvent extends FillBaseEvent {
   public override able(): void {
     this.context.map.doubleClickZoom.disable()
     //
-    // this.context.map.on('click', this.onClick)
-    // this.context.map.on('mousemove', this.onMousemove)
-    // this.context.map.on('dblclick', this.stop)
+    this.context.map.on('click', this.onClick)
+    this.context.map.on('mousemove', this.onMousemove)
+    this.context.map.on('dblclick', this.stop)
+    this.context.map.on('contextmenu', this.onContextmenu)
     this.changeStatus()
   }
   public override disabled(): void {
-    // this.context.map.off('click', this.onClick)
-    // this.context.map.off('mousemove', this.onMousemove)
-    // this.context.map.off('dblclick', this.stop)
+    this.context.map.off('click', this.onClick)
+    this.context.map.off('mousemove', this.onMousemove)
+    this.context.map.off('dblclick', this.stop)
+    this.context.map.off('contextmenu', this.onContextmenu)
 
     setTimeout(() => {
       this.context.map.doubleClickZoom.enable()
@@ -145,7 +179,7 @@ export class FillUpdateEvent extends FillBaseEvent {
 
     e.preventDefault()
     this.context.map.getCanvasContainer().style.cursor = 'move'
-    this.fill.dragStartLngLat = e.lngLat
+    this.setDragLngLat(e.lngLat)
 
     this.context.map.on('mousemove', this.onMousemove)
     this.context.map.once('mouseup', this.onMouseup)
@@ -157,14 +191,14 @@ export class FillUpdateEvent extends FillBaseEvent {
     this.context.map.getCanvasContainer().style.cursor = 'move'
     const current = e.lngLat
     this.fill.move(current)
-    this.fill.dragStartLngLat = current
+    this.setDragLngLat(current)
     this.fill.emit(`update`, this.message<Fill>(e, this.fill))
   }
 
   private onMouseup = (e: MapMouseEvent): void => {
     this.context.map.getCanvasContainer().style.cursor = 'pointer'
     this.context.map.off('mousemove', this.onMousemove)
-    this.dragStartLngLat = null
+    this.setDragLngLat(null)
     this.fill.render()
 
     this.fill.emit(`doneUpdate`, this.message<Fill>(e, this.fill))
@@ -180,6 +214,14 @@ export class FillUpdateEvent extends FillBaseEvent {
 
   constructor(map: Map, fill: Fill) {
     super(map, fill)
+  }
+
+  public setDragLngLat(position: LngLat | null): void {
+    this.dragStartLngLat = position
+  }
+
+  public getDragLngLat(): LngLat | null {
+    return this.dragStartLngLat
   }
 
   public override onAdd(): void {

@@ -1,11 +1,11 @@
-import { booleanPointInPolygon, centerOfMass, lineToPolygon } from '@turf/turf'
+import { bbox, booleanPointInPolygon, centerOfMass, lineToPolygon } from '@turf/turf'
 import type * as GeoJSON from 'geojson'
 import type { Feature, Polygon } from 'geojson'
 import type { Map } from 'mapbox-gl'
 import { LngLat } from 'mapbox-gl'
 import polylabel from 'polylabel'
 
-import type { FillResidentEvent } from '@/modules/Plot/plugins/Events/FillEvents.ts'
+import { FillResidentEvent } from '@/modules/Plot/plugins/Events/FillEvents.ts'
 import { FillUpdateEvent } from '@/modules/Plot/plugins/Events/FillEvents.ts'
 import { FillCreateEvent } from '@/modules/Plot/plugins/Events/FillEvents.ts'
 import { IconPoint } from '@/modules/Plot/plugins/IconPoint'
@@ -14,16 +14,15 @@ import { Poi } from '@/modules/Plot/plugins/Poi.ts'
 import { EMPTY_SOURCE, PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
 import type { IFillOptions } from '@/types/Plot/Fill.ts'
 import type { PlotType } from '@/types/Plot/Poi.ts'
+import type { CirclePointStyle } from '@/types/Plot/Point.ts'
 
-import { FILL_LAYER_NAME, LAYER_LIST, NAME } from './vars.ts'
+import { DEFAULT_FILL_COLOR, FILL_LAYER_NAME, LAYER_LIST, NAME } from './vars.ts'
 
 export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.Polygon | null> {
   static NAME: PlotType = NAME
   override readonly LAYER: string = FILL_LAYER_NAME
   public title: IconPoint | undefined
   public line: Line | null = null
-
-  public dragStartLngLat: LngLat | null = null
 
   protected residentEvent: FillResidentEvent
   protected updateEvent: FillUpdateEvent
@@ -36,7 +35,7 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
       this.options.position = [...this.options.position, this.options.position[0]]
     }
 
-    this.residentEvent = new FillCreateEvent(map, this)
+    this.residentEvent = new FillResidentEvent(map, this)
     this.updateEvent = new FillUpdateEvent(map, this)
     this.createEvent = new FillCreateEvent(map, this)
 
@@ -65,26 +64,16 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
     }
   }
 
-  edit(): void {
-    this.setState({ edit: true })
-
-    this.line?.edit()
-
-    this.residentEvent.disabled()
-    this.updateEvent.able()
-    this.render()
-  }
-
-  focus(): void {
-    /** empty **/
-  }
-
   get geometry(): Polygon | null {
     return this.getFeature().geometry
   }
 
   getFeature(): Feature<Polygon | null, T['style'] & T['properties']> {
-    if (this.line) {
+    if (
+      this.line?.geometry &&
+      Array.isArray(this.line.geometry.coordinates) &&
+      this.line.geometry.coordinates.length > 2
+    ) {
       const polygon = lineToPolygon(this.line.getFeature() as unknown as GeoJSON.LineString, {
         properties: {
           ...this.options.style,
@@ -109,15 +98,53 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
   }
 
   move(position: LngLat): void {
-    if (this.line) {
-      this.line.dragStartLngLat = this.dragStartLngLat
-      this.line.move(position)
-      this.render()
-    }
+    // 1. 确保有拖拽参考点和内部关联的 line 对象 如果不借助鼠标拖拽 直接移动以中心为基准点
+    const drag: LngLat | null =
+      this.center === null ? this.center : this.updateEvent.getDragLngLat()
+    if (!this.line || !drag) return
+
+    // 2. 计算当前鼠标所在的帧，相对于上一帧鼠标位置的经纬度偏移量 (Delta)
+    const lngDiff = position.lng - drag.lng
+    const latDiff = position.lat - drag.lat
+
+    // 3. 借助底层 Line 实例，遍历并移动所有构成多边形的实点
+    this.line.points.forEach((point, index) => {
+      if (point.center) {
+        const newPos = new LngLat(point.center.lng + lngDiff, point.center.lat + latDiff)
+
+        // 🔥 核心思路：复用 Line 的 updatePoint
+        // 传入 false 是为了防止在 for 循环中疯狂触发重绘，造成严重的性能问题
+        this.line!.updatePoint(index, newPos, false)
+      }
+    })
+
+    // 4. 同步最新坐标给 Fill 自身
+    // (因为 line.updatePoint 内部已经更新了 line.options.position)
+    this.options.position = this.line.options.position
+
+    // 5. 触发真正的统一重绘
+    this.render()
   }
 
   public createLine(): void {
     if (!Array.isArray(this.options.position)) return
+
+    // 1. 提取 Fill 的颜色，如果没有设置则使用默认的主题色 #f00
+    const fillColor = this.options.style?.['fill-color'] ?? DEFAULT_FILL_COLOR
+
+    // 2. 组装边框线样式：颜色与 Fill 同步，并合并传入的 outLineStyle
+    const lineStyle = {
+      'line-color': fillColor,
+      ...this.options.outLineStyle,
+    }
+
+    // 3. 组装实点样式：边框颜色与 Fill 同步，并合并传入的 vertexStyle
+    const vertexStyle = {
+      'circle-radius': 5,
+      'circle-stroke-color': fillColor,
+      // 'circle-color': '#fff', // 内部默认是白色，如果需要全实心也可以改成 fillColor
+      ...this.options.vertexStyle,
+    } as CirclePointStyle
 
     this.line = new Line(this.context.map, {
       isName: false,
@@ -125,10 +152,8 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
       // name: '',
       position: this.options.position,
       properties: {},
-      style: {},
-      vertexStyle: {
-        'circle-radius': 5,
-      },
+      style: lineStyle,
+      vertexStyle: vertexStyle,
       visibility: this.options.visibility,
       id: `${this.id}-line`,
     })
@@ -183,22 +208,92 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
       this.title.render()
     }
 
+    if (this.isFocus) {
+      this.context.focus.set(this.getFeature() as GeoJSON.Feature, {
+        armLength: 40,
+        padding: 30,
+      })
+    } else {
+      this.context.focus.remove(this.id)
+    }
+
     this.context.register.setGeoJSONData(PLOT_SOURCE_NAME, this.getFeature() as GeoJSON.Feature)
   }
 
-  select(): void {}
+  start(): void {
+    if (this.center === null) {
+      this.createEvent.able()
+      this.updateEvent.disabled()
+      this.residentEvent.disabled()
+      this.setState({ create: true })
+    }
+  }
 
-  start(): void {}
+  stop(): void {
+    this.createEvent.disabled()
+    this.residentEvent.able()
+    this.setState({ create: false })
+  }
 
-  stop(): void {}
+  unedit(): void {
+    this.setState({ edit: false })
+    this.line?.unedit()
+    this.residentEvent.able()
+    this.updateEvent.disabled()
 
-  unedit(): void {}
+    this.render()
+  }
 
-  unfocus(): void {}
+  edit(): void {
+    this.setState({ edit: true })
 
-  unselect(): void {}
+    this.line?.edit()
+
+    this.residentEvent.disabled()
+    this.updateEvent.able()
+    this.render()
+  }
+
+  focus(): void {
+    this.setState({ focus: true })
+
+    this.render()
+  }
+
+  unfocus(): void {
+    this.setState({ focus: false })
+
+    this.render()
+  }
+
+  select(): void {
+    const bounds = bbox(this.getFeature() as GeoJSON.Feature) as [number, number, number, number]
+    this.context.map.fitBounds(bounds, {
+      padding: {
+        left: 60,
+        right: 60,
+        top: 60,
+        bottom: 60,
+      },
+    })
+
+    this.context.map.once('moveend', () => {
+      this.focus()
+    })
+  }
+
+  unselect(): void {
+    this.unfocus()
+  }
 
   update(options: T): void {
-    console.log(options)
+    this.options = options
+
+    if (this.options.position) {
+      this.options.position = [...this.options.position, this.options.position[0]]
+    }
+
+    this.removeLine()
+    this.createLine()
   }
 }

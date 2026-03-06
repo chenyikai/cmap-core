@@ -26,15 +26,9 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
   public points: PointInstance[] = []
   public midPoints: Point[] = []
 
-  public modifyMid: Point | null | undefined
-
-  public dragStartLngLat: LngLat | null = null
-
-  public drawPoint: LngLat | null = null
-
-  protected residentEvent: LineResidentEvent
-  protected updateEvent: LineUpdateEvent
-  protected createEvent: LineCreateEvent
+  public residentEvent: LineResidentEvent
+  public updateEvent: LineUpdateEvent
+  public createEvent: LineCreateEvent
 
   constructor(map: Map, options: T) {
     super(map, options)
@@ -81,14 +75,16 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
     GeoJSON.LineString | null,
     T['style'] | T['properties']
   > {
-    if ((!this.options.position || this.options.position.length < 2) && !this.drawPoint) {
-      const emptyFeature: GeoJSON.Feature<null, T['style'] | T['properties']> = {
+    if (
+      (!this.options.position || this.options.position.length < 2) &&
+      !this.createEvent.getDrawLngLat()
+    ) {
+      return {
         type: 'Feature',
         geometry: null,
         id: this.id,
         properties: {},
       }
-      return emptyFeature
     }
 
     const coordinates = this.points.map((point) => {
@@ -99,15 +95,17 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
       }
     })
 
-    if (this.modifyMid) {
-      const { index } = this.modifyMid.options.properties ?? {}
-      if (typeof index === 'number' && this.modifyMid.center) {
-        coordinates.splice(index + 1, 0, this.modifyMid.center.toArray())
+    const modify = this.updateEvent.getModifyLngLat()
+
+    if (modify) {
+      const { index } = modify.options.properties ?? {}
+      if (typeof index === 'number' && modify.center) {
+        coordinates.splice(index + 1, 0, modify.center.toArray())
       }
     }
 
-    if (this.drawPoint) {
-      coordinates.push(this.drawPoint.toArray())
+    if (this.createEvent.getDrawLngLat()) {
+      coordinates.push(this.createEvent.getDrawLngLat()!.toArray())
     }
 
     return lineString(
@@ -204,34 +202,23 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
     throw new Error('Method not implemented.')
   }
   public override move(position: LngLat): void {
-    if (this.center === null) return
+    // 如果不借助鼠标拖拽 直接移动以中心为基准点
+    const drag: LngLat | null =
+      this.center === null ? this.center : this.updateEvent.getDragLngLat()
 
-    this.dragStartLngLat ??= this.center
+    if (!drag) return
 
-    const lngDiff = position.lng - this.dragStartLngLat.lng
-    const latDiff = position.lat - this.dragStartLngLat.lat
-    this.options.position?.forEach((item) => {
-      item.lng += lngDiff
-      item.lat += latDiff
-    })
-
-    this.points.forEach((point) => {
+    const lngDiff = position.lng - drag.lng
+    const latDiff = position.lat - drag.lat
+    this.points.forEach((point, index) => {
       if (point.center) {
         const newPos = new LngLat(point.center.lng + lngDiff, point.center.lat + latDiff)
-        point.move(newPos)
-      }
-    })
 
-    this.midPoints.forEach((mid) => {
-      if (mid.center) {
-        const newPos = new LngLat(mid.center.lng + lngDiff, mid.center.lat + latDiff)
-        mid.move(newPos)
+        this.updatePoint(index, newPos, false)
       }
     })
 
     this.render()
-
-    this.dragStartLngLat = null
   }
   public override update(options: T): void {
     this.options = options
@@ -330,7 +317,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
    * @param index 要插入的位置索引
    * @param position 新节点的坐标
    */
-  public insertPoint(index: number, position: LngLat): void {
+  public insertPoint(index: number, position: LngLat): PointInstance {
     // 1. 同步原始数据
     this.options.position ??= []
     this.options.position.splice(index, 0, position)
@@ -348,14 +335,17 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
     this.reindexPoints()
     this.syncMidPoints()
     this.render()
+
+    return newPoint
   }
 
   /**
    * 更新某个实点的位置 (例如: 拖拽某个节点)
    * @param index 节点索引
    * @param position 拖拽后的新坐标
+   * @param isRender 是否立即渲染
    */
-  public updatePoint(index: number, position: LngLat): void {
+  public updatePoint(index: number, position: LngLat, isRender = true): void {
     const point = this.getPoint(index)
     if (!point) return
 
@@ -371,7 +361,9 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
     this.updateAdjacentMidPoints(index)
 
     // 4. 重绘线段 (触发 getFeature 变更)
-    this.render()
+    if (isRender) {
+      this.render()
+    }
   }
 
   /** 更新指定中点的坐标 (例如：拖拽中点时触发，但在松手前它还是个中点) */

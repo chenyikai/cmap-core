@@ -33,6 +33,15 @@ export abstract class Poi<
     return !!state?.edit
   }
 
+  get isFocus(): boolean {
+    const state = this.getState()
+    if (state) {
+      return !!state.focus
+    } else {
+      return false
+    }
+  }
+
   public get isCreate(): boolean {
     const state = this.getState()
     return !!state?.create

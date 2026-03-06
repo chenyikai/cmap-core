@@ -1,8 +1,13 @@
+import type { ColorSpecification, DataDrivenPropertyValueSpecification } from 'mapbox-gl'
+
 import type { LineStyle } from '@/types/Plot/Line.ts'
 import type { IPoiOptions, PolygonPosition } from '@/types/Plot/Poi.ts'
 import type { PointStyle } from '@/types/Plot/Point.ts'
 
-export type FillStyle = object
+export interface FillStyle {
+  'fill-color'?: DataDrivenPropertyValueSpecification<ColorSpecification>
+  'fill-opacity'?: DataDrivenPropertyValueSpecification<number>
+}
 
 export interface IFillOptions extends IPoiOptions {
   position?: PolygonPosition
