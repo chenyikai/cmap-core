@@ -1,4 +1,4 @@
-import type { DataDrivenPropertyValueSpecification, LayerSpecification } from 'mapbox-gl'
+import type { LayerSpecification } from 'mapbox-gl'
 
 import type { SortLayer } from '@/core/ResourceRegister'
 import { DEFAULT_TEXT_COLOR } from '@/modules/Plot/plugins/IndexPoint/vars.ts'
@@ -8,52 +8,25 @@ import { PlotType } from '@/types/Plot/Poi.ts'
 export const NAME = PlotType.POINT
 
 export const Z_INDEX = 10
-
 export const TEXT_Z_INDEX = Z_INDEX + 1
 
 export const POINT_CIRCLE_LAYER_NAME = 'mapbox-gl-plot-point-circle-layer'
-
 export const POINT_TEXT_LAYER_NAME = 'mapbox-gl-plot-point-text-layer'
 
 export const DEFAULT_TEXT_SIZE = 12
-
-export const GAP_PX = 5 // 文字和图标边缘的固定间距 (像素)
-
+export const GAP_PX = 5
 export const DEFAULT_CIRCLE_RADIUS = 10
-
 export const DEFAULT_CIRCLE_COLOR = '#fff'
-
 export const DEFAULT_CIRCLE_STROKE_WIDTH = 2
-
 export const DEFAULT_CIRCLE_STROKE_COLOR = '#f00'
 
-// 🌟 核心：定义一个随 zoom 线性变化的比例因子
-const zoomScale: DataDrivenPropertyValueSpecification<number> = [
-  'interpolate',
-  ['linear'],
-  ['zoom'],
-  5,
-  0.5, // zoom为5时，缩小为 0.5 倍
-  14,
-  1, // zoom为14时，保持原大小 (1 倍)
-  22,
-  2.5, // zoom为22时，放大为 2.5 倍 (可根据实际视觉效果微调)
-]
+// 提取基础数据属性
+const baseRadius = ['coalesce', ['get', 'circle-radius'], DEFAULT_CIRCLE_RADIUS]
+const baseStrokeWidth = ['coalesce', ['get', 'circle-stroke-width'], DEFAULT_CIRCLE_STROKE_WIDTH]
+const baseTextSize = ['coalesce', ['get', 'text-size'], DEFAULT_TEXT_SIZE]
 
-// const circleRadius = ['coalesce', ['get', 'circle-radius'], DEFAULT_CIRCLE_RADIUS]
-const circleRadius: DataDrivenPropertyValueSpecification<number> = [
-  '*',
-  ['coalesce', ['get', 'circle-radius'], DEFAULT_CIRCLE_RADIUS],
-  zoomScale,
-]
-
-// const circleStrokeWidth = ['coalesce', ['get', 'circle-stroke-width'], DEFAULT_CIRCLE_STROKE_WIDTH]
-
-const circleStrokeWidth: DataDrivenPropertyValueSpecification<number> = [
-  '*',
-  ['coalesce', ['get', 'circle-stroke-width'], DEFAULT_CIRCLE_STROKE_WIDTH],
-  zoomScale,
-]
+// 提取 Hover 悬停时的放大倍数
+const hoverScale = ['case', ['boolean', ['feature-state', 'hover'], false], 1.2, 1]
 
 export const POINT_CIRCLE_LAYER: LayerSpecification = {
   id: POINT_CIRCLE_LAYER_NAME,
@@ -66,19 +39,31 @@ export const POINT_CIRCLE_LAYER: LayerSpecification = {
   ],
   source: PLOT_SOURCE_NAME,
   paint: {
+    // 必须把 interpolate ['zoom'] 放在最外层！
+    // 内部公式：基础值 * hover缩放 * 当前层级缩放因子
     'circle-radius': [
-      'case',
-      ['boolean', ['feature-state', 'hover'], false],
-      ['*', circleRadius, 1.2],
-      circleRadius,
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      5,
+      ['*', baseRadius, hoverScale, 0.5],
+      14,
+      ['*', baseRadius, hoverScale, 1],
+      22,
+      ['*', baseRadius, hoverScale, 2.5],
+    ],
+    'circle-stroke-width': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      5,
+      ['*', baseStrokeWidth, hoverScale, 0.5],
+      14,
+      ['*', baseStrokeWidth, hoverScale, 1],
+      22,
+      ['*', baseStrokeWidth, hoverScale, 2.5],
     ],
     'circle-color': ['coalesce', ['get', 'circle-color'], DEFAULT_CIRCLE_COLOR],
-    'circle-stroke-width': [
-      'case',
-      ['boolean', ['feature-state', 'hover'], false],
-      ['*', circleStrokeWidth, 1.2],
-      circleStrokeWidth,
-    ],
     'circle-stroke-color': [
       'coalesce',
       ['get', 'circle-stroke-color'],
@@ -103,8 +88,19 @@ export const POINT_TEXT_LAYER: LayerSpecification = {
     'text-offset': ['coalesce', ['get', '_calcTextOffset'], ['get', 'text-offset'], [0, 0]],
     'text-anchor': 'top',
     'text-rotate': ['coalesce', ['get', 'icon-rotate'], 0],
-    'text-size': ['*', ['coalesce', ['get', 'text-size'], DEFAULT_TEXT_SIZE], zoomScale],
     'text-allow-overlap': true,
+    // 文字大小同样遵循外层 interpolate
+    'text-size': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      5,
+      ['*', baseTextSize, 0.5],
+      14,
+      ['*', baseTextSize, 1],
+      22,
+      ['*', baseTextSize, 2.5],
+    ],
   },
   paint: {
     'text-color': ['coalesce', ['get', 'text-color'], DEFAULT_TEXT_COLOR],
