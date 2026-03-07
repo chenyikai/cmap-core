@@ -16,12 +16,27 @@ export const DEFAULT_ICON_ANCHOR = 'bottom'
 export const GAP_PX = 5 // 文字和图标边缘的固定间距 (像素)
 
 export const DEFAULT_ICON_SIZE = 1
-export const iconSize: DataDrivenPropertyValueSpecification<string> = [
-  'coalesce',
-  ['get', 'icon-size'],
-  DEFAULT_ICON_SIZE,
+
+const zoomScale: DataDrivenPropertyValueSpecification<number> = [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  5,
+  0.5,
+  14,
+  1,
+  22,
+  2.5,
 ]
-export const ICON_ROTATE: DataDrivenPropertyValueSpecification<string> = [
+
+// 结合属性与缩放因子
+export const iconSize: DataDrivenPropertyValueSpecification<number> = [
+  '*',
+  ['coalesce', ['get', 'icon-size'], DEFAULT_ICON_SIZE],
+  zoomScale,
+]
+
+export const ICON_ROTATE: DataDrivenPropertyValueSpecification<number> = [
   'coalesce',
   ['get', 'icon-rotate'],
   0,

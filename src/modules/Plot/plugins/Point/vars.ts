@@ -1,4 +1,4 @@
-import type { LayerSpecification } from 'mapbox-gl'
+import type { DataDrivenPropertyValueSpecification, LayerSpecification } from 'mapbox-gl'
 
 import type { SortLayer } from '@/core/ResourceRegister'
 import { DEFAULT_TEXT_COLOR } from '@/modules/Plot/plugins/IndexPoint/vars.ts'
@@ -27,9 +27,33 @@ export const DEFAULT_CIRCLE_STROKE_WIDTH = 2
 
 export const DEFAULT_CIRCLE_STROKE_COLOR = '#f00'
 
-const circleRadius = ['coalesce', ['get', 'circle-radius'], DEFAULT_CIRCLE_RADIUS]
+// 🌟 核心：定义一个随 zoom 线性变化的比例因子
+const zoomScale: DataDrivenPropertyValueSpecification<number> = [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  5,
+  0.5, // zoom为5时，缩小为 0.5 倍
+  14,
+  1, // zoom为14时，保持原大小 (1 倍)
+  22,
+  2.5, // zoom为22时，放大为 2.5 倍 (可根据实际视觉效果微调)
+]
 
-const circleStrokeWidth = ['coalesce', ['get', 'circle-stroke-width'], DEFAULT_CIRCLE_STROKE_WIDTH]
+// const circleRadius = ['coalesce', ['get', 'circle-radius'], DEFAULT_CIRCLE_RADIUS]
+const circleRadius: DataDrivenPropertyValueSpecification<number> = [
+  '*',
+  ['coalesce', ['get', 'circle-radius'], DEFAULT_CIRCLE_RADIUS],
+  zoomScale,
+]
+
+// const circleStrokeWidth = ['coalesce', ['get', 'circle-stroke-width'], DEFAULT_CIRCLE_STROKE_WIDTH]
+
+const circleStrokeWidth: DataDrivenPropertyValueSpecification<number> = [
+  '*',
+  ['coalesce', ['get', 'circle-stroke-width'], DEFAULT_CIRCLE_STROKE_WIDTH],
+  zoomScale,
+]
 
 export const POINT_CIRCLE_LAYER: LayerSpecification = {
   id: POINT_CIRCLE_LAYER_NAME,
@@ -45,14 +69,14 @@ export const POINT_CIRCLE_LAYER: LayerSpecification = {
     'circle-radius': [
       'case',
       ['boolean', ['feature-state', 'hover'], false],
-      ['+', circleRadius, ['%', circleRadius, 0.6]],
+      ['*', circleRadius, 1.2],
       circleRadius,
     ],
     'circle-color': ['coalesce', ['get', 'circle-color'], DEFAULT_CIRCLE_COLOR],
     'circle-stroke-width': [
       'case',
       ['boolean', ['feature-state', 'hover'], false],
-      ['+', circleStrokeWidth, ['%', circleStrokeWidth, 0.6]],
+      ['*', circleStrokeWidth, 1.2],
       circleStrokeWidth,
     ],
     'circle-stroke-color': [
@@ -79,7 +103,7 @@ export const POINT_TEXT_LAYER: LayerSpecification = {
     'text-offset': ['coalesce', ['get', '_calcTextOffset'], ['get', 'text-offset'], [0, 0]],
     'text-anchor': 'top',
     'text-rotate': ['coalesce', ['get', 'icon-rotate'], 0],
-    'text-size': ['coalesce', ['get', 'text-size'], DEFAULT_TEXT_SIZE],
+    'text-size': ['*', ['coalesce', ['get', 'text-size'], DEFAULT_TEXT_SIZE], zoomScale],
     'text-allow-overlap': true,
   },
   paint: {
