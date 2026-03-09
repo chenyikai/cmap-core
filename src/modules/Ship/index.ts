@@ -51,7 +51,8 @@ class Ship extends Module {
   private createCollisions(): CollisionItemOptions[] {
     return this.tooltips.map((tooltip) => {
       return {
-        ...tooltip.getSimpleBbox(),
+        // ...tooltip.getSimpleBbox(),
+        ...tooltip.getAllBbox(),
         id: tooltip.id,
       }
     })

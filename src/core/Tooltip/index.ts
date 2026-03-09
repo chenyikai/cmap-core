@@ -10,7 +10,7 @@ import type { AllAnchor, ITooltipOptions, SimpleAnchor } from '@/types/Toolip'
 import { LAYERS, TOOLTIP_SOURCE_NAME } from './vars.ts'
 
 export class Tooltip extends Module {
-  static DEBUG = true
+  static DEBUG = false
 
   options: ITooltipOptions
 

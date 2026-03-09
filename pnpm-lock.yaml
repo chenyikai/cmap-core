@@ -47,6 +47,9 @@ importers:
       rbush:
         specifier: ^4.0.1
         version: 4.0.1
+      tweakpane:
+        specifier: ^4.0.5
+        version: 4.0.5
       uuid:
         specifier: ^11.0.3
         version: 11.1.0
@@ -60,6 +63,9 @@ importers:
       '@eslint/js':
         specifier: ^9.39.2
         version: 9.39.3
+      '@tweakpane/core':
+        specifier: ^2.0.5
+        version: 2.0.5
       '@types/node':
         specifier: ^25.0.9
         version: 25.3.3
@@ -93,9 +99,6 @@ importers:
       husky:
         specifier: ^9.1.7
         version: 9.1.7
-      lil-gui:
-        specifier: ^0.21.0
-        version: 0.21.0
       lint-staged:
         specifier: ^16.2.7
         version: 16.3.1
@@ -1559,6 +1562,9 @@ packages:
   '@turf/voronoi@7.3.4':
     resolution: {integrity: sha512-cwKSiDzDHRnA7yafQ1zOhWxRuMzp+fYFFzadCdByBAG1jAD7UlFwKhS1fjNPBNs67Fl5X3LL5ahCLW5gEdFgmg==}
 
+  '@tweakpane/core@2.0.5':
+    resolution: {integrity: sha512-punBgD5rKCF5vcNo6BsSOXiDR/NSs9VM7SG65QSLJIxfRaGgj54ree9zQW6bO3pNFf3AogiGgaNODUVQRk9YqQ==}
+
   '@types/argparse@1.0.38':
     resolution: {integrity: sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==}
 
@@ -2468,9 +2474,6 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
-  lil-gui@0.21.0:
-    resolution: {integrity: sha512-tpvxN7v1GvE/Tv+GRopfOp0W7fVEjF4PltkuX8vOCIfim22rD1ztvfkoEMcv9lzQeuNUSeIrUmUjBwmlW/oUew==}
-
   lint-staged@16.3.1:
     resolution: {integrity: sha512-bqvvquXzFBAlSbluugR4KXAe4XnO/QZcKVszpkBtqLWa2KEiVy8n6Xp38OeUbv/gOJOX4Vo9u5pFt/ADvbm42Q==}
     engines: {node: '>=20.17'}
@@ -3061,6 +3064,9 @@ packages:
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+
+  tweakpane@4.0.5:
+    resolution: {integrity: sha512-rxEXdSI+ArlG1RyO6FghC4ZUX8JkEfz8F3v1JuteXSV0pEtHJzyo07fcDG+NsJfN5L39kSbCYbB9cBGHyuI/tQ==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -5571,6 +5577,8 @@ snapshots:
       d3-voronoi: 1.1.2
       tslib: 2.8.1
 
+  '@tweakpane/core@2.0.5': {}
+
   '@types/argparse@1.0.38': {}
 
   '@types/d3-voronoi@1.1.12': {}
@@ -6486,8 +6494,6 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  lil-gui@0.21.0: {}
-
   lint-staged@16.3.1:
     dependencies:
       commander: 14.0.3
@@ -7094,6 +7100,8 @@ snapshots:
       typescript: 5.9.3
 
   tslib@2.8.1: {}
+
+  tweakpane@4.0.5: {}
 
   type-check@0.4.0:
     dependencies:

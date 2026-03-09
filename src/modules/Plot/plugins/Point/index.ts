@@ -92,14 +92,19 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
     T['style'] & T['properties']
   > {
     if (!this.options.position) {
-      const emptyFeature: GeoJSON.Feature<null, T['style'] & T['properties']> = {
+      // const emptyFeature: GeoJSON.Feature<null, T['style'] & T['properties']> = {
+      //   type: 'Feature',
+      //   geometry: null,
+      //   id: this.id,
+      //   properties: {},
+      // }
+
+      return {
         type: 'Feature',
         geometry: null,
         id: this.id,
         properties: {},
       }
-
-      return emptyFeature
     }
 
     const h = (DEFAULT_CIRCLE_RADIUS + DEFAULT_CIRCLE_STROKE_WIDTH) * 2

@@ -14,10 +14,9 @@ import { EMPTY_SOURCE, PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
 import type { ILineOptions } from '@/types/Plot/Line.ts'
 import { PointType } from '@/types/Plot/Line.ts'
 import type { PlotType } from '@/types/Plot/Poi.ts'
-import type { PointInstance } from '@/types/Plot/Point.ts'
-import { isNull } from '@/utils/validate.ts'
+import type { PointInstance, PointStyle } from '@/types/Plot/Point.ts'
 
-import { LAYER_LIST, LINE_LAYER_NAME, NAME } from './vars.ts'
+import { DEFAULT_LINE_COLOR, LAYER_LIST, LINE_LAYER_NAME, NAME } from './vars.ts'
 
 export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.LineString | null> {
   static NAME: PlotType = NAME
@@ -114,6 +113,8 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
         ...this.options.properties,
         ...this.options.style,
         visibility: this.options.visibility,
+        isName: this.options.isName,
+        text: this.options.name,
         'line-dasharray': this.isEdit || this.isCreate ? [2, 2] : [99999, 99999],
       },
       {
@@ -228,14 +229,14 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
     this.render()
   }
   public override remove(): void {
-    // this.removePoint()
-    // this.residentEvent.disabled()
-    // this.createEvent.disabled()
-    // this.updateEvent.disabled()
-    // this.removeAllListeners()
-    //
-    // this.options.position = []
-    // this.render()
+    this.removePoint()
+    this.residentEvent.disabled()
+    this.createEvent.disabled()
+    this.updateEvent.disabled()
+    this.removeAllListeners()
+
+    this.options.position = []
+    this.render()
   }
   public override render(): void {
     this.points.map((point) => {
@@ -266,13 +267,19 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
   }
 
   public createVertex(id: string, index: number, position: LngLat): PointInstance {
+    const style: PointStyle = {
+      'circle-radius': 5,
+      'circle-stroke-color': this.options.style?.['line-color'] ?? DEFAULT_LINE_COLOR,
+      ...this.options.vertexStyle,
+    }
+
     return new Point(this.context.map, {
       // id: `${this.id}-node-${String(index)}`, // 建议 ID 加上 node 标识
       id, // 建议 ID 加上 node 标识
       isName: false,
       visibility: 'visible',
       position,
-      style: this.options.vertexStyle,
+      style,
       properties: {
         id: `${this.id}-node-${String(index)}`,
         index,
@@ -282,9 +289,12 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
   }
 
   public createMid(id: string, index: number, position: LngLat): Point {
-    const style = isNull(this.options.midStyle)
-      ? { 'circle-radius': 2, 'circle-color': '#f00' }
-      : this.options.midStyle
+    const style = {
+      'circle-radius': 2,
+      'circle-color': this.options.style?.['line-color'] ?? DEFAULT_LINE_COLOR,
+      'circle-stroke-color': this.options.style?.['line-color'] ?? DEFAULT_LINE_COLOR,
+      ...this.options.midStyle,
+    }
 
     return new Point(this.context.map, {
       id, // 建议 ID 加上 mid 标识

@@ -1,6 +1,6 @@
 import type EventEmitter from 'eventemitter3'
 import type * as GeoJSON from 'geojson'
-import type { ColorSpecification, LngLat } from 'mapbox-gl'
+import type { ColorSpecification, DataDrivenPropertyValueSpecification, LngLat } from 'mapbox-gl'
 
 import type {
   PointCreateEvent,
@@ -13,9 +13,10 @@ import type { IPoiOptions, PlotVisibility, PointPosition } from '@/types/Plot/Po
 
 export interface CirclePointStyle {
   'circle-stroke-width'?: number
-  'circle-stroke-color'?: ColorSpecification
+  'circle-stroke-color'?: DataDrivenPropertyValueSpecification<ColorSpecification>
   'circle-radius'?: number
-  'circle-color'?: ColorSpecification
+  'circle-color'?: DataDrivenPropertyValueSpecification<ColorSpecification>
+  'text-color'?: DataDrivenPropertyValueSpecification<ColorSpecification>
 }
 
 export type PointStyle = CirclePointStyle | IndexPointStyle | IconPointStyle

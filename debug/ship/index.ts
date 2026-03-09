@@ -1,231 +1,59 @@
-import axios from 'axios'
-import { LngLat, Map } from "mapbox-gl";
-import { set } from "lodash-es";
-import { IAisShipOptions } from "../../src/types/Ship/AisShip";
-import Ship from "../../src/modules/Ship";
-import { CMap } from "../../src/modules/CMap"
-import { staticShipData, gjShipData } from "./mock";
-import { AisShip, Tooltip } from "../../src";
-import  IconManager from "../../src/core/IconManager";
+import { LngLat, type Map } from 'mapbox-gl'
+import type { TabPageApi } from '@tweakpane/core' // 注意：从 core 导入类型
+import { AisShip, Ship } from '@/index'
+import { logEvent } from '../utils/logger'
+import { staticShipData } from './mock'
 
-import wjhgyc from "./icon/wjhgyc.png";
-import yjhgyc from "./icon/yjhgyc.png";
-import wjhnmgyc from "./icon/wjhnmgyc.png";
-import yjhnmgyc from "./icon/yjhnmgyc.png";
-import yjhnmsyc from "./icon/yjhnmsyc.png";
-import yjhsyc from "./icon/yjhsyc.png";
-import zyzgyc from "./icon/zyzgyc.png";
-import zyznmgyc from "./icon/zyznmgyc.png";
-import zyznmsyc from "./icon/zyznmsyc.png";
-import zyzsyc from "./icon/zyzsyc.png";
-import qwc from "./icon/qwc.png";
+let shipManager: Ship | null = null
 
-let ship: Ship | null = null
+export function initShipDebug(map: Map, folder: TabPageApi) {
+  folder.addButton({ title: '加载海量船舶 (Mock)' }).on('click', () => {
+    if (!shipManager) {
+      shipManager = new Ship(map, { plugins: [AisShip] })
+    }
 
-export function initShip(cMap: CMap) {
-  cMap.mapLoaded().then(map => {
-    window.ship = ship = new Ship(map, {
-      plugins: [AisShip]
-    });
+    const list = staticShipData.map((item: any) => ({
+      type: 'Ais',
+      direction: item.hdg || 0,
+      height: item.length,
+      width: item.width,
+      id: item.mmsi,
+      name: item.cnname || item.mmsi,
+      position: new LngLat(Number(item.location.split(',')[1]), Number(item.location.split(',')[0])),
+      speed: item.sog,
+      hdg: item.hdg || 0,
+      cog: item.cog,
+      rot: item.rot,
+      time: item.updateTime,
+      tooltip: true,
+    }))
 
-    const icon = new IconManager(map)
-    icon.load([
-      {
-        name: "wjhgyc",
-        url: wjhgyc,
-      },
-      {
-        name: "yjhgyc",
-        url: yjhgyc,
-      },
-      {
-        name: "zyzgyc",
-        url: zyzgyc,
-      },
-      {
-        name: "wjhnmgyc",
-        url: wjhnmgyc,
-      },
-      {
-        name: "yjhnmgyc",
-        url: yjhnmgyc,
-      },
-      {
-        name: "zyznmgyc",
-        url: zyznmgyc,
-      },
-      {
-        name: "yjhsyc",
-        url: yjhsyc,
-      },
-      {
-        name: "zyzsyc",
-        url: zyzsyc,
-      },
-      {
-        name: "yjhnmsyc",
-        url: yjhnmsyc,
-      },
-      {
-        name: "zyznmsyc",
-        url: zyznmsyc,
-      },
-      {
-        name: "qwc",
-        url: qwc,
-      },
-    ])
-
-    setTimeout(() => {
-      // ship!.select('413363020')
-    }, 2000)
-
-    // getShipData(map, false)
-    getGjShipData(map)
-
-    map.on('moveend', () => {
-      // getShipData(map, false);
-      getGjShipData(map);
-    });
+    shipManager.load(list)
+    logEvent('船舶加载完毕', { count: list.length })
   })
-}
 
+  folder.addBlade({ view: 'separator' })
 
-function getBounds(map: Map) {
-  const { _ne: maxData, _sw: minData } = map.getBounds()!;
-  const level = map.getZoom();
-  return {
-    maxLon: maxData.lng,
-    minLon: minData.lng,
-    maxLat: maxData.lat,
-    minLat: minData.lat,
-    level,
-  };
-}
+  // 2. 随机聚焦测试
+  folder.addButton({ title: '聚焦随机船舶' }).on('click', () => {
+    if (shipManager && shipManager.ships.length > 0) {
+      const randomIndex = Math.floor(Math.random() * shipManager.ships.length)
+      const randomId = shipManager.ships[randomIndex].id
+      shipManager.select(randomId)
+      logEvent('镜头飞跃并聚焦', { id: randomId })
+    } else {
+      logEvent('警告', '当前没有船舶数据')
+    }
+  })
 
-function kvToJson(k: any, v: any) {
-  const list: any = [];
-  v.forEach((valueItem: any) => {
-    let data = {};
-    valueItem.forEach((item: any, index: any) => {
-      if (Array.isArray(item)) {
-        set(data, 'list', {
-          k: k[index],
-          v: item,
-        });
-      } else {
-        set(data, k[index], item);
-      }
-    });
-    list.push(data);
-  });
-  return list;
-}
+  folder.addBlade({ view: 'separator' })
 
-function getGjShipData(map: Map) {
-  // if (map.getZoom() < 12 && ship) {
-  //   // ship.removeAll()
-  //   return
-  // }
+  folder.addButton({ title: '清空船舶' }).on('click', () => {
+    shipManager?.removeAll()
+    logEvent('系统提示', '所有船舶已清空')
+  })
 
-  const list: Array<IAisShipOptions> = gjShipData.map((item: any) => {
-    const option: IAisShipOptions = {
-      type: "Ais",
-      direction: item.hdg || 0,
-      height: item.length,
-      id: item.mmsi,
-      icon: item.shipIcon,
-      name: item.shipName,
-      position: new LngLat(Number(item.lon), Number(item.lat)),
-      speed: item.sog > 50 ? 0 : item.sog,
-      hdg: item.hdg || 0,
-      cog: item.cog,
-      rot: item.rot,
-      statusId: item.statusId,
-      status: item.status,
-      time: item.updateTime,
-      width: item.width,
-      top: item.toBow,
-      bottom: item.toStern,
-      right: item.toStarboard,
-      left: item.toPort,
-      tooltip: true,
-    };
-
-    return option
-  });
-
-  if (ship) {
-    ship.load(list)
-  }
-}
-
-function getShipData(map: Map, isStatic: boolean = false) {
-  if (isStatic) {
-    renderShip(map, staticShipData)
-    return
-  }
-
-  axios
-    .post('/ship/rest/ehhship/getShipDataList', getBounds(map), {
-      headers: {
-        Authorization: 'bearer 420e1725-cef0-4b33-93e7-608e83724d14',
-      },
-    })
-    .then(({ data }) => {
-      if (Object.values(data.data).length === 0 && ship) {
-        ship.removeAll()
-        return
-      }
-      renderShip(map, data.data)
-    });
-}
-
-function renderShip(_map: Map, data: any) {
-  if (_map.getZoom() < 12 && ship) {
-    ship.removeAll()
-    return
-  }
-
-  const { k, v } = data;
-  let shipData = []
-  if (k && v) {
-     shipData  = kvToJson(k, v);
-  } else {
-     shipData  = data
-  }
-
-  Tooltip.DEBUG = false
-
-  const list: Array<IAisShipOptions> = shipData.map((item: any) => {
-    const [lat, lon] = item.location.split(',');
-
-    const option: IAisShipOptions = {
-      type: "Ais",
-      direction: item.hdg || 0,
-      height: item.length,
-      id: item.mmsi,
-      name: item.cnname || item.enname || item.mmsi,
-      position: new LngLat(Number(lon), Number(lat)),
-      speed: item.sog > 20 ? 0 : item.sog,
-      hdg: item.hdg || 0,
-      cog: item.cog,
-      rot: item.rot,
-      statusId: item.statusId,
-      status: item.status,
-      time: item.updateTime,
-      width: item.width,
-      top: item.toBow,
-      bottom: item.toStern,
-      right: item.toStarboard,
-      left: item.toPort,
-      tooltip: true,
-    };
-
-    return option
-  });
-
-  if (ship) {
-    ship.load(list)
-  }
+  map.on('ship-click', (ship) => {
+    logEvent('🖱️ 船舶被点击', ship)
+  })
 }

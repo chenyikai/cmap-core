@@ -8,7 +8,6 @@ import {
   PointUpdateEvent,
 } from '@/modules/Plot/plugins/Events/PointEvents.ts'
 import { Point } from '@/modules/Plot/plugins/Point'
-import { EMPTY_SOURCE, PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
 import type { IIconPointOptions } from '@/types/Plot/IconPoint.ts'
 import type { PlotType } from '@/types/Plot/Poi.ts'
 
@@ -37,7 +36,7 @@ export class IconPoint extends Point<IIconPointOptions> {
   }
 
   public override onAdd(): void {
-    this.context.register.addSource(PLOT_SOURCE_NAME, EMPTY_SOURCE)
+    super.onAdd()
 
     LAYER_LIST.forEach((layer) => {
       this.context.register.addLayer(layer)
@@ -49,17 +48,12 @@ export class IconPoint extends Point<IIconPointOptions> {
     IIconPointOptions['style'] & IIconPointOptions['properties']
   > {
     if (!this.options.position) {
-      const emptyFeature: GeoJSON.Feature<
-        null,
-        IIconPointOptions['style'] & IIconPointOptions['properties']
-      > = {
+      return {
         type: 'Feature',
         geometry: null,
         id: this.id,
         properties: {},
       }
-
-      return emptyFeature
     }
 
     const h = this.context.iconManage.getImage(this.options.icon)?.height ?? 0
@@ -83,7 +77,7 @@ export class IconPoint extends Point<IIconPointOptions> {
         icon: this.options.icon,
         text: this.options.name,
         visibility: this.options.visibility,
-        isName: true,
+        isName: this.options.isName,
         _calcTextOffset: calculatedOffset,
         meta: 'icon',
       },
