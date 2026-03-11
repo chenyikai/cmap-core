@@ -52,6 +52,7 @@ export const FILL_CLOSED_LINE_LAYER: LayerSpecification = {
   paint: {
     'line-color': fillColor,
     'line-width': ['case', ['boolean', ['feature-state', 'create'], false], 3, 0],
+    // 'line-width': 3,
   },
   layout: {},
 }

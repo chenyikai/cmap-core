@@ -265,6 +265,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
       this.position().toArray(),
       {
         ...this.options,
+        id: this.options.id,
         icon: this.getIconName(),
         direction: this.direction,
         updateStatus: this.updateStatus,
@@ -321,6 +322,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
       let ship: GeoJSON.Feature<GeoJSON.Polygon, IAisShipOptions> = lineToPolygon(line, {
         properties: {
           ...this.options,
+          id: this.options.id,
           updateStatus: this.updateStatus,
           outLine: true,
         },

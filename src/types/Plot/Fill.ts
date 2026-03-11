@@ -12,6 +12,7 @@ export interface FillStyle {
 export interface IFillOptions extends IPoiOptions {
   position?: PolygonPosition
   style?: FillStyle
+  icon?: string
   outLineStyle?: LineStyle
   vertexStyle?: PointStyle
   midStyle?: PointStyle

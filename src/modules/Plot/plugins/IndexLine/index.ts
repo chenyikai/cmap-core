@@ -4,6 +4,7 @@ import type { LngLat } from 'mapbox-gl'
 import { IndexPoint } from '@/modules/Plot/plugins/IndexPoint'
 import { Line } from '@/modules/Plot/plugins/Line'
 import type { IIndexLineOptions } from '@/types/Plot/IndexLine.ts'
+import type { IndexPointStyle } from '@/types/Plot/IndexPoint.ts'
 import { PointType } from '@/types/Plot/Line.ts'
 import type { PointInstance } from '@/types/Plot/Point.ts'
 
@@ -19,7 +20,7 @@ export class IndexLine extends Line<IIndexLineOptions> {
       visibility: 'visible',
       position,
       index: index + 1,
-      style: this.options.vertexStyle,
+      style: this.options.vertexStyle as IndexPointStyle,
       properties: {
         id: `${this.id}-node-${String(index)}`,
         index,

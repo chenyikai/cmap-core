@@ -1,4 +1,4 @@
-import { along, length, lineString } from '@turf/turf'
+import { along, bbox, length, lineString } from '@turf/turf'
 import type * as GeoJSON from 'geojson'
 import type { Map } from 'mapbox-gl'
 import { LngLat } from 'mapbox-gl'
@@ -115,7 +115,8 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
         visibility: this.options.visibility,
         isName: this.options.isName,
         text: this.options.name,
-        'line-dasharray': this.isEdit || this.isCreate ? [2, 2] : [99999, 99999],
+        id: this.options.id,
+        'line-dasharray': this.isEdit || this.isCreate ? [2, 2] : [9999999999, 9999999999],
       },
       {
         id: this.id,
@@ -167,6 +168,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
 
     this.midPoints.forEach((midPoint) => {
       midPoint.edit()
+      midPoint.show()
     })
 
     this.residentEvent.disabled()
@@ -182,6 +184,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
     })
     this.midPoints.forEach((midPoint) => {
       midPoint.unedit()
+      midPoint.hide()
     })
 
     this.residentEvent.able()
@@ -191,16 +194,30 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
   }
 
   public override focus(): void {
-    throw new Error('Method not implemented.')
+    this.setState({ focus: true })
+    this.render()
   }
   public override unfocus(): void {
-    throw new Error('Method not implemented.')
+    this.setState({ focus: false })
+    this.render()
   }
   public override select(): void {
-    throw new Error('Method not implemented.')
+    const bounds = bbox(this.getFeature() as GeoJSON.Feature) as [number, number, number, number]
+    this.context.map.fitBounds(bounds, {
+      padding: {
+        left: 60,
+        right: 60,
+        top: 60,
+        bottom: 60,
+      },
+    })
+
+    this.context.map.once('moveend', () => {
+      this.focus()
+    })
   }
   public override unselect(): void {
-    throw new Error('Method not implemented.')
+    this.unfocus()
   }
   public override move(position: LngLat): void {
     // 如果不借助鼠标拖拽 直接移动以中心为基准点
@@ -247,6 +264,15 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
       this.midPoints.map((minPoint) => {
         minPoint.render()
       })
+    }
+
+    if (this.isFocus) {
+      this.context.focus.set(this.getFeature() as GeoJSON.Feature, {
+        armLength: 40,
+        padding: 30,
+      })
+    } else {
+      this.context.focus.remove(this.id)
     }
 
     this.context.register.setGeoJSONData(PLOT_SOURCE_NAME, this.getFeature() as GeoJSON.Feature)

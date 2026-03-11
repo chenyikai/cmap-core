@@ -24,7 +24,7 @@ class ResourceRegister {
   public addSource(id: string, source: SourceSpecification): void {
     if (!this.map.getSource(id)) {
       if (source.type === 'geojson' && !source.promoteId) {
-        // source.promoteId = 'id'; // 可选：根据你的数据结构决定是否开启
+        source.promoteId = 'id' // 可选：根据你的数据结构决定是否开启
       }
       this.map.addSource(id, source)
     }

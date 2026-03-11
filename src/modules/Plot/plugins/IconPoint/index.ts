@@ -74,6 +74,7 @@ export class IconPoint extends Point<IIconPointOptions> {
       {
         ...this.options.style,
         ...this.options.properties,
+        id: this.options.id,
         icon: this.options.icon,
         text: this.options.name,
         visibility: this.options.visibility,

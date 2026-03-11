@@ -3,6 +3,8 @@ import type { TabPageApi, FolderApi } from '@tweakpane/core'
 import { IconManager, Fill, Line, ArrowLine, IconPoint, IndexLine, IndexPoint, Point } from '@/index'
 import { logEvent } from '../utils/logger'
 import { IconAnchor } from "../../src/types/Plot/IconPoint";
+import { fillData, lineData } from "./mock";
+
 
 // 集中管理当前画布上所有的标绘实例
 const activePlots = new Map<string, any>()
@@ -63,16 +65,52 @@ const mockPositions = {
   ].map(p => new LngLat(p[0], p[1]))
 }
 
+function addMockLine(map: MapboxMap) {
+  const position = lineData.map((item) => {
+    return new LngLat(item[0], item[1])
+  })
+
+  const line = new Line(map, {
+    id: 'mockLine',
+    name: '模拟线-1',
+    visibility: 'visible',
+    isName: true,
+    position
+  })
+
+  line.render()
+
+  activePlots.set(line.id, line)
+}
+
+function addMockFill(map: MapboxMap) {
+  fillData.forEach((item, index) => {
+    const fill = new Fill(map, {
+      id: `mockFill-${index}`,
+      name: '模拟面' + index,
+      visibility: 'visible',
+      isName: true,
+      position: item.map(ele => new LngLat(ele[0], ele[1]))
+    })
+
+    fill.render()
+
+    activePlots.set(fill.id, fill)
+  })
+}
+
 // ==========================================
 // 主入口
 // ==========================================
 export async function initPlotDebug(map: MapboxMap, tab: TabPageApi) {
   const manage = new IconManager(map)
-  console.log(manage, 'manage');
-  // await manage.addSvg({
-  //   name: 'wx',
-  //   svg: '<svg t="1773040987808" class="icon" viewBox="0 0 1024 1024" width="32" height="32"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#FFFFFF"/><path d="M512 512m-469.333333 0a469.333333 469.333333 0 1 0 938.666666 0 469.333333 469.333333 0 1 0-938.666666 0Z" fill="#00A5FE"/><path d="M799.061333 554.922667l-54.101333 63.488 21.333333 1.877333a295.125333 295.125333 0 0 1-131.456 57.856c-61.866667 3.754667-90.837333-76.544-90.837333-76.544v-132.522667h83.2v-39.210666h-79.445333v-52.266667a83.285333 83.285333 0 0 0 58.112-80.256 85.333333 85.333333 0 0 0-87.082667-84.010667h-1.92a85.333333 85.333333 0 0 0-86.997333 84.010667 85.802667 85.802667 0 0 0 57.984 80.256v52.266667h-79.274667v39.210666h83.114667v132.522667s-30.933333 78.378667-92.8 76.544a295.125333 295.125333 0 0 1-131.456-57.856l21.333333-1.877333-56.106667-63.488-19.328 78.421333 23.210667-5.589333a291.157333 291.157333 0 0 0 117.930667 110.122666c71.509333 31.744 143.061333 70.912 158.506666 72.789334 15.445333-1.877333 86.997333-41.088 156.586667-72.789334a322.133333 322.133333 0 0 0 117.930667-110.122666l23.210666 5.589333z m-280.32-210.944a46.933333 46.933333 0 0 1-48.341333-46.677334 46.250667 46.250667 0 0 1 46.421333-44.757333h1.92a46.250667 46.250667 0 0 1 46.378667 44.8 45.44 45.44 0 0 1-46.336 46.677333z" fill="#FFFFFF"/></svg>'
-  // })
+  await manage.addSvg({
+    name: 'wx',
+    svg: '<svg t="1773040987808" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="11741" width="32" height="32"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#FFFFFF" p-id="11742"></path><path d="M512 512m-469.333333 0a469.333333 469.333333 0 1 0 938.666666 0 469.333333 469.333333 0 1 0-938.666666 0Z" fill="#00A5FE" p-id="11743"></path><path d="M799.061333 554.922667l-54.101333 63.488 21.333333 1.877333a295.125333 295.125333 0 0 1-131.456 57.856c-61.866667 3.754667-90.837333-76.544-90.837333-76.544v-132.522667h83.2v-39.210666h-79.445333v-52.266667a83.285333 83.285333 0 0 0 58.112-80.256 85.333333 85.333333 0 0 0-87.082667-84.010667h-1.92a85.333333 85.333333 0 0 0-86.997333 84.010667 85.802667 85.802667 0 0 0 57.984 80.256v52.266667h-79.274667v39.210666h83.114667v132.522667s-30.933333 78.378667-92.8 76.544a295.125333 295.125333 0 0 1-131.456-57.856l21.333333-1.877333-56.106667-63.488-19.328 78.421333 23.210667-5.589333a291.157333 291.157333 0 0 0 117.930667 110.122666c71.509333 31.744 143.061333 70.912 158.506666 72.789334 15.445333-1.877333 86.997333-41.088 156.586667-72.789334a322.133333 322.133333 0 0 0 117.930667-110.122666l23.210666 5.589333z m-280.32-210.944a46.933333 46.933333 0 0 1-48.341333-46.677334 46.250667 46.250667 0 0 1 46.421333-44.757333h1.92a46.250667 46.250667 0 0 1 46.378667 44.8 45.44 45.44 0 0 1-46.336 46.677333z" fill="#FFFFFF" p-id="11744"></path></svg>'
+  })
+
+  addMockFill(map)
+  addMockLine(map)
 
   // ==========================================
   // 🎛️ 区域一：创建与参数配置
@@ -299,8 +337,10 @@ export async function initPlotDebug(map: MapboxMap, tab: TabPageApi) {
       // 如果图形在拖拽中，自动刷新坐标 UI
       // 避免重复绑定：先卸载旧的监听
       plot.off('doneUpdate', plot._uiRefreshHandler)
+      plot.off('create', plot._uiRefreshHandler)
       plot._uiRefreshHandler = () => renderCoordinatesList(plot)
       plot.on('doneUpdate', plot._uiRefreshHandler)
+      plot.on('create', plot._uiRefreshHandler)
 
       parentTab.refresh()
     }
@@ -329,11 +369,16 @@ export async function initPlotDebug(map: MapboxMap, tab: TabPageApi) {
 
       // 为每一个点生成一个带有微调 x,y 控件的表单
       editState.positions.forEach((_, index): void => {
-        coordFolder!.addBinding(editState.positions, String(index), {
+        const binding = coordFolder!.addBinding(editState.positions, index, {
           label: `节点[${index}]`,
           x: { step: 0.000001 },
           y: { step: 0.000001 }
         })
+
+        const pickerBtn = binding.element.querySelector('button')
+        if (pickerBtn) {
+          pickerBtn.style.display = 'none'
+        }
       })
 
       coordFolder.addButton({ title: '📌 将坐标应用至地图' }).on('click', () => {
@@ -430,7 +475,6 @@ function buildPlotInstance(map: MapboxMap, isMock = false): any {
         ...baseConfig,
         position: isMock ? mockPositions.fill : undefined,
         style: { 'fill-color': state.fillColor, 'fill-opacity': state.fillOpacity },
-        outLineStyle: { 'line-color': state.lineColor, 'line-width': state.lineWidth }
       })
     default:
       return null

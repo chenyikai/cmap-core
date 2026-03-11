@@ -3,8 +3,9 @@ import type { Map, MapMouseEvent } from 'mapbox-gl'
 import { LngLat } from 'mapbox-gl'
 
 import { EventState } from '@/core/EventState'
-import { Line } from '@/modules/Plot/plugins/Line'
+import type { Line } from '@/modules/Plot/plugins/Line'
 import type { Point } from '@/modules/Plot/plugins/Point'
+import { CURSOR, Event } from '@/modules/Plot/vars.ts'
 import type { EventMessage } from '@/types/EventState'
 
 export abstract class LineBaseEvent extends EventState {
@@ -60,14 +61,18 @@ export class LineCreateEvent extends LineBaseEvent {
 
   private stop = (e: MapMouseEvent): void => {
     e.preventDefault()
+    this.line.stop()
 
     this.context.map.getCanvasContainer().style.cursor = ''
     this.setDrawLngLat(null)
     this.count = 0
+
     this.disabled()
 
     this.line.createPoint()
     this.line.edit()
+
+    this.line.emit(Event.CREATE, this.message<Line>(e, this.line))
   }
 
   constructor(map: Map, line: Line) {
@@ -121,12 +126,16 @@ export class LineUpdateEvent extends LineBaseEvent {
 
     this.line.updatePoint(index, current.center)
 
-    this.line.emit('update', this.message<Line>(e.originEvent, this.line), current)
+    this.line.emit(Event.UPDATE, this.message<Line>(e.originEvent, this.line), current)
   }
 
   private onMidBeforeUpdate = (e: EventMessage<Point>): void => {
     this.setModifyLngLat(e.instance)
-    this.line.emit('midBeforeUpdate', this.message<Line>(e.originEvent, this.line), e.instance)
+    this.line.emit(
+      Event.MID_BEFORE_UPDATE,
+      this.message<Line>(e.originEvent, this.line),
+      e.instance,
+    )
   }
 
   private onMidUpdate = (e: EventMessage<Point>): void => {
@@ -134,7 +143,7 @@ export class LineUpdateEvent extends LineBaseEvent {
     const { position } = cloneDeep(this.line.options)
     if (position && typeof index === 'number' && e.instance.center) {
       this.line.render()
-      this.line.emit('midUpdate', this.message<Line>(e.originEvent, this.line), e.instance)
+      this.line.emit(Event.MID_UPDATE, this.message<Line>(e.originEvent, this.line), e.instance)
     }
   }
 
@@ -151,7 +160,7 @@ export class LineUpdateEvent extends LineBaseEvent {
 
       this.line.edit()
 
-      this.line.emit('midDoneUpdate', this.message<Line>(e, this.line))
+      this.line.emit(Event.MID_DONE_UPDATE, this.message<Line>(e, this.line))
     }
   }
 
@@ -167,31 +176,31 @@ export class LineUpdateEvent extends LineBaseEvent {
     }
 
     e.preventDefault()
-    this.context.map.getCanvasContainer().style.cursor = 'move'
+    this.context.map.getCanvasContainer().style.cursor = CURSOR.MOVE
     this.dragStartLngLat = e.lngLat
 
     this.context.map.on('mousemove', this.onMousemove)
     this.context.map.once('mouseup', this.onMouseup)
 
-    this.line.emit(`${Line.NAME}.beforeUpdate`, this.message<Line>(e, this.line))
+    this.line.emit(Event.BEFORE_UPDATE, this.message<Line>(e, this.line))
   }
 
   private onLineMouseenter = (): void => {
-    this.context.map.getCanvasContainer().style.cursor = 'pointer'
+    this.context.map.getCanvasContainer().style.cursor = CURSOR.CLICK
     this.context.map.on('mousedown', this.line.LAYER, this.onLineMousedown)
   }
 
   private onLineMouseLeave = (): void => {
-    this.context.map.getCanvasContainer().style.cursor = ''
+    this.context.map.getCanvasContainer().style.cursor = CURSOR.EMPTY
     this.context.map.off('mousedown', this.line.LAYER, this.onLineMousedown)
   }
 
   private onMousemove = (e: MapMouseEvent): void => {
-    this.context.map.getCanvasContainer().style.cursor = 'move'
+    this.context.map.getCanvasContainer().style.cursor = CURSOR.MOVE
     const current = e.lngLat
     this.line.move(current)
     this.dragStartLngLat = current
-    this.line.emit(`${Line.NAME}.update`, this.message<Line>(e, this.line))
+    this.line.emit(Event.UPDATE, this.message<Line>(e, this.line))
   }
 
   private onMouseup = (e: MapMouseEvent): void => {
@@ -201,7 +210,7 @@ export class LineUpdateEvent extends LineBaseEvent {
     this.dragStartLngLat = null
     this.line.render()
 
-    this.line.emit(`${Line.NAME}.doneUpdate`, this.message<Line>(e, this.line))
+    this.line.emit(Event.DONE_UPDATE, this.message<Line>(e, this.line))
   }
 
   constructor(map: Map, line: Line) {
@@ -234,12 +243,12 @@ export class LineUpdateEvent extends LineBaseEvent {
 
   public override able(): void {
     this.line.points.forEach((point) => {
-      point.on('update', this.onVertexUpdate)
+      point.on(Event.UPDATE, this.onVertexUpdate)
     })
     this.line.midPoints.forEach((mid) => {
-      mid.on('beforeUpdate', this.onMidBeforeUpdate)
-      mid.on('update', this.onMidUpdate)
-      mid.on('doneUpdate', this.onMidDone)
+      mid.on(Event.BEFORE_UPDATE, this.onMidBeforeUpdate)
+      mid.on(Event.UPDATE, this.onMidUpdate)
+      mid.on(Event.DONE_UPDATE, this.onMidDone)
     })
 
     this.context.eventManager.on(this.line.id, this.line.LAYER, 'mouseenter', this.onLineMouseenter)
@@ -250,12 +259,12 @@ export class LineUpdateEvent extends LineBaseEvent {
 
   public override disabled(): void {
     this.line.points.forEach((point) => {
-      point.off('update', this.onVertexUpdate)
+      point.off(Event.UPDATE, this.onVertexUpdate)
     })
     this.line.midPoints.forEach((mid) => {
-      mid.off('beforeUpdate', this.onMidBeforeUpdate)
-      mid.off('update', this.onMidUpdate)
-      mid.off('doneUpdate', this.onMidDone)
+      mid.off(Event.BEFORE_UPDATE, this.onMidBeforeUpdate)
+      mid.off(Event.UPDATE, this.onMidUpdate)
+      mid.off(Event.DONE_UPDATE, this.onMidDone)
     })
 
     this.context.eventManager.off(this.line.id, 'mouseenter', this.onLineMouseenter)
@@ -271,7 +280,7 @@ export class LineResidentEvent extends LineBaseEvent {
     this.line.points.forEach((point) => {
       point.setState({ hover: true })
     })
-    this.line.emit('hover', this.message<Line>(e, this.line))
+    this.line.emit(Event.HOVER, this.message<Line>(e, this.line))
   }
 
   private onLineMouseLeave = (e: MapMouseEvent): void => {
@@ -280,11 +289,11 @@ export class LineResidentEvent extends LineBaseEvent {
     this.line.points.forEach((point) => {
       point.setState({ hover: false })
     })
-    this.line.emit('unhover', this.message<Line>(e, this.line))
+    this.line.emit(Event.UN_HOVER, this.message<Line>(e, this.line))
   }
 
   private onClick = (e: EventMessage<Point>): void => {
-    this.line.emit('click', this.message<Line>(e.originEvent, this.line))
+    this.line.emit(Event.CLICK, this.message<Line>(e.originEvent, this.line))
   }
 
   private onLineClick = (e: MapMouseEvent): void => {
@@ -298,7 +307,7 @@ export class LineResidentEvent extends LineBaseEvent {
       return
     }
 
-    this.line.emit('click', this.message<Line>(e, this.line))
+    this.line.emit(Event.CLICK, this.message<Line>(e, this.line))
   }
 
   constructor(map: Map, line: Line) {
@@ -315,7 +324,7 @@ export class LineResidentEvent extends LineBaseEvent {
 
   public override able(): void {
     this.line.points.forEach((point) => {
-      point.on('click', this.onClick)
+      point.on(Event.CLICK, this.onClick)
     })
     this.context.eventManager.on(this.line.id, this.line.LAYER, 'mouseenter', this.onLineMouseenter)
     this.context.eventManager.on(this.line.id, this.line.LAYER, 'mouseleave', this.onLineMouseLeave)
@@ -325,7 +334,7 @@ export class LineResidentEvent extends LineBaseEvent {
 
   public override disabled(): void {
     this.line.points.forEach((point) => {
-      point.off('click', this.onClick)
+      point.off(Event.CLICK, this.onClick)
     })
 
     this.context.eventManager.off(this.line.id, 'mouseenter', this.onLineMouseenter)

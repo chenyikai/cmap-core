@@ -4,6 +4,7 @@ import type { LngLat } from 'mapbox-gl'
 import { EventState } from '@/core/EventState'
 import type { Fill } from '@/modules/Plot/plugins/Fill'
 import type { Line } from '@/modules/Plot/plugins/Line'
+import { CURSOR, Event } from '@/modules/Plot/vars.ts'
 import type { EventMessage } from '@/types/EventState'
 import type { PointInstance } from '@/types/Plot/Point.ts'
 
@@ -60,10 +61,11 @@ export class FillCreateEvent extends FillBaseEvent {
   }
 
   private onMousemove = (e: MapMouseEvent): void => {
-    console.log('onMousemove')
-    this.context.map.getCanvasContainer().style.cursor = 'crosshair'
+    this.context.map.getCanvasContainer().style.cursor = CURSOR.CREATE
     this.setDrawLngLat(e.lngLat)
     this.fill.render()
+
+    this.fill.emit(Event.UPDATE, this.message<Fill>(e, this.fill))
   }
 
   private onContextmenu = (e: MapMouseEvent): void => {
@@ -80,18 +82,14 @@ export class FillCreateEvent extends FillBaseEvent {
       point.hide()
     }
 
-    this.context.map.getCanvasContainer().style.cursor = ''
-    // this.fill.stop()
+    this.context.map.getCanvasContainer().style.cursor = CURSOR.EMPTY
     this.setDrawLngLat(null)
     this.count = 0
     this.fill.setState({ create: false })
     this.disabled()
 
     this.fill.edit()
-    //
-    // this.line.removePoint()
-    // this.line.createPoint()
-    // this.line.edit()
+    this.fill.emit(Event.CREATE, this.message<Fill>(e, this.fill))
   }
 
   constructor(map: Map, fill: Fill) {
@@ -139,7 +137,7 @@ export class FillCreateEvent extends FillBaseEvent {
 export class FillUpdateEvent extends FillBaseEvent {
   protected dragStartLngLat: LngLat | null = null
 
-  private onLineUpdate = (_e: EventMessage<Line>, point: PointInstance): void => {
+  private onLineUpdate = (e: EventMessage<Line>, point: PointInstance): void => {
     if (!point.center || !this.fill.line) return
 
     const index = point.options.properties?.index as number
@@ -152,14 +150,20 @@ export class FillUpdateEvent extends FillBaseEvent {
     this.fill.line.updatePoint(index, point.center)
 
     this.fill.render()
+
+    this.fill.emit(Event.UPDATE, this.message<Fill>(e.originEvent, this.fill), point)
   }
 
-  private onLineMidUpdate = (): void => {
+  private onLineMidUpdate = (e: EventMessage<Line>): void => {
     this.fill.render()
+
+    this.fill.emit(Event.MID_UPDATE, this.message<Fill>(e.originEvent, this.fill))
   }
 
-  private onLineMidDoneUpdate = (): void => {
+  private onLineMidDoneUpdate = (e: EventMessage<Line>): void => {
     this.fill.line?.points.at(-1)?.hide()
+
+    this.fill.emit(Event.MID_DONE_UPDATE, this.message<Fill>(e.originEvent, this.fill))
   }
 
   private onFillMousedown = (e: MapMouseEvent): void => {

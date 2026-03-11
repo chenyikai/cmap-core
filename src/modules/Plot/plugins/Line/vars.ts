@@ -33,11 +33,11 @@ const lineWidth: DataDrivenPropertyValueSpecification<number> = [
   DEFAULT_LINE_WIDTH,
 ]
 
-const lineDasharray: DataDrivenPropertyValueSpecification<number[]> = [
-  'coalesce',
-  ['get', 'line-dasharray'],
-  [99999, 99999],
-]
+// const lineDasharray: DataDrivenPropertyValueSpecification<number[]> = [
+//   'coalesce',
+//   ['get', 'line-dasharray'],
+//   [99999, 99999],
+// ]
 
 // 文字大小缩放因子 (随缩放层级线性变化)
 const baseTextSize = ['coalesce', ['get', 'text-size'], DEFAULT_TEXT_SIZE]
@@ -48,7 +48,7 @@ export const LINE_LAYER: LayerSpecification = {
   filter: ['all', ['==', '$type', 'LineString'], ['==', 'visibility', 'visible']],
   source: PLOT_SOURCE_NAME,
   paint: {
-    'line-dasharray': lineDasharray,
+    // 'line-dasharray': lineDasharray,
     'line-color': lineColor,
     'line-width': [
       'case',

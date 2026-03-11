@@ -124,6 +124,7 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
       {
         ...this.options.style,
         ...this.options.properties,
+        id: this.options.id,
         visibility: this.options.visibility,
         isName: this.options.isName,
         text: this.options.name,

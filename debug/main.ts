@@ -10,8 +10,10 @@ import { logEvent } from './utils/logger'
 const cMap = new CMap({
   container: 'map',
   type: CMap.LAND,
-  center: [122.091606, 30.004767],
-  zoom: 14,
+  // center: [122.091606, 30.004767],
+  center: [122.61947449287959, 29.882149834354422],
+  // zoom: 14,
+  zoom: 9.5,
 })
 
 // 初始化 Tweakpane
@@ -37,12 +39,23 @@ cMap.mapLoaded().then((map) => {
   })
 
   // === 第一页：基础环境控制 ===
-  const envParams = { isSatellite: false }
-  tab.pages[0].addBinding(envParams, 'isSatellite', {
-    label: '卫星影像'
-  }).on('change', (ev: any) => {
-    cMap.change(ev.value ? CMap.SATELLITE : CMap.LAND)
-    logEvent('切换底图', ev.value ? '卫星影像' : '矢量地图')
+  const envParams = { isSatellite: false, source: CMap.LAND }
+  const mapTab = tab.pages[0]
+  // mapTab.addBinding(envParams, 'isSatellite', {
+  //   label: '卫星影像'
+  // }).on('change', (ev: any) => {
+  //   cMap.change(ev.value ? CMap.SATELLITE : CMap.LAND)
+  //   logEvent('切换底图', ev.value ? '卫星影像' : '矢量地图')
+  // })
+
+  mapTab.addBinding(envParams, 'source', {
+    label: '图源',
+    options: {
+      '地图': CMap.LAND,
+      '卫星图': CMap.SATELLITE
+    }
+  }).on('change', () => {
+    cMap.change(envParams.source)
   })
 
   // === 分发 map 和 TabPage 给各个子模块 ===

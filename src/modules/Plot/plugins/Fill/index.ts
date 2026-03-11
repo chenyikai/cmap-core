@@ -79,6 +79,7 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
           ...this.options.style,
           ...this.options.properties,
           visibility: this.options.visibility,
+          id: this.options.id,
         },
       }) as Feature<Polygon | null, T['style'] & T['properties']>
       polygon.id = this.id
@@ -158,7 +159,11 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
       id: `${this.id}-line`,
     })
 
-    this.line.points.at(-1)?.hide()
+    const lastIndex = this.line.points.length - 1
+    if (lastIndex > 0) {
+      const lastPoint = this.line.points[lastIndex]
+      lastPoint.hide()
+    }
   }
 
   public removeLine(): void {
@@ -174,8 +179,8 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
     })
 
     this.context.iconManage.addSvg({
-      name: 'test',
-      svg: '<svg t="1772630233838" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7234" width="32" height="32"><path d="M683.287273 272.756364a20.48 20.48 0 0 0-23.272728-13.730909l-293.701818 41.658181a20.014545 20.014545 0 0 0-16.756363 14.196364L266.472727 584.145455a20.247273 20.247273 0 0 0 9.774546 23.272727l272.290909 147.316363a20.48 20.48 0 0 0 25.134545-4.18909l190.370909-210.85091a20.014545 20.014545 0 0 0 4.189091-20.48z m230.865454 251.578181l-130.327272-379.810909a43.054545 43.054545 0 0 0-46.545455-28.858181L284.625455 179.665455A43.287273 43.287273 0 0 0 249.250909 209.454545L121.716364 624.174545A43.752727 43.752727 0 0 0 142.429091 674.909091l417.512727 226.443636a43.985455 43.985455 0 0 0 52.829091-9.076363l292.538182-325.818182a43.985455 43.985455 0 0 0 8.843636-42.123637z m-77.730909 16.523637l-251.345454 279.272727a19.083636 19.083636 0 0 1-23.272728 4.189091L207.825455 631.854545a19.083636 19.083636 0 0 1-9.309091-23.272727l108.218181-351.883636a19.316364 19.316364 0 0 1 15.825455-13.498182L709.818182 189.207273a19.083636 19.083636 0 0 1 20.945454 12.8l109.381819 319.767272a19.083636 19.083636 0 0 1-3.723637 19.083637z" fill="#13227a" p-id="7235"></path></svg>',
+      name: 'normal-fill',
+      svg: '<svg t="1773066297467" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="15103" width="32" height="32"><path d="M1024 512c0 282.8-229.2 512-512 512S0 794.8 0 512 229.2 0 512 0s512 229.2 512 512" fill="#5A89FF" p-id="15104"></path><path d="M709.76 818.4H314.24a24 24 0 0 1-22.8-16.56L169.2 425.6c-3.2-9.92 0.32-20.72 8.72-26.8l320-232.48c8.4-6.08 19.84-6.08 28.24 0l320 232.48a24 24 0 0 1 8.72 26.8l-122.24 376.16a24.136 24.136 0 0 1-22.88 16.64z m-378.08-48h360.64l111.44-343.04L512 215.36l-291.76 212L331.68 770.4z" fill="#FFFFFF" p-id="15105"></path></svg>',
     })
   }
 
@@ -197,8 +202,8 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
 
     if (this.center) {
       this.title = new IconPoint(this.context.map, {
-        icon: 'test',
-        visibility: 'visible',
+        icon: this.options.icon ?? 'normal-fill',
+        visibility: this.options.visibility,
         id: this.id + '-fill-title-icon',
         position: this.center,
         name: this.options.name,

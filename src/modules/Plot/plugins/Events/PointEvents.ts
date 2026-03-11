@@ -2,6 +2,7 @@ import type { Map, MapMouseEvent } from 'mapbox-gl'
 
 import { EventState } from '@/core/EventState'
 import type { Point } from '@/modules/Plot/plugins/Point'
+import { Event } from '@/modules/Plot/vars.ts'
 
 export abstract class PointBaseEvent<T extends Point = Point> extends EventState {
   protected point: T
@@ -28,9 +29,12 @@ export class PointCreateEvent<T extends Point = Point> extends PointBaseEvent<T>
       position: e.lngLat,
     })
 
-    this.point.emit(`create`, this.message<Point>(e, this.point))
+    this.point.emit(Event.CREATE, this.message<Point>(e, this.point))
 
+    this.point.stop()
     this.disabled()
+
+    this.point.edit()
   }
 
   private onMousemove = (): void => {
@@ -69,14 +73,14 @@ export class PointUpdateEvent<T extends Point = Point> extends PointBaseEvent<T>
     this.context.map.on('mousemove', this.onMousemove)
     this.context.map.once('mouseup', this.onMouseup)
 
-    this.point.emit(`beforeUpdate`, this.message<Point>(e, this.point))
+    this.point.emit(Event.BEFORE_UPDATE, this.message<Point>(e, this.point))
   }
 
   private onMousemove = (e: MapMouseEvent): void => {
     this.context.map.getCanvasContainer().style.cursor = 'move'
     this.point.move(e.lngLat)
 
-    this.point.emit(`update`, this.message<Point>(e, this.point))
+    this.point.emit(Event.UPDATE, this.message<Point>(e, this.point))
   }
 
   private onMouseup = (e: MapMouseEvent): void => {
@@ -86,7 +90,7 @@ export class PointUpdateEvent<T extends Point = Point> extends PointBaseEvent<T>
 
     this.point.render()
 
-    this.point.emit(`doneUpdate`, this.message<Point>(e, this.point))
+    this.point.emit(Event.DONE_UPDATE, this.message<Point>(e, this.point))
   }
 
   constructor(map: Map, point: T) {
@@ -117,25 +121,25 @@ export class PointResidentEvent<T extends Point = Point> extends PointBaseEvent<
     this.context.map.getCanvasContainer().style.cursor = 'pointer'
     const message = this.message<Point>(e, this.point)
     this.point.setState({ hover: true })
-    this.point.emit('hover', message)
+    this.point.emit(Event.HOVER, message)
   }
 
   private onMouseLeave = (e: MapMouseEvent): void => {
     this.context.map.getCanvasContainer().style.cursor = ''
     const message = this.message<Point>(e, this.point)
     this.point.setState({ hover: false })
-    this.point.emit('unhover', message)
+    this.point.emit(Event.UN_HOVER, message)
   }
 
   private onClick = (e: MapMouseEvent): void => {
     const message = this.message<Point>(e, this.point)
-    this.point.emit('click', message)
+    this.point.emit(Event.CLICK, message)
   }
 
   private onDblclick = (e: MapMouseEvent): void => {
     e.preventDefault()
     const message = this.message<Point>(e, this.point)
-    this.point.emit('dblclick', message)
+    this.point.emit(Event.DBL_CLICK, message)
   }
 
   constructor(map: Map, point: T) {

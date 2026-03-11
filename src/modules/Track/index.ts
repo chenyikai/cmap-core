@@ -334,6 +334,7 @@ export class Track extends Module {
               item.position.toArray(),
               {
                 ...item,
+                id: item.pId,
                 icon,
                 iconSize,
                 isStartEnd: index === 0 || index === length - 1,

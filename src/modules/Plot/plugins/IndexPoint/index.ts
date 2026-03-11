@@ -47,6 +47,7 @@ export class IndexPoint extends Point<IIndexPointOptions> {
       {
         ...this.options.style,
         ...this.options.properties,
+        id: this.options.id,
         visibility: this.options.visibility,
         isName: false,
         index: this.options.index,
