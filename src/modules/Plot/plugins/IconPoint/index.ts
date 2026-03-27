@@ -43,10 +43,7 @@ export class IconPoint extends Point<IIconPointOptions> {
     })
   }
 
-  public override getFeature(): GeoJSON.Feature<
-    GeoJSON.Point | null,
-    IIconPointOptions['style'] & IIconPointOptions['properties']
-  > {
+  public override getFeature(): GeoJSON.Feature<GeoJSON.Point | null> {
     if (!this.options.position) {
       return {
         type: 'Feature',

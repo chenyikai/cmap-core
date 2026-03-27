@@ -142,6 +142,26 @@ class Ship extends Module {
     return this.ships.find((item) => item.id === id)
   }
 
+  focus(id: IBaseShipOptions['id']): void {
+    const ship = this.get(id)
+    if (ship) {
+      ship.focus()
+      this.focusId = ship.id
+    } else {
+      console.warn(`The ship-${String(id)} was not found.`)
+    }
+  }
+
+  unfocus(id: IBaseShipOptions['id']): void {
+    const ship = this.get(id)
+    if (ship) {
+      ship.unfocus()
+      this.focusId = null
+    } else {
+      console.warn(`The ship-${String(id)} was not found.`)
+    }
+  }
+
   select(id: IBaseShipOptions['id']): void {
     const ship = this.get(id)
     if (ship) {

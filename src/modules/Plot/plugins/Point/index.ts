@@ -87,10 +87,7 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
     throw new Error('Method not implemented.')
   }
 
-  public override getFeature(): GeoJSON.Feature<
-    GeoJSON.Point | null,
-    T['style'] & T['properties']
-  > {
+  public override getFeature(): GeoJSON.Feature<GeoJSON.Point | null> {
     if (!this.options.position) {
       // const emptyFeature: GeoJSON.Feature<null, T['style'] & T['properties']> = {
       //   type: 'Feature',

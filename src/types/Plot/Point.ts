@@ -60,7 +60,7 @@ export interface PointInstance<T extends IPointOptions = IPointOptions> {
 
   // --- GeoJSON 相关 (源自 C) ---
   // C 中重写，去除了 A 返回值末尾的 `| null` 联合类型
-  getFeature(): GeoJSON.Feature<GeoJSON.Point | null, T['style'] & T['properties']>
+  getFeature(): GeoJSON.Feature<GeoJSON.Point | null>
 
   // --- 交互与状态控制方法 (源自 A 与 C) ---
   start(): void

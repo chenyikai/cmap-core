@@ -11,6 +11,7 @@ export enum PointType {
 export interface LineStyle {
   'line-color'?: DataDrivenPropertyValueSpecification<ColorSpecification>
   'line-width'?: DataDrivenPropertyValueSpecification<number>
+  'text-size'?: DataDrivenPropertyValueSpecification<number>
 }
 
 export interface ILineOptions extends IPoiOptions {

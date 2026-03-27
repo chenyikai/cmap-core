@@ -6,14 +6,15 @@ import { initPlotDebug } from './plot'
 import { initShipDebug } from './ship'
 // import { initTrackDebug } from './track'
 import { logEvent } from './utils/logger'
+// import { LngLat } from "mapbox-gl";
 
 const cMap = new CMap({
   container: 'map',
   type: CMap.LAND,
-  // center: [122.091606, 30.004767],
-  center: [122.61947449287959, 29.882149834354422],
-  // zoom: 14,
-  zoom: 9.5,
+  center: [122.091606, 30.004767],
+  // center: [122.61947449287959, 29.882149834354422],
+  zoom: 14,
+  // zoom: 9.5,
 })
 
 // 初始化 Tweakpane
@@ -25,6 +26,16 @@ const pane = new Pane({
 cMap.mapLoaded().then((map) => {
   // @ts-ignore 暴露给全局方便浏览器控制台调试
   window.map = map
+
+  // const circle = new Circle(map, {
+  //   id: 'circle-1',
+  //   visibility: 'visible',
+  //   center: new LngLat(122.091606, 30.004767),
+  //   radius: 1,
+  //   unit: 'kilometers'
+  // })
+  //
+  // circle.render()
 
   logEvent('系统提示', 'Mapbox 渲染引擎已就绪')
 

@@ -14,8 +14,8 @@ export class EventManager {
   // 记录底层已注册的监听器，防止重复绑定: "layerId:eventType" -> Handler
   private activeLayerListeners = new Map<string, (e: any) => void>()
 
-  // 记录当前鼠标悬停的 Feature ID (用于正确触发 mouseleave)
-  private currentHoverId: string | null = null
+  // 记录当前鼠标悬停的 Feature ID，按 layerId 分开记录，支持多图层同时 hover
+  private currentHoverIdByLayer = new Map<string, string>()
 
   constructor(map: MapboxMap) {
     this.map = map
@@ -110,34 +110,42 @@ export class EventManager {
 
     // 定义底层通用的分发器
     const handler = (e: MapMouseEvent): void => {
-      this.dispatch(e, eventType)
+      this.dispatch(e, layerId, eventType)
     }
 
     // @ts-expect-error mapbox-gl types mismatch
     this.map.on(eventType, layerId, handler)
     this.activeLayerListeners.set(key, handler)
 
-    // console.warn(`[EventManager] 激活底层监听: ${key}`)
+    // mouseleave 依赖 mouseenter 记录 hover 状态，需确保 mouseenter 底层监听也已激活
+    if (eventType === 'mouseleave') {
+      this.ensureMapListener(layerId, 'mouseenter' as MapEventType)
+    }
   }
 
   /**
    * 核心分发逻辑
    */
-  private dispatch(e: MapMouseEvent, eventType: MapEventType): void {
+  private dispatch(e: MapMouseEvent, layerId: string, eventType: MapEventType): void {
     let targetId: string | undefined
 
     if (eventType === 'mouseleave') {
-      if (this.currentHoverId !== null) {
-        targetId = this.currentHoverId
-        this.currentHoverId = null // 重置状态
+      // mouseleave 无 features，从按图层记录的 hover 状态中取 ID
+      const hoverId = this.currentHoverIdByLayer.get(layerId)
+      if (hoverId !== undefined) {
+        targetId = hoverId
+        this.currentHoverIdByLayer.delete(layerId)
       }
     } else {
       // 对于 click, mouseenter 等，从事件中获取 ID
       if (e.features && e.features.length > 0) {
         const feature = e.features[0]
 
-        // 🌟 修复核心2：优先读取 properties.id
-        // 即使 Mapbox 底层在生成矢量瓦片时弄丢了顶级 feature.id，我们之前手动塞入 properties 里的 id 是绝对安全的！
+        // 优先读取 properties.id：
+        // 因为 ResourceRegister 对所有 GeoJSON source 自动注入了 promoteId: 'id'，
+        // Mapbox 会用 properties.id 替换顶级 feature.id。
+        // 顶级 feature.id 在 promoteId 模式下可能为 undefined，所以 properties.id 是唯一可靠来源。
+        // ⚠️ 如果你的 feature 没有 properties.id，事件将无法分发！请确保数据侧同步设置 properties.id。
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const rawId = feature.properties?.id ?? feature.id
 
@@ -149,18 +157,18 @@ export class EventManager {
 
     if (targetId === undefined) return
 
-    // 特殊处理 mouseenter：记录 ID
+    // 特殊处理 mouseenter：按图层记录当前 hover ID
     if (eventType === 'mouseenter') {
-      this.currentHoverId = targetId
+      this.currentHoverIdByLayer.set(layerId, targetId)
     }
 
-    // 查找并执行业务层注入的回调
+    // 查找并执行业务层注入的回调（使用快照迭代，防止回调内部修改数组导致的问题）
     const instanceEvents = this.listeners.get(targetId)
 
     if (instanceEvents) {
       const callbacks = instanceEvents.get(eventType)
       if (callbacks) {
-        callbacks.forEach((fn) => {
+        ;[...callbacks].forEach((fn) => {
           fn(e)
         })
       }
@@ -174,9 +182,12 @@ export class EventManager {
   public destroy(): void {
     // 解绑所有底层 Mapbox 事件
     this.activeLayerListeners.forEach((handler, key) => {
-      const [layerId, eventType] = key.split(':')
+      // 用 lastIndexOf 分割，避免 layerId 本身含 ':' 时解析错误
+      const sep = key.lastIndexOf(':')
+      const layerId = key.substring(0, sep)
+      const eventType = key.substring(sep + 1) as MapEventType
       try {
-        this.map.off(eventType as MapEventType, layerId, handler)
+        this.map.off(eventType, layerId, handler)
       } catch (err) {
         // 忽略地图已销毁导致的错误
       }
@@ -184,6 +195,6 @@ export class EventManager {
 
     this.activeLayerListeners.clear()
     this.listeners.clear()
-    this.currentHoverId = null
+    this.currentHoverIdByLayer.clear()
   }
 }

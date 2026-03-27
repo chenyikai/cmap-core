@@ -34,3 +34,7 @@ export enum Event {
   CLICK = 'click',
   DBL_CLICK = 'dblclick',
 }
+
+export enum Meta {
+  LINE_TITLE = 'lineTitle',
+}

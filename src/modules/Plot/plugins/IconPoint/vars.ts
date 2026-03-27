@@ -23,7 +23,12 @@ export const ICON_ROTATE: DataDrivenPropertyValueSpecification<number> = [
 export const POINT_ICON_LAYER: LayerSpecification = {
   id: POINT_ICON_LAYER_NAME,
   type: 'symbol',
-  filter: ['all', ['==', '$type', 'Point'], ['==', 'meta', 'icon']],
+  filter: [
+    'all',
+    ['==', '$type', 'Point'],
+    ['==', 'meta', 'icon'],
+    ['==', 'visibility', 'visible'],
+  ],
   source: PLOT_SOURCE_NAME,
   layout: {
     'icon-allow-overlap': true,

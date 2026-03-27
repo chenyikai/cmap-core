@@ -10,7 +10,7 @@ import {
 } from '@/modules/Plot/plugins/Events/LineEvents.ts'
 import { Poi } from '@/modules/Plot/plugins/Poi.ts'
 import { Point } from '@/modules/Plot/plugins/Point'
-import { EMPTY_SOURCE, PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
+import { EMPTY_SOURCE, Meta, PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
 import type { ILineOptions } from '@/types/Plot/Line.ts'
 import { PointType } from '@/types/Plot/Line.ts'
 import type { PlotType } from '@/types/Plot/Poi.ts'
@@ -24,6 +24,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
 
   public points: PointInstance[] = []
   public midPoints: Point[] = []
+  public titles: GeoJSON.Feature<GeoJSON.LineString | null>[] = []
 
   public residentEvent: LineResidentEvent
   public updateEvent: LineUpdateEvent
@@ -70,10 +71,8 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
   public override onRemove(): void {
     this.remove()
   }
-  public override getFeature(): GeoJSON.Feature<
-    GeoJSON.LineString | null,
-    T['style'] | T['properties']
-  > {
+
+  public override getFeature(): GeoJSON.Feature<GeoJSON.LineString | null> {
     if (
       (!this.options.position || this.options.position.length < 2) &&
       !this.createEvent.getDrawLngLat()
@@ -116,7 +115,6 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
         isName: this.options.isName,
         text: this.options.name,
         id: this.options.id,
-        'line-dasharray': this.isEdit || this.isCreate ? [2, 2] : [9999999999, 9999999999],
       },
       {
         id: this.id,
@@ -247,6 +245,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
   }
   public override remove(): void {
     this.removePoint()
+    this.removeTitles()
     this.residentEvent.disabled()
     this.createEvent.disabled()
     this.updateEvent.disabled()
@@ -275,7 +274,16 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
       this.context.focus.remove(this.id)
     }
 
-    this.context.register.setGeoJSONData(PLOT_SOURCE_NAME, this.getFeature() as GeoJSON.Feature)
+    if (Array.isArray(this.options.position) && this.options.position.length > 1) {
+      this.createTitles()
+    } else {
+      this.removeTitles()
+    }
+
+    this.context.register.setGeoJSONData(PLOT_SOURCE_NAME, [
+      this.getFeature(),
+      ...this.titles,
+    ] as GeoJSON.Feature[])
   }
 
   public getMidPoint(index: number): Point | null {
@@ -334,6 +342,49 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
         type: PointType.MIDPOINT,
       },
     })
+  }
+
+  private createTitles(): GeoJSON.Feature<GeoJSON.LineString>[] {
+    if (!Array.isArray(this.points) || this.points.length === 0) return []
+
+    const length = this.points.length
+    this.titles = this.points.flatMap((current, index) => {
+      if (index === length - 1) return []
+      if (!current.center) return []
+
+      const next = this.points[index + 1]
+      if (!next.center) return []
+
+      const id = `line-title-${this.id}-${String(index)}`
+      return lineString(
+        [current.center.toArray(), next.center.toArray()],
+        {
+          meta: Meta.LINE_TITLE,
+          visibility: this.options.visibility,
+          isName: true,
+          text: this.options.name,
+          'text-size': this.options.style?.['text-size'],
+          originId: this.id,
+          id,
+        },
+        {
+          id,
+        },
+      )
+    })
+
+    return this.titles as GeoJSON.Feature<GeoJSON.LineString>[]
+  }
+
+  private removeTitles(): GeoJSON.Feature<null>[] {
+    this.titles = this.titles.map((item) => {
+      return {
+        ...item,
+        geometry: null,
+      }
+    })
+
+    return this.titles as GeoJSON.Feature<null>[]
   }
 
   public createPoint(): void {

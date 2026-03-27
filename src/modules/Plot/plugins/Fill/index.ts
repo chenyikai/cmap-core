@@ -21,7 +21,7 @@ import { DEFAULT_FILL_COLOR, FILL_LAYER_NAME, LAYER_LIST, NAME } from './vars.ts
 export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.Polygon | null> {
   static NAME: PlotType = NAME
   override readonly LAYER: string = FILL_LAYER_NAME
-  public title: IconPoint | undefined
+  public title: IconPoint | null = null
   public line: Line | null = null
 
   protected residentEvent: FillResidentEvent
@@ -40,6 +40,17 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
     this.createEvent = new FillCreateEvent(map, this)
 
     this.createLine()
+
+    if (this.center) {
+      this.title = new IconPoint(this.context.map, {
+        icon: this.options.icon ?? 'normal-fill',
+        visibility: this.options.visibility,
+        id: this.id + '-fill-title-icon',
+        position: this.center,
+        name: this.options.name,
+        isName: this.options.isName,
+      })
+    }
 
     this.residentEvent.able()
   }
@@ -68,7 +79,7 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
     return this.getFeature().geometry
   }
 
-  getFeature(): Feature<Polygon | null, T['style'] & T['properties']> {
+  getFeature(): Feature<Polygon | null> {
     if (
       this.line?.geometry &&
       Array.isArray(this.line.geometry.coordinates) &&
@@ -81,7 +92,7 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
           visibility: this.options.visibility,
           id: this.options.id,
         },
-      }) as Feature<Polygon | null, T['style'] & T['properties']>
+      }) as Feature<Polygon | null>
       polygon.id = this.id
       return polygon
     } else {
@@ -134,7 +145,7 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
     const fillColor = this.options.style?.['fill-color'] ?? DEFAULT_FILL_COLOR
 
     // 2. 组装边框线样式：颜色与 Fill 同步，并合并传入的 outLineStyle
-    const lineStyle = {
+    const lineStyle: IFillOptions['outLineStyle'] = {
       'line-color': fillColor,
       ...this.options.outLineStyle,
     }
@@ -191,6 +202,9 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
   remove(): void {
     this.options.position = []
     this.removeLine()
+
+    this.title?.remove()
+    this.title = null
     this.render()
   }
 
@@ -200,17 +214,10 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
       this.options.position = this.line.options.position
     }
 
-    if (this.center) {
-      this.title = new IconPoint(this.context.map, {
-        icon: this.options.icon ?? 'normal-fill',
-        visibility: this.options.visibility,
-        id: this.id + '-fill-title-icon',
-        position: this.center,
-        name: this.options.name,
-        isName: this.options.isName,
-      })
-
-      this.title.render()
+    if (this.options.visibility === 'visible') {
+      this.title?.show()
+    } else {
+      this.title?.hide()
     }
 
     if (this.isFocus) {
@@ -230,6 +237,7 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
       this.createEvent.able()
       this.updateEvent.disabled()
       this.residentEvent.disabled()
+
       this.setState({ create: true })
     }
   }
