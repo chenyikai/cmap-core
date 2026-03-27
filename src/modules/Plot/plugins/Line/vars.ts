@@ -125,10 +125,10 @@ export const LINE_TEXT_LAYER: LayerSpecification = {
 }
 
 export const LAYER_LIST: SortLayer[] = [
-  {
-    layer: DOTTED_LINE_LAYER,
-    zIndex: Z_INDEX,
-  },
+  // {
+  //   layer: DOTTED_LINE_LAYER,
+  //   zIndex: Z_INDEX,
+  // },
   {
     layer: LINE_LAYER,
     zIndex: Z_INDEX,

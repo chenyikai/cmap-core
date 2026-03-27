@@ -1,5 +1,7 @@
 import type { StyleSpecification } from 'mapbox-gl'
 
+const TDT_TOKEN = 'dedbd86f02e50097b36eb7cfc2e0bf5f'
+
 export const landStyle: StyleSpecification = {
   version: 8,
   name: 'Basic',
@@ -7,14 +9,14 @@ export const landStyle: StyleSpecification = {
   sources: {
     base: {
       tiles: [
-        'http://t0.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t1.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t2.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t3.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t4.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t5.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t6.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t7.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
+        `http://t0.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t1.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t2.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t3.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t4.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t5.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t6.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t7.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
       ],
       type: 'raster',
       tileSize: 256,
@@ -23,14 +25,14 @@ export const landStyle: StyleSpecification = {
     },
     label: {
       tiles: [
-        'http://t0.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t1.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t2.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t3.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t4.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t6.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t7.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
+        `http://t0.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t1.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t2.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t3.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t4.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t6.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t7.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
       ],
       type: 'raster',
       tileSize: 256,
@@ -80,14 +82,14 @@ export const satelliteStyle: StyleSpecification = {
   sources: {
     base: {
       tiles: [
-        'http://t0.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t1.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t2.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t3.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t4.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t6.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t7.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
+        `http://t0.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t1.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t2.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t3.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t4.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t6.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t7.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
       ],
       type: 'raster',
       tileSize: 256,
@@ -96,14 +98,14 @@ export const satelliteStyle: StyleSpecification = {
     },
     label: {
       tiles: [
-        'http://t0.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t1.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t2.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t3.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t4.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t6.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
-        'http://t7.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=15999a02266fd7d952a7a771eca68990',
+        `http://t0.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t1.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t2.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t3.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t4.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t5.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t6.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
+        `http://t7.tianditu.gov.cn/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=${TDT_TOKEN}`,
       ],
       type: 'raster',
       tileSize: 256,
