@@ -52,7 +52,7 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
       })
     }
 
-    this.residentEvent.able()
+    this.residentEvent.enabled()
   }
 
   get center(): LngLat | null {
@@ -234,7 +234,7 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
 
   start(): void {
     if (this.center === null) {
-      this.createEvent.able()
+      this.createEvent.enabled()
       this.updateEvent.disabled()
       this.residentEvent.disabled()
 
@@ -244,14 +244,14 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
 
   stop(): void {
     this.createEvent.disabled()
-    this.residentEvent.able()
+    this.residentEvent.enabled()
     this.setState({ create: false })
   }
 
   unedit(): void {
     this.setState({ edit: false })
     this.line?.unedit()
-    this.residentEvent.able()
+    this.residentEvent.enabled()
     this.updateEvent.disabled()
 
     this.render()
@@ -263,7 +263,7 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
     this.line?.edit()
 
     this.residentEvent.disabled()
-    this.updateEvent.able()
+    this.updateEvent.enabled()
     this.render()
   }
 

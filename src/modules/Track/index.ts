@@ -53,7 +53,7 @@ export class TrackEvent extends EventState {
     this.context.map.off('moveend', this._moveEnd)
   }
 
-  public override able(): void {
+  public override enabled(): void {
     this.context.map.on('mousemove', TRACK_ICON_LAYER_NAME, this._move)
     this.context.map.on('mouseleave', TRACK_ICON_LAYER_NAME, this._leave)
     this.context.map.on('moveend', this._moveEnd)
@@ -65,7 +65,7 @@ export class TrackEvent extends EventState {
     this._leave = this.onLeave.bind(this)
     this._moveEnd = this.onMoveEnd.bind(this)
 
-    this.able()
+    this.enabled()
   }
 
   onRemove(): void {

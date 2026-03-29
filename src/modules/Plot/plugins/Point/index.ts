@@ -36,7 +36,7 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
     this.residentEvent = new PointResidentEvent(map, this)
     this.updateEvent = new PointUpdateEvent(map, this)
     this.createEvent = new PointCreateEvent(map, this)
-    this.residentEvent.able()
+    this.residentEvent.enabled()
   }
 
   public override onAdd(): void {
@@ -56,11 +56,11 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
   public override edit(): void {
     this.setState({ edit: true })
     this.residentEvent.disabled()
-    this.updateEvent.able()
+    this.updateEvent.enabled()
   }
   public override unedit(): void {
     this.setState({ edit: false })
-    this.residentEvent.able()
+    this.residentEvent.enabled()
     this.updateEvent.disabled()
   }
 
@@ -135,7 +135,7 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
   }
   public override start(): void {
     if (this.center === null) {
-      this.createEvent.able()
+      this.createEvent.enabled()
     }
   }
   public override stop(): void {

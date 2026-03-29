@@ -32,7 +32,7 @@ export class IconPoint extends Point<IIconPointOptions> {
     this.residentEvent = new PointResidentEvent<IconPoint>(map, this)
     this.updateEvent = new PointUpdateEvent<IconPoint>(map, this)
     this.createEvent = new PointCreateEvent<IconPoint>(map, this)
-    this.residentEvent.able()
+    this.residentEvent.enabled()
   }
 
   public override onAdd(): void {

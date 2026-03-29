@@ -23,7 +23,7 @@ export abstract class EventState extends Module {
       this.disabled()
     } else if (this.status === EventState.OFF) {
       this.status = EventState.ON
-      this.able()
+      this.enabled()
     }
 
     return this.status
@@ -44,7 +44,7 @@ export abstract class EventState extends Module {
     }
   }
 
-  public abstract able(): void
+  public abstract enabled(): void
 
   public abstract disabled(): void
 }

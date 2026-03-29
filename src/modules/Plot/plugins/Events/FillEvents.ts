@@ -21,7 +21,7 @@ export abstract class FillBaseEvent extends EventState {
 
   public abstract override onRemove(): void
 
-  public abstract override able(): void
+  public abstract override enabled(): void
 
   public abstract override disabled(): void
 }
@@ -112,7 +112,7 @@ export class FillCreateEvent extends FillBaseEvent {
     /* empty */
   }
 
-  public override able(): void {
+  public override enabled(): void {
     this.context.map.doubleClickZoom.disable()
     //
     this.context.map.on('click', this.onClick)
@@ -236,7 +236,7 @@ export class FillUpdateEvent extends FillBaseEvent {
     this.disabled()
   }
 
-  public override able(): void {
+  public override enabled(): void {
     this.fill.line?.on('update', this.onLineUpdate)
 
     this.fill.line?.on('midUpdate', this.onLineMidUpdate)
@@ -282,7 +282,7 @@ export class FillResidentEvent extends FillBaseEvent {
     this.disabled()
   }
 
-  public override able(): void {
+  public override enabled(): void {
     this.changeStatus()
   }
 

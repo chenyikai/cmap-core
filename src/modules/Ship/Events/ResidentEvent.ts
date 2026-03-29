@@ -29,7 +29,7 @@ export class ResidentEvent extends EventState {
     }
   }
 
-  override able(): void {
+  override enabled(): void {
     this.context.map.on('click', SHIP_ICON_LAYER_NAME, this._click)
     this.context.map.on('mousemove', SHIP_ICON_LAYER_NAME, this._move)
     this.context.map.on('mouseleave', SHIP_ICON_LAYER_NAME, this._leave)
@@ -59,7 +59,7 @@ export class ResidentEvent extends EventState {
     this._leave = this.onLeave.bind(this)
     this._zoomEnd = this.onZoomEnd.bind(this)
 
-    this.able()
+    this.enabled()
   }
 
   onRemove(): void {

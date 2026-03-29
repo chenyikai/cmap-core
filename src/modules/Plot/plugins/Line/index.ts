@@ -39,7 +39,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
     this.createEvent = new LineCreateEvent(map, this)
     this.createPoint()
 
-    this.residentEvent.able()
+    this.residentEvent.enabled()
   }
 
   public override get id(): string {
@@ -124,7 +124,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
   }
   public override start(): void {
     if (this.center === null) {
-      this.createEvent.able()
+      this.createEvent.enabled()
       this.updateEvent.disabled()
       this.residentEvent.disabled()
       this.setState({ create: true })
@@ -132,7 +132,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
   }
   public override stop(): void {
     this.createEvent.disabled()
-    this.residentEvent.able()
+    this.residentEvent.enabled()
     this.setState({ create: false })
   }
 
@@ -171,7 +171,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
     })
 
     this.residentEvent.disabled()
-    this.updateEvent.able()
+    this.updateEvent.enabled()
 
     this.render()
   }
@@ -186,7 +186,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
       midPoint.hide()
     })
 
-    this.residentEvent.able()
+    this.residentEvent.enabled()
     this.updateEvent.disabled()
 
     this.render()

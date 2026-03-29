@@ -21,7 +21,7 @@ export abstract class LineBaseEvent extends EventState {
 
   public abstract override onRemove(): void
 
-  public abstract override able(): void
+  public abstract override enabled(): void
 
   public abstract override disabled(): void
 }
@@ -94,7 +94,7 @@ export class LineCreateEvent extends LineBaseEvent {
     return this.drawPoint
   }
 
-  public override able(): void {
+  public override enabled(): void{
     this.context.map.doubleClickZoom.disable()
 
     this.context.map.on('click', this.onClick)
@@ -241,7 +241,7 @@ export class LineUpdateEvent extends LineBaseEvent {
     return this.dragStartLngLat
   }
 
-  public override able(): void {
+  public override enabled(): void {
     this.line.points.forEach((point) => {
       point.on(Event.UPDATE, this.onVertexUpdate)
     })
@@ -322,7 +322,7 @@ export class LineResidentEvent extends LineBaseEvent {
     this.disabled()
   }
 
-  public override able(): void {
+  public override enabled(): void {
     this.line.points.forEach((point) => {
       point.on(Event.CLICK, this.onClick)
     })

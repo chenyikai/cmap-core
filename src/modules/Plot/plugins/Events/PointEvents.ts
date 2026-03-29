@@ -17,7 +17,7 @@ export abstract class PointBaseEvent<T extends Point = Point> extends EventState
 
   public abstract override onRemove(): void
 
-  public abstract override able(): void
+  public abstract override enabled(): void
 
   public abstract override disabled(): void
 }
@@ -52,7 +52,7 @@ export class PointCreateEvent<T extends Point = Point> extends PointBaseEvent<T>
     this.disabled()
   }
 
-  public override able(): void {
+  public override enabled(): void {
     this.context.map.on('click', this.onClick)
     this.context.map.on('mousemove', this.onMousemove)
     this.changeStatus()
@@ -105,7 +105,7 @@ export class PointUpdateEvent<T extends Point = Point> extends PointBaseEvent<T>
     this.disabled()
   }
 
-  public override able(): void {
+  public override enabled(): void {
     this.context.eventManager.on(this.point.id, this.point.LAYER, 'mousedown', this.onMousedown)
     this.changeStatus()
   }
@@ -154,7 +154,7 @@ export class PointResidentEvent<T extends Point = Point> extends PointBaseEvent<
     this.disabled()
   }
 
-  public override able(): void {
+  public override enabled(): void {
     this.context.eventManager.on(this.point.id, this.point.LAYER, 'dblclick', this.onDblclick)
 
     this.context.eventManager.on(this.point.id, this.point.LAYER, 'mouseenter', this.onMouseEnter)
