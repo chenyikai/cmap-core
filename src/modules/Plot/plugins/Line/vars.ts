@@ -20,7 +20,7 @@ export const LINE_TEXT_LAYER_NAME = 'mapbox-gl-plot-line-text-layer'
 export const DEFAULT_LINE_COLOR = '#f00'
 export const DEFAULT_LINE_WIDTH = 3
 export const DEFAULT_TEXT_COLOR = '#333'
-export const DEFAULT_TEXT_SIZE = 18
+export const DEFAULT_TEXT_SIZE = 16
 
 const lineColor: DataDrivenPropertyValueSpecification<ColorSpecification> = [
   'coalesce',
@@ -67,7 +67,12 @@ export const DOTTED_LINE_LAYER: LayerSpecification = {
 export const LINE_LAYER: LayerSpecification = {
   id: LINE_LAYER_NAME,
   type: 'line',
-  filter: ['all', ['==', '$type', 'LineString'], ['==', 'visibility', 'visible']],
+  filter: [
+    'all',
+    ['==', '$type', 'LineString'],
+    ['==', 'visibility', 'visible'],
+    ['!=', 'meta', Meta.LINE_TITLE],
+  ],
   source: PLOT_SOURCE_NAME,
   paint: {
     // 'line-dasharray': lineDasharray,
