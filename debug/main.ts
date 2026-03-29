@@ -2,7 +2,7 @@ import { CMap } from '@/index'
 import { Pane } from 'tweakpane'
 import '../src/styles/index.scss'
 
-import { initPlotDebug } from './plot'
+import { initPlotDebug, initPlotManagePane } from './plot'
 import { initShipDebug } from './ship'
 // import { initTrackDebug } from './track'
 import { logEvent } from './utils/logger'
@@ -17,10 +17,22 @@ const cMap = new CMap({
   // zoom: 9.5,
 })
 
-// 初始化 Tweakpane
+// 初始化 Tweakpane（右侧主面板）
 const pane = new Pane({
   title: 'CMap SDK 调试控制台',
   expanded: true
+})
+
+// 创建左上角容器
+const leftTopContainer = document.createElement('div')
+leftTopContainer.style.cssText = 'position: absolute; top: 10px; left: 10px; z-index: 100;'
+document.body.appendChild(leftTopContainer)
+
+// 初始化左上角标绘管理面板
+const plotManagePane = new Pane({
+  title: '📋 已绘标绘管理',
+  expanded: true,
+  container: leftTopContainer
 })
 
 cMap.mapLoaded().then((map) => {
@@ -72,5 +84,6 @@ cMap.mapLoaded().then((map) => {
   // === 分发 map 和 TabPage 给各个子模块 ===
   initShipDebug(map, tab.pages[1])
   initPlotDebug(map, tab.pages[2])
+  initPlotManagePane(map, plotManagePane)
   // initTrackDebug(map, tab.pages[3])
 })

@@ -1,5 +1,6 @@
 import { LngLat, type Map as MapboxMap } from 'mapbox-gl'
 import type { TabPageApi, FolderApi } from '@tweakpane/core'
+import { Pane } from 'tweakpane'
 import { IconManager, Fill, Line, ArrowLine, IconPoint, IndexLine, IndexPoint, Point } from '@/index'
 import { logEvent } from '../utils/logger'
 import { IconAnchor } from "../../src/types/Plot/IconPoint";
@@ -108,20 +109,20 @@ function addMockFill(map: MapboxMap) {
 }
 
 // ==========================================
-// 主入口
+// 主入口：创建标绘面板
 // ==========================================
 export async function initPlotDebug(map: MapboxMap, tab: TabPageApi) {
   const manage = new IconManager(map)
   await manage.addSvg({
     name: 'wx',
-    svg: '<svg t="1773040987808" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="11741" width="32" height="32"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#FFFFFF" p-id="11742"></path><path d="M512 512m-469.333333 0a469.333333 469.333333 0 1 0 938.666666 0 469.333333 469.333333 0 1 0-938.666666 0Z" fill="#00A5FE" p-id="11743"></path><path d="M799.061333 554.922667l-54.101333 63.488 21.333333 1.877333a295.125333 295.125333 0 0 1-131.456 57.856c-61.866667 3.754667-90.837333-76.544-90.837333-76.544v-132.522667h83.2v-39.210666h-79.445333v-52.266667a83.285333 83.285333 0 0 0 58.112-80.256 85.333333 85.333333 0 0 0-87.082667-84.010667h-1.92a85.333333 85.333333 0 0 0-86.997333 84.010667 85.802667 85.802667 0 0 0 57.984 80.256v52.266667h-79.274667v39.210666h83.114667v132.522667s-30.933333 78.378667-92.8 76.544a295.125333 295.125333 0 0 1-131.456-57.856l21.333333-1.877333-56.106667-63.488-19.328 78.421333 23.210667-5.589333a291.157333 291.157333 0 0 0 117.930667 110.122666c71.509333 31.744 143.061333 70.912 158.506666 72.789334 15.445333-1.877333 86.997333-41.088 156.586667-72.789334a322.133333 322.133333 0 0 0 117.930667-110.122666l23.210666 5.589333z m-280.32-210.944a46.933333 46.933333 0 0 1-48.341333-46.677334 46.250667 46.250667 0 0 1 46.421333-44.757333h1.92a46.250667 46.250667 0 0 1 46.378667 44.8 45.44 45.44 0 0 1-46.336 46.677333z" fill="#FFFFFF" p-id="11744"></path></svg>'
+    svg: '<svg t="1773040987808" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="11741" width="32" height="32"><path d="M512 512m-512 0a512 512 0 1 0 1024 0a512 512 0 1 0-1024 0Z" fill="#FFFFFF" p-id="11742"></path><path d="M512 512m-469.333333 0a469.333333 469.333333 0 1 0 938.666666 0a469.333333 469.333333 0 1 0-938.666666 0Z" fill="#00A5FE" p-id="11743"></path><path d="M799.061333 554.922667l-54.101333 63.488 21.333333 1.877333a295.125333 295.125333 0 0 1-131.456 57.856c-61.866667 3.754667-90.837333-76.544-90.837333-76.544v-132.522667h83.2v-39.210666h-79.445333v-52.266667a83.285333 83.285333 0 0 0 58.112-80.256 85.333333 85.333333 0 0 0-87.082667-84.010667h-1.92a85.333333 85.333333 0 0 0-86.997333 84.010667 85.802667 85.802667 0 0 0 57.984 80.256v52.266667h-79.274667v39.210666h83.114667v132.522667s-30.933333 78.378667-92.8 76.544a295.125333 295.125333 0 0 1-131.456-57.856l21.333333-1.877333-56.106667-63.488-19.328 78.421333 23.210667-5.589333a291.157333 291.157333 0 0 0 117.930667 110.122666c71.509333 31.744 143.061333 70.912 158.506666 72.789334 15.445333-1.877333 86.997333-41.088 156.586667-72.789334a322.133333 322.133333 0 0 0 117.930667-110.122666l23.210666 5.589333z m-280.32-210.944a46.933333 46.933333 0 0 1-48.341333-46.677334 46.250667 46.250667 0 0 1 46.421333-44.757333h1.92a46.250667 46.250667 0 0 1 46.378667 44.8 45.44 45.44 0 0 1-46.336 46.677333z" fill="#FFFFFF" p-id="11744"></path></svg>'
   })
 
   // addMockFill(map)
   // addMockLine(map)
 
   // ==========================================
-  // 🎛️ 区域一：创建与参数配置
+  // 🎛️ 创建与参数配置
   // ==========================================
   const createFolder = tab.addFolder({ title: '🎛️ 标绘创建与参数', expanded: true })
 
@@ -162,7 +163,7 @@ export async function initPlotDebug(map: MapboxMap, tab: TabPageApi) {
     const plot = buildPlotInstance(map)
     plot.start()
     activePlots.set(plot.id, plot)
-    refreshListFolder(map, tab)
+    refreshManagePane(map)
     logEvent('开启手工绘制', { type: state.plotType, id: plot.id })
   })
 
@@ -170,7 +171,7 @@ export async function initPlotDebug(map: MapboxMap, tab: TabPageApi) {
     const plot = buildPlotInstance(map, true)
     plot.render()
     activePlots.set(plot.id, plot)
-    refreshListFolder(map, tab)
+    refreshManagePane(map)
     logEvent('载入预设标绘', { type: state.plotType, id: plot.id })
   })
 
@@ -196,216 +197,222 @@ export async function initPlotDebug(map: MapboxMap, tab: TabPageApi) {
     }
   }
   updateDynamicParams()
+}
 
-  // ==========================================
-  // 📋 区域二：已绘标绘管理列表
-  // ==========================================
-  let listFolder: FolderApi | null = null
-  let coordFolder: FolderApi | null = null // 坐标专属面板
+// ==========================================
+// 📋 独立面板：已绘标绘管理
+// ==========================================
+let managePaneInstance: Pane | null = null
+let listFolder: FolderApi | null = null
+let coordFolder: FolderApi | null = null
 
-  function refreshListFolder(map: MapboxMap, parentTab: TabPageApi) {
-    if (listFolder) listFolder.dispose()
-    listFolder = parentTab.addFolder({ title: '📋 已绘标绘管理', expanded: true })
+export function initPlotManagePane(map: MapboxMap, pane: Pane) {
+  managePaneInstance = pane
+  refreshManagePane(map)
+}
 
-    if (activePlots.size === 0) {
+function refreshManagePane(map: MapboxMap) {
+  if (!managePaneInstance) return
+
+  // 清空旧内容
+  managePaneInstance.children.forEach(child => child.dispose())
+
+  if (activePlots.size === 0) {
+    // @ts-ignore
+    managePaneInstance.addBinding({ msg: '暂无标绘实例' }, 'msg', { readonly: true, label: '状态' })
+    return
+  }
+
+  const plotIds = Array.from(activePlots.keys())
+  if (!activePlots.has(state.selectedPlotId)) state.selectedPlotId = plotIds[0]
+
+  const options = Array.from(activePlots.values()).map(p => ({
+    text: p.options.name ? `${p.options.name} [${p.id.split('-')[0]}]` : p.id,
+    value: p.id
+  }))
+
+  // 1. 实例选择
+  managePaneInstance.addBinding(state, 'selectedPlotId', { label: '当前选中', options }).on('change', () => {
+    syncEditState(map)
+  })
+
+  managePaneInstance.addBlade({ view: 'separator' })
+
+  // 2. 快捷操作
+  const actionFolder = managePaneInstance.addFolder({ title: '快捷操作' })
+  actionFolder.addButton({ title: '👁️ 显示 (show)' }).on('click', () => activePlots.get(state.selectedPlotId)?.show())
+  actionFolder.addButton({ title: '🚫 隐藏 (hide)' }).on('click', () => activePlots.get(state.selectedPlotId)?.hide())
+  actionFolder.addButton({ title: '✏️ 开启编辑 (edit)' }).on('click', () => activePlots.get(state.selectedPlotId)?.edit())
+  actionFolder.addButton({ title: '🔒 结束编辑 (unedit)' }).on('click', () => activePlots.get(state.selectedPlotId)?.unedit())
+  actionFolder.addButton({ title: '🔍 镜头聚焦 (focus)' }).on('click', () => activePlots.get(state.selectedPlotId)?.focus())
+
+  // 3. 参数动态修改面板
+  const editPropsFolder = managePaneInstance.addFolder({ title: '⚙️ 属性修改' })
+  editPropsFolder.addBinding(editState, 'name', { label: '标绘名称' })
+  editPropsFolder.addBinding(editState, 'isName', { label: '开启文本' })
+
+  const eFillColor = editPropsFolder.addBinding(editState, 'fillColor', { label: '面填充色' })
+  const eFillOpacity = editPropsFolder.addBinding(editState, 'fillOpacity', { label: '面透明度', min: 0.1, max: 1, step: 0.1 })
+  const eLineWidth = editPropsFolder.addBinding(editState, 'lineWidth', { label: '线宽', min: 1, max: 15, step: 1 })
+  const eLineColor = editPropsFolder.addBinding(editState, 'lineColor', { label: '线颜色' })
+  const eIndex = editPropsFolder.addBinding(editState, 'index', { label: '序号', min: 1, step: 1 })
+  const eCircleRadius = editPropsFolder.addBinding(editState, 'circleRadius', { label: '点半径', min: 2, max: 30, step: 1 })
+  const eCircleColor = editPropsFolder.addBinding(editState, 'circleColor', { label: '点颜色' })
+  const eStrokeWidth = editPropsFolder.addBinding(editState, 'strokeWidth', { label: '外廓宽', min: 0, max: 30, step: 1 })
+  const eStrokeColor = editPropsFolder.addBinding(editState, 'strokeColor', { label: '外廓色' })
+  const eTextColor = editPropsFolder.addBinding(editState, 'textColor', { label: '文本颜色' })
+  const eIconSize = editPropsFolder.addBinding(editState, 'iconSize', { label: '图标大小', min: 0.01, max: 10, step: 0.1 })
+  const eIconRotate = editPropsFolder.addBinding(editState, 'iconRotate', { label: '图标旋转', min: 0, max: 360, step: 1 })
+
+  editPropsFolder.addButton({ title: '💾 保存属性修改' }).on('click', () => {
+    const plot = activePlots.get(state.selectedPlotId)
+    if (!plot) return
+    const type = plot.id.split('-')[0]
+
+    plot.options.name = editState.name
+    plot.options.isName = editState.isName
+    plot.options.style = plot.options.style || {}
+
+    if (['Point', 'IndexPoint'].includes(type)) {
+      plot.options.style['circle-radius'] = editState.circleRadius
+      plot.options.style['circle-color'] = editState.circleColor
+      plot.options.style['circle-stroke-width'] = editState.strokeWidth
+      plot.options.style['circle-stroke-color'] = editState.strokeColor
+      plot.options.style['text-color'] = editState.textColor
+      if (type === 'IndexPoint') plot.options.index = editState.index
+    }
+    if (type === 'IconPoint') {
+      plot.options.style['icon-size'] = editState.iconSize
+      plot.options.style['icon-rotate'] = editState.iconRotate
+      plot.options.style['text-color'] = editState.textColor
+    }
+    if (['Line', 'IndexLine', 'ArrowLine'].includes(type)) {
+      plot.options.style['line-color'] = editState.lineColor
+      plot.options.style['line-width'] = editState.lineWidth
+    }
+    if (type === 'Fill') {
+      plot.options.style['fill-color'] = editState.fillColor
+      plot.options.style['fill-opacity'] = editState.fillOpacity
+      if (plot.options.outLineStyle) {
+        plot.options.outLineStyle['line-color'] = editState.lineColor
+        plot.options.outLineStyle['line-width'] = editState.lineWidth
+      }
+    }
+
+    plot.update(plot.options)
+    logEvent('属性已更新', plot.options)
+  })
+
+  // 🌟 4. 动态坐标面板 (坐标列表)
+  coordFolder = managePaneInstance.addFolder({ title: '🌐 坐标信息编辑' })
+
+  // 5. 底部清空
+  managePaneInstance.addBlade({ view: 'separator' })
+  managePaneInstance.addButton({ title: '🗑️ 移除当前标绘' }).on('click', () => {
+    activePlots.get(state.selectedPlotId)?.remove()
+    activePlots.delete(state.selectedPlotId)
+    refreshManagePane(map)
+  })
+
+  // ===== 内部同步逻辑 =====
+  function syncEditState() {
+    const plot = activePlots.get(state.selectedPlotId)
+    if (!plot) return
+    const type = plot.id.split('-')[0]
+    const style = plot.options.style || {}
+    const outlineStyle = plot.options.outLineStyle || {}
+
+    // 同步基础
+    editState.name = plot.options.name || ''
+    editState.isName = !!plot.options.isName
+    editState.circleRadius = style['circle-radius'] || 10
+    editState.circleColor = style['circle-color'] || '#fff'
+    editState.strokeWidth = style['circle-stroke-width'] || 2
+    editState.strokeColor = style['circle-stroke-color'] || '#f00'
+    editState.textColor = style['text-color'] || '#333'
+    editState.iconSize = style['icon-size'] || 1
+    editState.iconRotate = style['icon-rotate'] || 0
+    editState.lineColor = type === 'Fill' ? outlineStyle['line-color'] || '#f00' : style['line-color'] || '#f00'
+    editState.lineWidth = type === 'Fill' ? outlineStyle['line-width'] || 3 : style['line-width'] || 3
+    editState.fillColor = style['fill-color'] || '#00BFFF'
+    editState.fillOpacity = style['fill-opacity'] || 0.4
+    editState.index = plot.options.index || 1
+
+    // 刷新属性面板显隐
+    const hideAll = () =>[eFillColor, eFillOpacity, eLineWidth, eLineColor, eIndex, eCircleRadius, eCircleColor, eStrokeWidth, eStrokeColor, eTextColor, eIconSize, eIconRotate].forEach(b => b.hidden = true)
+    hideAll()
+    if (['Point', 'IndexPoint'].includes(type)) {
+      eCircleRadius.hidden = eStrokeWidth.hidden = eStrokeColor.hidden = eCircleColor.hidden = eTextColor.hidden = false;
+      if (type === 'IndexPoint') eIndex.hidden = false;
+    }
+    if (type === 'IconPoint') { eIconSize.hidden = eIconRotate.hidden = eTextColor.hidden = false; }
+    if (['Line', 'IndexLine', 'ArrowLine'].includes(type)) { eLineWidth.hidden = eLineColor.hidden = false; }
+    if (type === 'Fill') { eFillColor.hidden = eFillOpacity.hidden = eLineColor.hidden = eLineWidth.hidden = false; }
+
+    // 渲染坐标输入列表
+    renderCoordinatesList(plot)
+
+    // 如果图形在拖拽中，自动刷新坐标 UI
+    // 避免重复绑定：先卸载旧的监听
+    plot.off('doneUpdate', plot._uiRefreshHandler)
+    plot.off('create', plot._uiRefreshHandler)
+    plot._uiRefreshHandler = () => renderCoordinatesList(plot)
+    plot.on('doneUpdate', plot._uiRefreshHandler)
+    plot.on('create', plot._uiRefreshHandler)
+
+    managePaneInstance?.refresh()
+  }
+
+  // 渲染动态坐标列表
+  function renderCoordinatesList(plot: any) {
+    if (!coordFolder) return
+
+    // 清空旧的坐标控件
+    [...coordFolder.children].forEach(child => child.dispose())
+
+    const pos = plot.options.position
+    if (!pos) {
       // @ts-ignore
-      listFolder.addBinding({ msg: '暂无标绘实例' }, 'msg', { readonly: true, label: '状态' })
+      coordFolder.addBinding({ msg: '等待绘制坐标...' }, 'msg', { readonly: true, label: '' })
       return
     }
 
-    const plotIds = Array.from(activePlots.keys())
-    if (!activePlots.has(state.selectedPlotId)) state.selectedPlotId = plotIds[0]
+    // 将 LngLat 转换为 Tweakpane 可绑定的 { x, y } 对象数组
+    editState.positions =[]
+    if (Array.isArray(pos)) {
+      pos.forEach(p => editState.positions.push({ x: p.lng, y: p.lat }))
+    } else {
+      editState.positions.push({ x: pos.lng, y: pos.lat })
+    }
 
-    const options = Array.from(activePlots.values()).map(p => ({
-      text: p.options.name ? `${p.options.name} [${p.id.split('-')[0]}]` : p.id,
-      value: p.id
-    }))
+    // 为每一个点生成一个带有微调 x,y 控件的表单
+    editState.positions.forEach((_, index): void => {
+      const binding = coordFolder!.addBinding(editState.positions, index, {
+        label: `节点[${index}]`,
+        x: { step: 0.000001 },
+        y: { step: 0.000001 }
+      })
 
-    // 1. 实例选择
-    listFolder.addBinding(state, 'selectedPlotId', { label: '当前选中', options }).on('change', () => {
-      syncEditState()
+      const pickerBtn = binding.element.querySelector('button')
+      if (pickerBtn) {
+        pickerBtn.style.display = 'none'
+      }
     })
 
-    listFolder.addBlade({ view: 'separator' })
-
-    // 2. 快捷操作
-    const actionFolder = listFolder.addFolder({ title: '快捷操作' })
-    actionFolder.addButton({ title: '👁️ 显示 (show)' }).on('click', () => activePlots.get(state.selectedPlotId)?.show())
-    actionFolder.addButton({ title: '🚫 隐藏 (hide)' }).on('click', () => activePlots.get(state.selectedPlotId)?.hide())
-    actionFolder.addButton({ title: '✏️ 开启编辑 (edit)' }).on('click', () => activePlots.get(state.selectedPlotId)?.edit())
-    actionFolder.addButton({ title: '🔒 结束编辑 (unedit)' }).on('click', () => activePlots.get(state.selectedPlotId)?.unedit())
-    actionFolder.addButton({ title: '🔍 镜头聚焦 (focus)' }).on('click', () => activePlots.get(state.selectedPlotId)?.focus())
-
-    // 3. 参数动态修改面板
-    const editPropsFolder = listFolder.addFolder({ title: '⚙️ 属性修改' })
-    editPropsFolder.addBinding(editState, 'name', { label: '标绘名称' })
-    editPropsFolder.addBinding(editState, 'isName', { label: '开启文本' })
-
-    const eFillColor = editPropsFolder.addBinding(editState, 'fillColor', { label: '面填充色' })
-    const eFillOpacity = editPropsFolder.addBinding(editState, 'fillOpacity', { label: '面透明度', min: 0.1, max: 1, step: 0.1 })
-    const eLineWidth = editPropsFolder.addBinding(editState, 'lineWidth', { label: '线宽', min: 1, max: 15, step: 1 })
-    const eLineColor = editPropsFolder.addBinding(editState, 'lineColor', { label: '线颜色' })
-    const eIndex = editPropsFolder.addBinding(editState, 'index', { label: '序号', min: 1, step: 1 })
-    const eCircleRadius = editPropsFolder.addBinding(editState, 'circleRadius', { label: '点半径', min: 2, max: 30, step: 1 })
-    const eCircleColor = editPropsFolder.addBinding(editState, 'circleColor', { label: '点颜色' })
-    const eStrokeWidth = editPropsFolder.addBinding(editState, 'strokeWidth', { label: '外廓宽', min: 0, max: 30, step: 1 })
-    const eStrokeColor = editPropsFolder.addBinding(editState, 'strokeColor', { label: '外廓色' })
-    const eTextColor = editPropsFolder.addBinding(editState, 'textColor', { label: '文本颜色' })
-    const eIconSize = editPropsFolder.addBinding(editState, 'iconSize', { label: '图标大小', min: 0.01, max: 10, step: 0.1 })
-    const eIconRotate = editPropsFolder.addBinding(editState, 'iconRotate', { label: '图标旋转', min: 0, max: 360, step: 1 })
-
-    editPropsFolder.addButton({ title: '💾 保存属性修改' }).on('click', () => {
-      const plot = activePlots.get(state.selectedPlotId)
-      if (!plot) return
-      const type = plot.id.split('-')[0]
-
-      plot.options.name = editState.name
-      plot.options.isName = editState.isName
-      plot.options.style = plot.options.style || {}
-
-      if (['Point', 'IndexPoint'].includes(type)) {
-        plot.options.style['circle-radius'] = editState.circleRadius
-        plot.options.style['circle-color'] = editState.circleColor
-        plot.options.style['circle-stroke-width'] = editState.strokeWidth
-        plot.options.style['circle-stroke-color'] = editState.strokeColor
-        plot.options.style['text-color'] = editState.textColor
-        if (type === 'IndexPoint') plot.options.index = editState.index
-      }
-      if (type === 'IconPoint') {
-        plot.options.style['icon-size'] = editState.iconSize
-        plot.options.style['icon-rotate'] = editState.iconRotate
-        plot.options.style['text-color'] = editState.textColor
-      }
-      if (['Line', 'IndexLine', 'ArrowLine'].includes(type)) {
-        plot.options.style['line-color'] = editState.lineColor
-        plot.options.style['line-width'] = editState.lineWidth
-      }
-      if (type === 'Fill') {
-        plot.options.style['fill-color'] = editState.fillColor
-        plot.options.style['fill-opacity'] = editState.fillOpacity
-        if (plot.options.outLineStyle) {
-          plot.options.outLineStyle['line-color'] = editState.lineColor
-          plot.options.outLineStyle['line-width'] = editState.lineWidth
-        }
+    coordFolder.addButton({ title: '📌 将坐标应用至地图' }).on('click', () => {
+      // 将修改后的 { x, y } 重新转换为 LngLat 塞回 plot
+      if (Array.isArray(plot.options.position)) {
+        plot.options.position = editState.positions.map(p => new LngLat(p.x, p.y))
+      } else {
+        plot.options.position = new LngLat(editState.positions[0].x, editState.positions[0].y)
       }
 
       plot.update(plot.options)
-      logEvent('属性已更新', plot.options)
+      logEvent('精准坐标修改已应用', plot.options.position)
     })
-
-    // 🌟 4. 动态坐标面板 (坐标列表)
-    coordFolder = listFolder.addFolder({ title: '🌐 坐标信息编辑' })
-
-    // 5. 底部清空
-    listFolder.addBlade({ view: 'separator' })
-    listFolder.addButton({ title: '🗑️ 移除当前标绘' }).on('click', () => {
-      activePlots.get(state.selectedPlotId)?.remove()
-      activePlots.delete(state.selectedPlotId)
-      refreshListFolder(map, parentTab)
-    })
-
-    // ===== 内部同步逻辑 =====
-    function syncEditState() {
-      const plot = activePlots.get(state.selectedPlotId)
-      if (!plot) return
-      const type = plot.id.split('-')[0]
-      const style = plot.options.style || {}
-      const outlineStyle = plot.options.outLineStyle || {}
-
-      // 同步基础
-      editState.name = plot.options.name || ''
-      editState.isName = !!plot.options.isName
-      editState.circleRadius = style['circle-radius'] || 10
-      editState.circleColor = style['circle-color'] || '#fff'
-      editState.strokeWidth = style['circle-stroke-width'] || 2
-      editState.strokeColor = style['circle-stroke-color'] || '#f00'
-      editState.textColor = style['text-color'] || '#333'
-      editState.iconSize = style['icon-size'] || 1
-      editState.iconRotate = style['icon-rotate'] || 0
-      editState.lineColor = type === 'Fill' ? outlineStyle['line-color'] || '#f00' : style['line-color'] || '#f00'
-      editState.lineWidth = type === 'Fill' ? outlineStyle['line-width'] || 3 : style['line-width'] || 3
-      editState.fillColor = style['fill-color'] || '#00BFFF'
-      editState.fillOpacity = style['fill-opacity'] || 0.4
-      editState.index = plot.options.index || 1
-
-      // 刷新属性面板显隐
-      const hideAll = () =>[eFillColor, eFillOpacity, eLineWidth, eLineColor, eIndex, eCircleRadius, eCircleColor, eStrokeWidth, eStrokeColor, eTextColor, eIconSize, eIconRotate].forEach(b => b.hidden = true)
-      hideAll()
-      if (['Point', 'IndexPoint'].includes(type)) {
-        eCircleRadius.hidden = eStrokeWidth.hidden = eStrokeColor.hidden = eCircleColor.hidden = eTextColor.hidden = false;
-        if (type === 'IndexPoint') eIndex.hidden = false;
-      }
-      if (type === 'IconPoint') { eIconSize.hidden = eIconRotate.hidden = eTextColor.hidden = false; }
-      if (['Line', 'IndexLine', 'ArrowLine'].includes(type)) { eLineWidth.hidden = eLineColor.hidden = false; }
-      if (type === 'Fill') { eFillColor.hidden = eFillOpacity.hidden = eLineColor.hidden = eLineWidth.hidden = false; }
-
-      // 渲染坐标输入列表
-      renderCoordinatesList(plot)
-
-      // 如果图形在拖拽中，自动刷新坐标 UI
-      // 避免重复绑定：先卸载旧的监听
-      plot.off('doneUpdate', plot._uiRefreshHandler)
-      plot.off('create', plot._uiRefreshHandler)
-      plot._uiRefreshHandler = () => renderCoordinatesList(plot)
-      plot.on('doneUpdate', plot._uiRefreshHandler)
-      plot.on('create', plot._uiRefreshHandler)
-
-      parentTab.refresh()
-    }
-
-    // 渲染动态坐标列表
-    function renderCoordinatesList(plot: any) {
-      if (!coordFolder) return
-
-      // 清空旧的坐标控件
-      [...coordFolder.children].forEach(child => child.dispose())
-
-      const pos = plot.options.position
-      if (!pos) {
-        // @ts-ignore
-        coordFolder.addBinding({ msg: '等待绘制坐标...' }, 'msg', { readonly: true, label: '' })
-        return
-      }
-
-      // 将 LngLat 转换为 Tweakpane 可绑定的 { x, y } 对象数组
-      editState.positions =[]
-      if (Array.isArray(pos)) {
-        pos.forEach(p => editState.positions.push({ x: p.lng, y: p.lat }))
-      } else {
-        editState.positions.push({ x: pos.lng, y: pos.lat })
-      }
-
-      // 为每一个点生成一个带有微调 x,y 控件的表单
-      editState.positions.forEach((_, index): void => {
-        const binding = coordFolder!.addBinding(editState.positions, index, {
-          label: `节点[${index}]`,
-          x: { step: 0.000001 },
-          y: { step: 0.000001 }
-        })
-
-        const pickerBtn = binding.element.querySelector('button')
-        if (pickerBtn) {
-          pickerBtn.style.display = 'none'
-        }
-      })
-
-      coordFolder.addButton({ title: '📌 将坐标应用至地图' }).on('click', () => {
-        // 将修改后的 { x, y } 重新转换为 LngLat 塞回 plot
-        if (Array.isArray(plot.options.position)) {
-          plot.options.position = editState.positions.map(p => new LngLat(p.x, p.y))
-        } else {
-          plot.options.position = new LngLat(editState.positions[0].x, editState.positions[0].y)
-        }
-
-        plot.update(plot.options)
-        logEvent('精准坐标修改已应用', plot.options.position)
-      })
-    }
-
-    syncEditState() // 初始化执行一次
   }
 
-  refreshListFolder(map, tab)
+  syncEditState() // 初始化执行一次
 }
 
 // ==========================================
