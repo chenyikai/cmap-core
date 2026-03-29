@@ -98,7 +98,7 @@ export const LINE_TEXT_LAYER: LayerSpecification = {
     'all',
     ['==', '$type', 'LineString'],
     ['==', 'isName', true],
-    ['==', 'meta', Meta.LINE_TITLE],
+    // ['==', 'meta', Meta.LINE_TITLE],
     ['==', 'visibility', 'visible'],
   ],
   source: PLOT_SOURCE_NAME,

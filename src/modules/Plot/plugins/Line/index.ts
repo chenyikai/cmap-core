@@ -1,5 +1,6 @@
 import { along, bbox, length, lineString } from '@turf/turf'
 import type * as GeoJSON from 'geojson'
+import type { Feature, LineString } from 'geojson'
 import type { Map } from 'mapbox-gl'
 import { LngLat } from 'mapbox-gl'
 
@@ -245,7 +246,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
   }
   public override remove(): void {
     this.removePoint()
-    this.removeTitles()
+    // this.removeTitles()
     this.residentEvent.disabled()
     this.createEvent.disabled()
     this.updateEvent.disabled()
@@ -274,15 +275,15 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
       this.context.focus.remove(this.id)
     }
 
-    if (Array.isArray(this.options.position) && this.options.position.length > 1) {
-      this.createTitles()
-    } else {
-      this.removeTitles()
-    }
+    // if (Array.isArray(this.options.position) && this.options.position.length > 1) {
+    //   this.createTitles()
+    // } else {
+    //   this.removeTitles()
+    // }
 
     this.context.register.setGeoJSONData(PLOT_SOURCE_NAME, [
       this.getFeature(),
-      ...this.titles,
+      // ...this.titles,
     ] as GeoJSON.Feature[])
   }
 
@@ -344,7 +345,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
     })
   }
 
-  private createTitles(): GeoJSON.Feature<GeoJSON.LineString>[] {
+  public createTitles(): Feature<LineString>[] {
     if (!Array.isArray(this.points) || this.points.length === 0) return []
 
     const length = this.points.length
@@ -376,7 +377,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
     return this.titles as GeoJSON.Feature<GeoJSON.LineString>[]
   }
 
-  private removeTitles(): GeoJSON.Feature<null>[] {
+  public removeTitles(): GeoJSON.Feature<null>[] {
     this.titles = this.titles.map((item) => {
       return {
         ...item,

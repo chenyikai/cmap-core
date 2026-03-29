@@ -36,5 +36,6 @@ export enum Event {
 }
 
 export enum Meta {
+  Line = 'Line',
   LINE_TITLE = 'lineTitle',
 }
