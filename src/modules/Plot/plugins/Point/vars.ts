@@ -104,6 +104,8 @@ export const POINT_TEXT_LAYER: LayerSpecification = {
   },
   paint: {
     'text-color': ['coalesce', ['get', 'text-color'], DEFAULT_TEXT_COLOR],
+    'text-halo-color': '#ffffff', // 白色描边，防止线条颜色穿透文字
+    'text-halo-width': 1,
   },
 }
 

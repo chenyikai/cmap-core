@@ -208,6 +208,16 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
     this.render()
   }
 
+  public override show(): void {
+    this.line?.show()
+    super.show()
+  }
+
+  public override hide(): void {
+    this.line?.hide()
+    super.hide()
+  }
+
   render(): void {
     if (this.line) {
       this.line.render()
