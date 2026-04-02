@@ -94,7 +94,7 @@ export class LineCreateEvent extends LineBaseEvent {
     return this.drawPoint
   }
 
-  public override enabled(): void{
+  public override enabled(): void {
     this.context.map.doubleClickZoom.disable()
 
     this.context.map.on('click', this.onClick)

@@ -138,6 +138,7 @@ export class FillUpdateEvent extends FillBaseEvent {
   protected dragStartLngLat: LngLat | null = null
 
   private onLineUpdate = (e: EventMessage<Line>, point: PointInstance): void => {
+    console.log('onLineUpdate')
     if (!point.center || !this.fill.line) return
 
     const index = point.options.properties?.index as number
@@ -188,7 +189,7 @@ export class FillUpdateEvent extends FillBaseEvent {
     this.context.map.on('mousemove', this.onMousemove)
     this.context.map.once('mouseup', this.onMouseup)
 
-    this.fill.emit(`beforeUpdate`, this.message<Fill>(e, this.fill))
+    this.fill.emit(Event.BEFORE_UPDATE, this.message<Fill>(e, this.fill))
   }
 
   private onMousemove = (e: MapMouseEvent): void => {
@@ -196,7 +197,7 @@ export class FillUpdateEvent extends FillBaseEvent {
     const current = e.lngLat
     this.fill.move(current)
     this.setDragLngLat(current)
-    this.fill.emit(`update`, this.message<Fill>(e, this.fill))
+    this.fill.emit(Event.UPDATE, this.message<Fill>(e, this.fill))
   }
 
   private onMouseup = (e: MapMouseEvent): void => {
@@ -205,7 +206,7 @@ export class FillUpdateEvent extends FillBaseEvent {
     this.setDragLngLat(null)
     this.fill.render()
 
-    this.fill.emit(`doneUpdate`, this.message<Fill>(e, this.fill))
+    this.fill.emit(Event.DONE_UPDATE, this.message<Fill>(e, this.fill))
   }
 
   private onFillMouseenter = (): void => {
@@ -237,11 +238,11 @@ export class FillUpdateEvent extends FillBaseEvent {
   }
 
   public override enabled(): void {
-    this.fill.line?.on('update', this.onLineUpdate)
+    this.fill.line?.on(Event.UPDATE, this.onLineUpdate)
 
-    this.fill.line?.on('midUpdate', this.onLineMidUpdate)
+    this.fill.line?.on(Event.MID_UPDATE, this.onLineMidUpdate)
 
-    this.fill.line?.on('midDoneUpdate', this.onLineMidDoneUpdate)
+    this.fill.line?.on(Event.MID_DONE_UPDATE, this.onLineMidDoneUpdate)
 
     this.context.map.on('mousedown', this.fill.LAYER, this.onFillMousedown)
 
@@ -253,11 +254,11 @@ export class FillUpdateEvent extends FillBaseEvent {
   }
 
   public override disabled(): void {
-    this.fill.line?.off('update', this.onLineUpdate)
+    this.fill.line?.off(Event.UPDATE, this.onLineUpdate)
 
-    this.fill.line?.off('midUpdate', this.onLineMidUpdate)
+    this.fill.line?.off(Event.MID_UPDATE, this.onLineMidUpdate)
 
-    this.fill.line?.off('midDoneUpdate', this.onLineMidDoneUpdate)
+    this.fill.line?.off(Event.MID_DONE_UPDATE, this.onLineMidDoneUpdate)
 
     this.context.map.off('mousedown', this.fill.LAYER, this.onFillMousedown)
 
