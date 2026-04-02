@@ -39,7 +39,7 @@
     "type-check": "tsc --noEmit",
     "change": "changeset",
     "version": "changeset version",
-    "release": "pnpm run build && changeset publish",
+    "pub": "changeset && changeset version && pnpm run build && changeset publish",
     "build:demo": "vite build --config vite.demo.config.ts",
     "build:publish": "tsc && vite build && npm run build:demo && cp -rf dist haitu-demo package.json debug index.html /Users/yikaichen/Projects/chenzq/cmap-core/ && cd /Users/yikaichen/Projects/chenzq/cmap-core && git add . && (git commit -m \"chore: update dist and package.json $(date +'%Y-%m-%d_%H-%M-%S')\" || echo \"No changes to commit\") && git push"
   },
