@@ -359,7 +359,6 @@ export class Tooltip extends Module {
 
       this.mark?.addTo(this.context.map)
 
-      console.log(Tooltip.DEBUG)
       if (Tooltip.DEBUG) {
         this.debug()
       }

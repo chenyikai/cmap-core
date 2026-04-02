@@ -220,8 +220,7 @@ export class Line<T extends ILineOptions = ILineOptions> extends Poi<T, GeoJSON.
   }
   public override move(position: LngLat): void {
     // 如果不借助鼠标拖拽 直接移动以中心为基准点
-    const drag: LngLat | null =
-      this.center === null ? this.center : this.updateEvent.getDragLngLat()
+    const drag: LngLat | null = this.center ?? this.updateEvent.getDragLngLat()
 
     if (!drag) return
 

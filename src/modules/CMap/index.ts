@@ -8,7 +8,7 @@ import type { ICMapOptions } from '@/types/CMap'
 import { MapType } from '@/types/CMap'
 import type { SvgIcon } from '@/types/IconManager'
 
-import { landStyle, satelliteStyle } from './vars.ts'
+import { createStyle } from './vars.ts'
 
 export class CMap extends EventEmitter {
   public readonly map: Map
@@ -28,11 +28,7 @@ export class CMap extends EventEmitter {
     this.options = options
 
     if (isEmpty(this.options.style)) {
-      if (options.type === CMap.LAND) {
-        this.options.style = landStyle
-      } else if (options.type === CMap.SATELLITE) {
-        this.options.style = satelliteStyle
-      }
+      this.options.style = createStyle(options.type, options.http2, options.TDTToken)
     }
 
     Map.prototype._authenticate = (): void => {
@@ -85,11 +81,7 @@ export class CMap extends EventEmitter {
   }
 
   change(type: MapType): void {
-    if (type === CMap.LAND) {
-      this.getMap().setStyle(landStyle)
-    } else if (type === CMap.SATELLITE) {
-      this.getMap().setStyle(satelliteStyle)
-    }
+    this.getMap().setStyle(createStyle(type, this.options.http2, this.options.TDTToken))
   }
 
   getMap(): Map {
