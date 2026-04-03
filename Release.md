@@ -113,6 +113,15 @@ pnpm pub
 
 > `pub:patch / pub:minor / pub:major` 三条命令：若已通过 `pnpm change` 创建了 changeset 文件，则直接使用该文件；否则自动生成一条通用的 `Version bump.` 记录。
 
+发布成功后，脚本会自动执行以下操作，无需手动处理：
+
+```
+git tag v1.2.3
+git push --tags
+```
+
+在 GitHub 仓库的 **Tags** 页面即可看到对应的 `vX.X.X` 标签。
+
 ---
 
 ## 常见问题
