@@ -1,91 +1,103 @@
 import type { BBox } from 'rbush'
 
-import type { CollisionItemOptions } from '@/types/Collision/item.ts'
-import { Scopes } from '@/types/Collision/item.ts'
-import type { Anchor } from '@/types/Toolip/index.ts'
+import type { CollisionItemOptions, Id } from '@/types/Collision/item.ts'
 
-class CollisionItem {
-  // 最小X
-  static MIN_X: Scopes = Scopes.MIN_X
-  // 最小Y
-  static MIN_Y: Scopes = Scopes.MIN_Y
-  // 最大X
-  static MAX_X: Scopes = Scopes.MAX_X
-  // 最大Y
-  static MAX_Y: Scopes = Scopes.MAX_Y
+/**
+ * 碰撞检测项
+ *
+ * 持有一组候选方向的 BBox，碰撞系统会按优先级逐一尝试，
+ * 找到第一个不与已放置项冲突的方向后确定最终 dir。
+ *
+ * 实现了 RBush 所需的 minX/minY/maxX/maxY 接口，可直接插入空间索引树。
+ *
+ * @template T 方向标识类型，默认 string，与 CollisionItemOptions 保持一致
+ */
+class CollisionItem<T extends string = string> {
+  /** 唯一标识 */
+  id: Id
 
-  id: CollisionItemOptions['id']
-
+  /** 当前是否显示（碰撞检测后由系统写入） */
   visible = true
 
-  dir: Anchor = 'top-left'
+  /** 当前选定的放置方向 */
+  dir: T
 
-  dirs: Anchor[] = [
-    'top-left',
-    'top-right',
-    'bottom-left',
-    'bottom-right',
-    // 'center',
-    // 'top',
-    // 'bottom',
-    // 'left',
-    // 'right',
-  ]
+  /** 按优先顺序排列的候选方向列表 */
+  readonly priority: T[]
 
-  _options: CollisionItemOptions
+  private readonly positions: Partial<Record<T, BBox>>
 
-  /**
-   *
-   * @param options
-   */
-  constructor(options: CollisionItemOptions) {
+  constructor(options: CollisionItemOptions<T>) {
     this.id = options.id
-    this._options = options
+    this.positions = options.positions
+
+    // 过滤掉 positions 中不存在的 key，确保 dir 始终有对应 BBox
+    const keys = Object.keys(options.positions) as T[]
+    this.priority = (options.priority ?? keys).filter((k) => k in options.positions)
+    this.dir = this.priority[0]
   }
 
+  // ── RBush 空间索引所需的四个边界值 ──────────────────────────────
+
   get minX(): number {
-    return this._options[this.dir].minX
+    return this.positions[this.dir]?.minX ?? 0
   }
 
   get minY(): number {
-    return this._options[this.dir].minY
+    return this.positions[this.dir]?.minY ?? 0
   }
 
   get maxX(): number {
-    return this._options[this.dir].maxX
+    return this.positions[this.dir]?.maxX ?? 0
   }
 
   get maxY(): number {
-    return this._options[this.dir].maxY
+    return this.positions[this.dir]?.maxY ?? 0
   }
 
-  /**
-   *
-   */
+  // ── 公开方法 ────────────────────────────────────────────────────
+
+  /** 获取当前方向下的 BBox */
   getBBox(): BBox {
-    return this._options[this.dir]
+    return this.positions[this.dir] ?? { minX: 0, minY: 0, maxX: 0, maxY: 0 }
   }
 
-  /**
-   * 设置是否显示
-   * @param visible
-   */
+  /** 切换当前放置方向 */
+  setDir(dir: T): void {
+    this.dir = dir
+  }
+
+  /** 设置是否显示 */
   setVisible(visible: boolean): void {
     this.visible = visible
   }
 
-  setDir(dir: Anchor): void {
-    this.dir = dir
+  /**
+   * AABB 相交检测：判断当前 BBox 与给定 BBox 是否有重叠区域
+   *
+   * 使用分离轴定理的逆命题：任意一轴上不相交则整体不相交。
+   */
+  isIntersect(box: BBox): boolean {
+    return !(
+      box.maxX < this.minX ||
+      box.minX > this.maxX ||
+      box.maxY < this.minY ||
+      box.minY > this.maxY
+    )
   }
 
   /**
-   * 判断item与box是否相交
-   * @param box
-   * @return true-相交 false-不相交
+   * 判断当前 BBox 是否被给定 BBox 完全包含
+   *
+   * 即 box 的四条边均在当前 BBox 的外侧或重合。
    */
-  isIntersect(box: BBox): boolean {
-    const { minX, minY, maxX, maxY } = box
-    return minX <= this.minX && minY <= this.minY && this.maxX <= maxX && this.maxY <= maxY
+  isContainedBy(box: BBox): boolean {
+    return (
+      box.minX <= this.minX &&
+      box.minY <= this.minY &&
+      this.maxX <= box.maxX &&
+      this.maxY <= box.maxY
+    )
   }
 }
 

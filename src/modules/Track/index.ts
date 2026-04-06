@@ -9,6 +9,7 @@ import { EventState } from '@/core/EventState'
 import { Module } from '@/core/Module'
 import { Tooltip } from '@/core/Tooltip'
 import type { CollisionItemOptions } from '@/types/Collision/item.ts'
+import type { Anchor } from '@/types/Toolip'
 import type { ITrackOptions, TrackItem, TrackItemWithLabel } from '@/types/Track'
 import { TooltipType } from '@/types/Track'
 
@@ -130,14 +131,14 @@ export class Track extends Module {
   public options: ITrackOptions
   public trackData = new Map<TrackItem['id'], TrackItemWithLabel[]>()
   private tooltips: Tooltip[] = []
-  private collision: Collision
+  private collision: Collision<Anchor>
   private event: TrackEvent
 
   constructor(map: MapboxglMap, options: ITrackOptions) {
     super(map)
 
     this.options = options
-    this.collision = new Collision(map)
+    this.collision = new Collision<Anchor>(map)
     this.event = new TrackEvent(map, this)
   }
 
@@ -365,14 +366,12 @@ export class Track extends Module {
     })
   }
 
-  private createCollisions(): CollisionItemOptions[] {
-    return this.tooltips.map((tooltip) => {
-      return {
-        // ...tooltip.getSimpleBbox(),
-        ...tooltip.getAllBbox(),
-        id: tooltip.id,
-      }
-    })
+  private createCollisions(): CollisionItemOptions<Anchor>[] {
+    return this.tooltips.map((tooltip) => ({
+      id: tooltip.id,
+      positions: tooltip.getAllBbox(),
+      priority: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+    }))
   }
 
   private createTooltip(): void {

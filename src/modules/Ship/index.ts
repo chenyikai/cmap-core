@@ -6,6 +6,7 @@ import type { Tooltip } from '@/core/Tooltip'
 import type { BaseShip } from '@/modules/Ship/BaseShip.ts'
 import { ResidentEvent } from '@/modules/Ship/Events/ResidentEvent'
 import type { CollisionItemOptions } from '@/types/Collision/item.ts'
+import type { Anchor } from '@/types/Toolip'
 import type { IShipOptions } from '@/types/Ship'
 import type { BaseShipConstructor, IBaseShipOptions } from '@/types/Ship/BaseShip.ts'
 
@@ -15,13 +16,13 @@ class Ship extends Module {
   event: ResidentEvent
 
   private pluginRegistry = new Map<string, BaseShipConstructor>()
-  private collision: Collision
+  private collision: Collision<Anchor>
   private focusId: IBaseShipOptions['id'] | null = null
 
   constructor(map: MapboxGlMap, options: IShipOptions) {
     super(map)
     this.options = options
-    this.collision = new Collision(this.context.map)
+    this.collision = new Collision<Anchor>(this.context.map)
     this.event = new ResidentEvent(map)
 
     this.registerPlugins(options.plugins)
@@ -48,14 +49,12 @@ class Ship extends Module {
     })
   }
 
-  private createCollisions(): CollisionItemOptions[] {
-    return this.tooltips.map((tooltip) => {
-      return {
-        // ...tooltip.getSimpleBbox(),
-        ...tooltip.getAllBbox(),
-        id: tooltip.id,
-      }
-    })
+  private createCollisions(): CollisionItemOptions<Anchor>[] {
+    return this.tooltips.map((tooltip) => ({
+      id: tooltip.id,
+      positions: tooltip.getAllBbox(),
+      priority: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+    }))
   }
 
   private collisionTooltip(): void {

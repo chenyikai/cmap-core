@@ -111,8 +111,7 @@ export class Fill<T extends IFillOptions = IFillOptions> extends Poi<T, GeoJSON.
 
   move(position: LngLat): void {
     // 1. 确保有拖拽参考点和内部关联的 line 对象 如果不借助鼠标拖拽 直接移动以中心为基准点
-    const drag: LngLat | null =
-      this.center === null ? this.center : this.updateEvent.getDragLngLat()
+    const drag: LngLat | null = this.center ?? this.updateEvent.getDragLngLat()
     if (!this.line || !drag) return
 
     // 2. 计算当前鼠标所在的帧，相对于上一帧鼠标位置的经纬度偏移量 (Delta)

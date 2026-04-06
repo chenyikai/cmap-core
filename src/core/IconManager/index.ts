@@ -72,7 +72,7 @@ class IconManager {
 
         // 🌟 核心修复：异步操作回来后，再次进行双重检查 (Double-check)
         if (!this.has(icon.name)) {
-          this._cache.set({
+          await this._cache.set({
             name: icon.name,
             content: { width: data.image.width, height: data.image.height, image: data.image },
           })
