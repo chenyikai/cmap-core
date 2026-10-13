@@ -14,7 +14,7 @@ export class IndexPoint extends Point<IIndexPointOptions> {
 
   constructor(map: Map, options: IIndexPointOptions) {
     super(map, options)
-    this.syncInteractionState()
+    this.initializeInteraction()
   }
 
   public override onAdd(): void {

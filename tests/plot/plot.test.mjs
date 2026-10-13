@@ -48,7 +48,9 @@ function load(relative) {
 const { Point } = load('src/modules/Plot/plugins/Point')
 const { IndexPoint } = load('src/modules/Plot/plugins/IndexPoint')
 const { IconPoint } = load('src/modules/Plot/plugins/IconPoint')
-const { POINT_TEXT_LAYER } = load('src/modules/Plot/plugins/Point/vars.ts')
+const { POINT_TEXT_COLLISION_LAYER, POINT_TEXT_LAYER } = load(
+  'src/modules/Plot/plugins/Point/vars.ts',
+)
 const { POINT_ICON_LAYER } = load('src/modules/Plot/plugins/IconPoint/vars.ts')
 const { Line } = load('src/modules/Plot/plugins/Line')
 const { ArrowLine } = load('src/modules/Plot/plugins/ArrowLine')
@@ -94,8 +96,8 @@ function createMap() {
     fire(type, e, layer = '') {
       for (const fn of [...(events.get(`${type}:${layer}`) ?? [])]) fn(e)
     },
-    listenerCount(type) {
-      return (events.get(`${type}:`) ?? []).length
+    listenerCount(type, layer = '') {
+      return (events.get(`${type}:${layer}`) ?? []).length
     },
     getCanvasContainer: () => canvas,
     queryRenderedFeatures: () => [],
@@ -193,10 +195,32 @@ test('Point variants normalize LngLatLike array positions', () => {
 test('Point style keeps explicit text offset ahead of the calculated fallback', () => {
   const textOffset = POINT_TEXT_LAYER.layout['text-offset']
   assert.equal(JSON.stringify(textOffset[1]), JSON.stringify(['get', 'text-offset']))
-  assert.equal(JSON.stringify(textOffset[2]), JSON.stringify(['get', '_calcTextOffset']))
+  assert.equal(textOffset[2][0], 'interpolate')
+  assert.equal(JSON.stringify(textOffset[2][4][1]), JSON.stringify(['get', '_calcTextOffsetZ5']))
 
   const iconSize = POINT_ICON_LAYER.layout['icon-size']
   assert.equal(iconSize[4][2], 0.5)
+  assert.equal(POINT_TEXT_LAYER.layout['text-allow-overlap'], true)
+  assert.equal(POINT_TEXT_COLLISION_LAYER.layout['text-allow-overlap'], false)
+})
+
+test('IconPoint accepts external icon dimensions and keeps its label gap stable across zooms', () => {
+  const { map } = createMap()
+  const p = new IconPoint(map, {
+    ...options('icon', lngLat(1)),
+    icon: 'external-icon',
+    iconDimensions: { width: 40, height: 20 },
+    isName: true,
+    style: { 'icon-anchor': 'center', 'text-size': 12 },
+  })
+  const properties = p.getFeature().properties
+  const lowZoomOffset = properties._calcTextOffsetZ5[1] * 6
+  const normalZoomOffset = properties._calcTextOffsetZ14[1] * 12
+  const highZoomOffset = properties._calcTextOffsetZ22[1] * 30
+  assert.ok(Math.abs(lowZoomOffset - 10) < 1e-6)
+  assert.ok(Math.abs(normalZoomOffset - 15) < 1e-6)
+  assert.ok(Math.abs(highZoomOffset - 30) < 1e-6)
+  p.remove()
 })
 
 test('Point update synchronizes visibility, events and focus data', () => {
@@ -246,6 +270,42 @@ test('event switch is accurate, edit is idempotent, unedit cancels active draggi
   map.fire('mousemove', mouse(lngLat(9)))
   assert.equal(p.center.lng, 1)
   assert.equal(map.listenerCount('mouseup'), 0)
+})
+
+test('EventManager isolates equal feature IDs by layer and releases unused map listeners', () => {
+  const { map } = createMap()
+  const manager = map.context.eventManager
+  let first = 0
+  let second = 0
+  const onFirst = () => first++
+  const onSecond = () => second++
+
+  manager.on('shared', 'layer-a', 'click', onFirst)
+  manager.on('shared', 'layer-b', 'click', onSecond)
+  assert.equal(map.listenerCount('click', 'layer-a'), 1)
+  assert.equal(map.listenerCount('click', 'layer-b'), 1)
+
+  map.fire('click', mouse(lngLat(1), 'shared'), 'layer-a')
+  assert.equal(first, 1)
+  assert.equal(second, 0)
+
+  manager.off('shared', 'click', onFirst)
+  assert.equal(map.listenerCount('click', 'layer-a'), 0)
+  assert.equal(map.listenerCount('click', 'layer-b'), 1)
+  manager.off('shared', 'click', onSecond)
+  assert.equal(map.listenerCount('click', 'layer-b'), 0)
+})
+
+test('EventManager keeps and releases the mouseenter dependency used by mouseleave', () => {
+  const { map } = createMap()
+  const manager = map.context.eventManager
+  const onLeave = () => {}
+  manager.on('p', 'hover-layer', 'mouseleave', onLeave)
+  assert.equal(map.listenerCount('mouseenter', 'hover-layer'), 1)
+  assert.equal(map.listenerCount('mouseleave', 'hover-layer'), 1)
+  manager.off('p', 'mouseleave', onLeave)
+  assert.equal(map.listenerCount('mouseenter', 'hover-layer'), 0)
+  assert.equal(map.listenerCount('mouseleave', 'hover-layer'), 0)
 })
 
 test('node insertion/deletion keeps coordinates, stable IDs and rendering synchronized', () => {

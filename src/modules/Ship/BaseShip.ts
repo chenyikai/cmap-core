@@ -4,7 +4,6 @@ import type { Map, MapMouseEvent, Point } from 'mapbox-gl'
 import { Module } from '@/core/Module'
 import type { Tooltip } from '@/core/Tooltip'
 import type { UPDATE_STATUS } from '@/modules/Ship/vars.ts'
-import type { IAisShipOptions } from '@/types/Ship/AisShip.ts'
 import type { IBaseShipOptions, Orientation, Shape } from '@/types/Ship/BaseShip.ts'
 
 export abstract class BaseShip<T extends IBaseShipOptions> extends Module {
@@ -17,6 +16,10 @@ export abstract class BaseShip<T extends IBaseShipOptions> extends Module {
 
   visible = true
 
+  protected override get mapLifecycleEvent(): 'remove' {
+    return 'remove'
+  }
+
   protected constructor(map: Map, options: T) {
     super(map)
 
@@ -24,7 +27,7 @@ export abstract class BaseShip<T extends IBaseShipOptions> extends Module {
   }
 
   override destroy(): void {
-    throw new Error('Method not implemented.')
+    super.destroy()
   }
 
   get isFocus(): boolean {
@@ -71,7 +74,7 @@ export abstract class BaseShip<T extends IBaseShipOptions> extends Module {
 
   abstract removeTooltip(): void
 
-  abstract update(options: IAisShipOptions): void
+  abstract update(options: T): void
 
   abstract select(): void
 
@@ -97,6 +100,7 @@ export abstract class BaseShip<T extends IBaseShipOptions> extends Module {
   abstract offset(): Point
 
   public setState(states: Record<string, unknown>): void {
+    if (this.mapRemoved) return
     this.context.map.setFeatureState(
       {
         source: this.SOURCE,
@@ -107,6 +111,7 @@ export abstract class BaseShip<T extends IBaseShipOptions> extends Module {
   }
 
   public getState(): Record<string, unknown> | null | undefined {
+    if (this.mapRemoved) return undefined
     return this.context.map.getFeatureState({
       source: this.SOURCE,
       id: this.id,
@@ -116,7 +121,7 @@ export abstract class BaseShip<T extends IBaseShipOptions> extends Module {
   public isSelf(e: MapMouseEvent): boolean {
     if (e.features && e.features.length > 0) {
       const data = e.features[0]
-      return String(data.id) === this.id
+      return data.id != null && String(data.id) === String(this.id)
     } else {
       return false
     }

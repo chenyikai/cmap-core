@@ -13,7 +13,7 @@ pnpm add cmap-core
 引入样式（必须）：
 
 ```ts
-import 'cmap-core/dist/cmap-core.css'
+import 'cmap-core/style.css'
 ```
 
 ---
@@ -124,8 +124,8 @@ const ship = new Ship(cmap.getMap(), {
 
 | 方法 | 返回值 | 说明 |
 |------|--------|------|
-| `add(data)` | `BaseShip \| undefined` | 添加单条船舶 |
-| `load(list)` | `BaseShip[]` | 批量加载，**会清空已有数据** |
+| `add(data)` | `BaseShip \| undefined` | 添加并立即显示单条船舶；相同 ID / 类型更新已有实例 |
+| `load(list)` | `BaseShip[]` | 批量替换数据；相同 ID / 类型复用实例和标签，移除本次列表中不存在的船舶 |
 | `get(id)` | `BaseShip \| undefined` | 获取指定船舶实例 |
 | `remove(id)` | `void` | 移除指定船舶 |
 | `removeAll()` | `void` | 移除全部船舶 |
@@ -134,6 +134,12 @@ const ship = new Ship(cmap.getMap(), {
 | `select(id)` | `void` | 选中 |
 | `unselect(id)` | `void` | 取消选中 |
 | `render()` | `void` | 手动触发渲染 |
+
+船舶 ID 按字符串统一匹配，例如 `123` 与 `'123'` 指向同一条船。`load()` 中重复 ID 以最后一条数据为准；未变化的数据不会重复生成船体或更新 Tooltip。`render()` 仍可用于强制刷新。
+
+`focus()` / `select()` 切换当前聚焦船舶；删除、清空或取消选中会取消尚未完成的聚焦回调。取消地图的 `beforeRemove` 不会清空船舶，实际移除地图时才释放船舶资源。
+
+实形船体按地理坐标生成，地图旋转或倾斜不会改变船体的地理朝向。Tooltip 样式与航向长线计算保持原样。
 
 ### IBaseShipOptions
 
@@ -317,6 +323,8 @@ poi.on('hover', (e) => { })               // 悬停
 poi.on('unhover', (e) => { })             // 离开
 ```
 
+浏览器双击会先产生两次 `click`，再产生一次 `dblclick`。组件保留这一标准顺序，避免为区分双击而延迟单击事件。
+
 ### IPoiOptions — 基础配置
 
 所有标绘类型均继承此接口：
@@ -367,6 +375,8 @@ const point = new Point(cmap.getMap(), {
 point.render()
 ```
 
+名称使用 Mapbox symbol 字体渲染。传入自定义地图样式时，需要在 style 中配置可用的 `glyphs` 地址。
+
 ### IPointOptions
 
 继承 `IPoiOptions`，额外字段：
@@ -389,6 +399,7 @@ point.render()
 | `text-size` | `number` | 名称文字大小（像素） |
 | `text-offset` | `[number, number]` | 名称文字偏移；显式配置优先于自动偏移 |
 | `text-rotate` | `number` | 名称文字旋转角度（度），默认不跟随图标旋转 |
+| `text-allow-overlap` | `boolean` | 是否允许名称重叠，默认 `true`；设为 `false` 时参与碰撞检测 |
 
 ---
 
@@ -444,6 +455,8 @@ const iconPoint = new IconPoint(cmap.getMap(), {
   visibility: 'visible',
   position: [120.38, 36.07],
   icon: 'port-icon',       // 需在 IconManager 中已加载
+  // 如果图标是通过 map.addImage() 直接注册的，请提供：
+  // iconDimensions: { width: 32, height: 32 },
   style: {
     'icon-size': 1,
     'icon-rotate': 0,
@@ -463,6 +476,7 @@ iconPoint.render()
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|:----:|------|
 | `icon` | `string` | ✅ | 图标名称，需在 IconManager 中已加载 |
+| `iconDimensions` | `{ width: number; height: number }` | - | 直接使用 `map.addImage()` 时提供图标布局尺寸 |
 | `style` | `IconPointStyle` | - | 样式 |
 
 ### IconPointStyle
@@ -476,6 +490,7 @@ iconPoint.render()
 | `text-size` | `number` | 文字大小（像素） |
 | `text-offset` | `[number, number]` | 文字偏移 `[x, y]` |
 | `text-rotate` | `number` | 文字旋转角度（度） |
+| `text-allow-overlap` | `boolean` | 是否允许文字重叠，默认 `true` |
 
 ```ts
 type IconAnchor =
@@ -813,40 +828,90 @@ cmap.icon.delete('port')
 
 ## Tooltip — 提示框
 
+普通文字标签只需 `new Tooltip(map, { position, text })`，无需创建 DOM、管理器或调用 `render()`。
+同一地图共享一个 Canvas，自动在下一次地图渲染帧显示；地图尚未加载时会等待加载完成。
+默认保留船名 / 轨迹时间标签的半透明白底、圆角、加粗文字及阴影。
+
 ```ts
 import { Tooltip } from 'cmap-core'
 
 const tooltip = new Tooltip(cmap.getMap(), {
-  id: 'tip-1',
   position: [120.38, 36.07],
-  element: document.getElementById('popup')!,
-  anchor: 'bottom',
-  offsetX: 0,
-  offsetY: -10,
-  line: true,
-  visible: true,
+  text: '浙渔 001',
 })
 
-tooltip.render()
-tooltip.show()
+// 按需指定偏移、连接线、防重叠和主题
+const trackLabel = new Tooltip(cmap.getMap(), {
+  position: [120.39, 36.08],
+  text: '2026-10-13 12:34:56',
+  theme: 'track',
+  anchor: 'bottom-right',
+  offsetX: 5,
+  offsetY: 25,
+  line: true,
+  collision: true,
+})
+
+// 以下操作自动合并到下一帧
+tooltip.update({ text: '浙渔 002' })
+tooltip.setLngLat([120.39, 36.08])
 tooltip.hide()
-tooltip.update({ position: [120.39, 36.08] })
+tooltip.show()
 tooltip.remove()
 ```
+
+原有 `element: HTMLElement` 用法继续支持，使用 DOM 兼容渲染并保留原元素和事件处理器。
+`text` 与 `element` 必须二选一；`update({ text })` / `update({ element })` 可以切换渲染模式。
+文本模式支持下表中的样式参数，并不执行任意 HTML/CSS。复杂布局和交互内容请继续使用 `element`。
+
+```ts
+const popup = new Tooltip(cmap.getMap(), {
+  position: [120.38, 36.07],
+  element: document.getElementById('popup')!,
+  className: 'my-interactive-tooltip',
+})
+```
+
+`render()` 保留兼容，现在只请求一次批量重绘；`visible` 表示最近一帧布局后的实际可见性，
+`options.visible` 表示用户请求的显示状态。视野外和碰撞隐藏不会修改用户状态。
+`remove()` / `destroy()` 完整释放该标签且不可再次显示，暂时隐藏请使用 `hide()`。
+最后一个标签移除或地图销毁后，会释放共享 Canvas、监听器、尺寸观察器和位图缓存。
 
 ### ITooltipOptions
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|:----:|------|
-| `id` | `string \| number` | ✅ | 唯一标识 |
-| `position` | `LngLat` | ✅ | 地图坐标 |
-| `element` | `HTMLElement` | ✅ | 要展示的 DOM 元素 |
+| `id` | `string \| number` | - | 省略自动生成；创建后不可更改 |
+| `position` | `LngLatLike` | ✅ | 支持坐标数组、经纬度对象及 `LngLat` |
+| `text` | `string` | 二选一 | Canvas 文本，可包含换行符 |
+| `element` | `HTMLElement` | 二选一 | DOM 兼容模式，保留原元素 |
+| `renderer` | `'canvas' \| 'dom'` | - | 自动根据内容选择；显式指定时必须与内容匹配 |
+| `theme` | `'default' \| 'ship' \| 'track'` | - | 文本主题，默认使用船名样式 |
+| `style` | `TooltipTextStyle` | - | 文本模式的样式覆盖 |
 | `visible` | `boolean` | - | 是否可见，默认 `true` |
-| `anchor` | `Anchor` | - | 锚点方向，默认 `'bottom'` |
-| `offsetX` | `number` | - | X 方向像素偏移 |
-| `offsetY` | `number` | - | Y 方向像素偏移 |
-| `line` | `boolean` | - | 是否绘制连接线 |
-| `className` | `string` | - | 自定义 CSS 类名 |
+| `anchor` | `Anchor` | - | 锚点方向，默认 `'bottom-right'` |
+| `offsetX` / `offsetY` | `number` | - | 默认 `0`；按照锚点方向计算带符号的 CSS 像素偏移 |
+| `line` | `boolean` | - | 默认关闭；连接至朝向目标的标签边界，支持文本圆角；目标被标签覆盖时不画线 |
+| `className` | `string` | - | DOM 容器类名 / 文本主题测量时的类名 |
+| `collision` | `boolean` | - | 默认关闭；船名、轨迹时间标签内部默认开启 |
+| `targetRadius` | `number` | - | 目标图标避让半径（CSS 像素），默认 `0`；仅参与避让、不截短连线，内置船名标签自动计算 |
+| `priority` | `number` | - | 碰撞布局优先级，数值越大越优先 |
+| `anchors` | `Anchor[]` | - | 碰撞时尝试的候选方向，默认四个角 |
+
+`TooltipTextStyle` 支持 `fontFamily`、`fontSize`、`fontWeight`、`lineHeight`、`color`、
+`backgroundColor`、`paddingX`、`paddingY`、`borderRadius`、`shadowColor`、`shadowBlur`、
+`shadowOffsetX` 和 `shadowOffsetY`。尺寸均为 CSS 像素，设备像素比由内部处理。
+部分 `style` 更新会与现有覆盖参数合并；网页主题 CSS 改变后调用 `Tooltip.refreshStyles(map)`
+重新读取样式，字体加载完成则自动刷新。
+
+文本位图缓存上限为每地图 32 MiB（不含主画布及浏览器开销）；可见内容超出预算时，
+复用背景并直接绘制文字，保持所有未被碰撞规则隐藏的标签可见。初始化位图分帧生成。
+Canvas 文本不能像 HTML 那样选择文字或接收 DOM 事件，需要这些能力时使用 DOM 模式。
+
+开启 `collision` 后，会检查标签重叠、连接线穿过其他标签、连接线交叉，以及已注册标签的目标保护区。
+固定位置（`collision: false`）的标签不会被自动隐藏，但会作为自动布局的障碍物。
+候选方向均不可用时，低优先级标签暂时隐藏；障碍消失后自动恢复，不修改 `options.visible`。
+此处只处理 Tooltip 的短连接线，不参与船舶航向长线的计算和绘制。
 
 ```ts
 type Anchor =

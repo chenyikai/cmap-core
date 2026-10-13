@@ -17,8 +17,15 @@ export interface IconPointStyle extends PointTextStyle {
   'icon-anchor'?: IconAnchor
 }
 
+export interface IconDimensions {
+  width: number
+  height: number
+}
+
 export interface IIconPointOptions extends IPointOptions<IconPointStyle> {
   icon: string
+  /** 使用 map.addImage() 直接注册图标时，可通过此字段提供布局尺寸。 */
+  iconDimensions?: IconDimensions
   style?: IconPointStyle
 }
 

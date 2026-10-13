@@ -19,9 +19,8 @@ interface GeoJSONSource {
 
 class ResourceRegister {
   private map: MapboxGlMap
-  private sourceData = new Map<string, GeoJSON.FeatureCollection>()
-  /** Feature 索引，key 为 `${sourceId}:${featureId}` */
-  private featureIndex = new Map<string, number>()
+  // Preserve insertion order while allowing O(1) upsert/delete, including bulk ship removal.
+  private sourceFeatures = new Map<string, Map<string, GeoJSON.Feature>>()
   private dirtySourceIds = new Set<string>()
   private renderFrameId: number | null = null
   private layerList: SortLayer[] = []
@@ -33,6 +32,11 @@ class ResourceRegister {
 
   constructor(map: MapboxGlMap) {
     this.map = map
+    map.once('remove', this.onMapRemove)
+  }
+
+  private readonly onMapRemove = (): void => {
+    this.destroy()
   }
 
   private checkDestroyed(): void {
@@ -108,19 +112,13 @@ class ResourceRegister {
     if (this.map.getSource(sourceId)) {
       this.map.removeSource(sourceId)
     }
-    this.sourceData.delete(sourceId)
+    this.sourceFeatures.delete(sourceId)
+    this.dirtySourceIds.delete(sourceId)
     this.managedSourceIds.delete(sourceId)
-    // 清理该 source 相关的 feature 索引
-    for (const key of this.featureIndex.keys()) {
-      if (key.startsWith(`${sourceId}:`)) {
-        this.featureIndex.delete(key)
-      }
-    }
   }
 
   public findFeature(source: string, featureId: string): GeoJSON.Feature | undefined {
-    const data = this.sourceData.get(source)
-    return data?.features.find((item) => item.id === featureId)
+    return this.sourceFeatures.get(source)?.get(featureId)
   }
 
   /**
@@ -138,49 +136,34 @@ class ResourceRegister {
     id: string,
     data: GeoJSON.Feature<GeoJSON.Geometry | null> | GeoJSON.Feature<GeoJSON.Geometry | null>[],
   ): void {
-    this.checkDestroyed()
+    if (this.destroyed) return
     const inputFeatures = Array.isArray(data) ? data : [data]
 
-    let collection = this.sourceData.get(id)
+    let collection = this.sourceFeatures.get(id)
     if (!collection) {
-      collection = { type: 'FeatureCollection', features: [] }
-      this.sourceData.set(id, collection)
+      collection = new Map()
+      this.sourceFeatures.set(id, collection)
     }
 
-    inputFeatures.forEach((newFeature) => {
-      if (!isValidId(newFeature.id)) return
+    let changed = false
+    for (const newFeature of inputFeatures) {
+      if (!isValidId(newFeature.id)) continue
 
-      const indexKey = `${id}:${String(newFeature.id)}`
-      const existingIndex = this.featureIndex.get(indexKey)
+      const key = String(newFeature.id)
 
       // === 删除逻辑 (Geometry 为 null) ===
       if (newFeature.geometry === null) {
-        if (existingIndex !== undefined) {
-          collection.features.splice(existingIndex, 1)
-          this.featureIndex.delete(indexKey)
-          // 更新被删除元素之后的索引
-          for (const [key, idx] of this.featureIndex.entries()) {
-            if (key.startsWith(`${id}:`) && idx > existingIndex) {
-              this.featureIndex.set(key, idx - 1)
-            }
-          }
-        }
+        if (collection.delete(key)) changed = true
       } else {
-        const feature = newFeature as GeoJSON.Feature
-        if (existingIndex !== undefined) {
-          // 替换旧数据
-          collection.features[existingIndex] = feature
-        } else {
-          // 追加新数据
-          const newIndex = collection.features.length
-          collection.features.push(feature)
-          this.featureIndex.set(indexKey, newIndex)
-        }
+        collection.set(key, newFeature as GeoJSON.Feature)
+        changed = true
       }
-    })
+    }
 
-    this.dirtySourceIds.add(id)
-    this.scheduleRender()
+    if (changed) {
+      this.dirtySourceIds.add(id)
+      this.scheduleRender()
+    }
   }
 
   /**
@@ -204,12 +187,12 @@ class ResourceRegister {
     this.dirtySourceIds.forEach((id) => {
       try {
         const source = this.getSource(id)
-        const collection = this.sourceData.get(id)
+        const collection = this.sourceFeatures.get(id)
 
         if (source?.type === 'geojson' && collection) {
           ;(source as GeoJSONSource).setData({
-            ...collection,
-            features: [...collection.features],
+            type: 'FeatureCollection',
+            features: [...collection.values()],
           })
         }
       } catch (e) {
@@ -253,6 +236,7 @@ class ResourceRegister {
   public destroy(removeFromMap = false): void {
     if (this.destroyed) return
     this.destroyed = true
+    this.map.off('remove', this.onMapRemove)
 
     if (this.renderFrameId !== null) {
       cancelAnimationFrame(this.renderFrameId)
@@ -275,9 +259,8 @@ class ResourceRegister {
     }
 
     this.layerList = []
-    this.sourceData.clear()
+    this.sourceFeatures.clear()
     this.dirtySourceIds.clear()
-    this.featureIndex.clear()
     this.managedSourceIds.clear()
     this.managedLayerIds.clear()
   }

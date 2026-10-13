@@ -1,15 +1,12 @@
 import { bearing, lineString, point } from '@turf/turf'
 import dayjs from 'dayjs'
 import type * as GeoJSON from 'geojson'
-import type { Map as MapboxglMap, MapMouseEvent, PointLike } from 'mapbox-gl'
+import type { Map as MapboxglMap, MapMouseEvent } from 'mapbox-gl'
 import { LngLat } from 'mapbox-gl'
 
-import Collision from '@/core/Collision'
 import { EventState } from '@/core/EventState'
 import { Module } from '@/core/Module'
 import { Tooltip } from '@/core/Tooltip'
-import type { CollisionItemOptions } from '@/types/Collision/item.ts'
-import type { Anchor } from '@/types/Toolip'
 import type { ITrackOptions, TrackItem, TrackItemWithLabel } from '@/types/Track'
 import { TooltipType } from '@/types/Track'
 
@@ -46,27 +43,29 @@ export class TrackEvent extends EventState {
     super(map)
 
     this.track = track
+    this._move = this.onMove.bind(this)
+    this._leave = this.onLeave.bind(this)
+    this._moveEnd = this.onMoveEnd.bind(this)
+    this.enabled()
   }
 
   public override disabled(): void {
     this.context.map.off('mousemove', TRACK_ICON_LAYER_NAME, this._move)
     this.context.map.off('mouseleave', TRACK_ICON_LAYER_NAME, this._leave)
     this.context.map.off('moveend', this._moveEnd)
+    this.status = EventState.OFF
   }
 
   public override enabled(): void {
+    if (this.status === EventState.ON) return
     this.context.map.on('mousemove', TRACK_ICON_LAYER_NAME, this._move)
     this.context.map.on('mouseleave', TRACK_ICON_LAYER_NAME, this._leave)
     this.context.map.on('moveend', this._moveEnd)
+    this.status = EventState.ON
   }
 
   onAdd(): void {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    this._move = this.onMove.bind(this) as any
-    this._leave = this.onLeave.bind(this)
-    this._moveEnd = this.onMoveEnd.bind(this)
-
-    this.enabled()
+    // Bind only after subclass fields have been initialized.
   }
 
   onRemove(): void {
@@ -74,25 +73,23 @@ export class TrackEvent extends EventState {
   }
 
   onMoveEnd(): void {
-    this.track.render()
+    this.track.refreshForZoom()
   }
 
-  onMove(
-    e: MapMouseEvent & {
-      features?: GeoJSON.Feature<GeoJSON.Geometry, { id: string; pId: string }>[]
-    },
-  ): void {
+  onMove(e: MapMouseEvent): void {
     if (e.features?.length) {
       this.context.map.getCanvasContainer().style.cursor = 'pointer'
 
-      if (this.hoverId === (e.features[0].id ?? e.features[0].properties.id)) return
+      const props = e.features[0].properties as { trackId?: string; pId?: string } | null
+      if (!props?.trackId || !props.pId) return
+      if (this.hoverId === props.trackId && this.hoverPointId === props.pId) return
 
       if (this.hoverId) {
         this.unhover()
       }
 
-      this.hoverId = (e.features[0].id ?? e.features[0].properties.id) as string
-      this.hoverPointId = e.features[0].properties.pId
+      this.hoverId = props.trackId
+      this.hoverPointId = props.pId
       this.hover()
     }
   }
@@ -130,15 +127,14 @@ export class TrackEvent extends EventState {
 export class Track extends Module {
   public options: ITrackOptions
   public trackData = new Map<TrackItem['id'], TrackItemWithLabel[]>()
-  private tooltips: Tooltip[] = []
-  private collision: Collision<Anchor>
+  private tooltips = new Map<string, Tooltip>()
+  private renderedZoom?: number
   private event: TrackEvent
 
   constructor(map: MapboxglMap, options: ITrackOptions) {
     super(map)
 
     this.options = options
-    this.collision = new Collision<Anchor>(map)
     this.event = new TrackEvent(map, this)
   }
 
@@ -177,10 +173,12 @@ export class Track extends Module {
   }
 
   override onRemove(): void {
-    this.event.disabled()
+    this.removeAllTooltip()
+    this.event.destroy()
   }
 
   load(items: TrackItem[]): void {
+    if (items.length === 0) return
     const id = items[0].id
 
     // 按照时间升序排列
@@ -193,8 +191,9 @@ export class Track extends Module {
 
   remove(): void {
     this.removeAllTooltip()
-    this.event.disabled()
-    this.context.register.setGeoJSONData(TRACK_SOURCE_NAME, this.getFeature())
+    const removed = this.getFeature().map((feature) => ({ ...feature, geometry: null }))
+    this.trackData.clear()
+    this.context.register.setGeoJSONData(TRACK_SOURCE_NAME, removed)
   }
 
   private markItem(items: TrackItem[]): TrackItemWithLabel[] {
@@ -336,6 +335,7 @@ export class Track extends Module {
               {
                 ...item,
                 id: item.pId,
+                trackId: id,
                 icon,
                 iconSize,
                 isStartEnd: index === 0 || index === length - 1,
@@ -353,93 +353,61 @@ export class Track extends Module {
     return features
   }
 
-  private collisionTooltip(): void {
-    this.collision.load(this.createCollisions()).forEach((collision) => {
-      const tooltip = this.tooltips.find((tooltip) => tooltip.id === collision.id)
-      if (!tooltip) return
-
-      if (collision.visible) {
-        tooltip.setAnchor(collision.dir)
+  private syncTooltips(features: GeoJSON.Feature[]): void {
+    const next = new Set<string>()
+    for (const feature of features) {
+      if (feature.geometry.type !== 'Point') continue
+      const id = String(feature.id)
+      next.add(id)
+      const position = new LngLat(feature.geometry.coordinates[0], feature.geometry.coordinates[1])
+      const time = Number(feature.properties?.time)
+      const text = dayjs(time).format('YYYY-MM-DD HH:mm:ss')
+      const tooltip = this.tooltips.get(id)
+      if (tooltip) {
+        tooltip.update({
+          position,
+          ...(tooltip.options.text !== text ? { text } : {}),
+        })
       } else {
-        tooltip.hide()
+        this.tooltips.set(
+          id,
+          new Tooltip(this.context.map, {
+            id,
+            position,
+            text,
+            theme: 'track',
+            collision: true,
+            className: 'mapbox-gl-track-name-tooltip',
+            offsetX: 5,
+            offsetY: 25,
+            anchor: 'bottom-right',
+          }),
+        )
       }
-    })
-  }
-
-  private createCollisions(): CollisionItemOptions<Anchor>[] {
-    return this.tooltips.map((tooltip) => ({
-      id: tooltip.id,
-      positions: tooltip.getAllBbox(),
-      priority: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
-    }))
-  }
-
-  private createTooltip(): void {
-    const { width, height } = this.context.map.getCanvas()
-
-    const viewportBBox: [PointLike, PointLike] = [
-      [0, 0],
-      [width, height],
-    ]
-
-    const f = this.context.map.queryRenderedFeatures(viewportBBox, {
-      layers: [TRACK_ICON_LAYER_NAME],
-    }) as unknown as GeoJSON.Feature<GeoJSON.Point, { time: string; pId: string }>[]
-
-    if (f.length === 0) return
-
-    const createLabel = (id: string, name: string): HTMLElement => {
-      let shipNameBox = document.getElementById(id)
-      if (shipNameBox) {
-        return shipNameBox
-      }
-
-      shipNameBox = document.createElement('div')
-      shipNameBox.id = `${id}-track-name-box`
-      shipNameBox.classList.add('track-name-box')
-
-      const shipName = document.createElement('div')
-      shipName.innerText = name
-      shipName.classList.add('track-name')
-
-      shipNameBox.appendChild(shipName)
-
-      return shipNameBox
     }
-
-    this.tooltips = f.map(
-      (item) =>
-        new Tooltip(this.context.map, {
-          id: item.properties.pId,
-          position: new LngLat(item.geometry.coordinates[0], item.geometry.coordinates[1]),
-          className: 'mapbox-gl-track-name-tooltip',
-          offsetX: 5,
-          offsetY: 25,
-          element: createLabel(
-            item.properties.pId,
-            dayjs(Number(item.properties.time)).format('YYYY-MM-DD HH:mm:ss'),
-          ),
-          anchor: 'bottom-right',
-          visible: false,
-        }),
-    )
-
-    this.collisionTooltip()
+    for (const [id, tooltip] of this.tooltips) {
+      if (!next.has(id)) {
+        tooltip.remove()
+        this.tooltips.delete(id)
+      }
+    }
   }
 
   private removeAllTooltip(): void {
     this.tooltips.forEach((tooltip) => {
       tooltip.remove()
     })
+    this.tooltips.clear()
+  }
 
-    this.tooltips = []
-    this.collision.clear()
+  refreshForZoom(): void {
+    if (this.renderedZoom !== this.context.map.getZoom()) this.render()
   }
 
   render(): void {
-    this.removeAllTooltip()
-    this.createTooltip()
-
-    this.context.register.setGeoJSONData(TRACK_SOURCE_NAME, this.getFeature())
+    this.renderedZoom = this.context.map.getZoom()
+    const features = this.getFeature()
+    this.syncTooltips(features)
+    this.context.register.setGeoJSONData(TRACK_SOURCE_NAME, features)
   }
 }

@@ -1,4 +1,4 @@
-import type { LayerSpecification } from 'mapbox-gl'
+import type { FilterSpecification, LayerSpecification } from 'mapbox-gl'
 
 import type { SortLayer } from '@/core/ResourceRegister'
 import { PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
@@ -11,6 +11,7 @@ export const TEXT_Z_INDEX = Z_INDEX + 1
 
 export const POINT_CIRCLE_LAYER_NAME = 'mapbox-gl-plot-point-circle-layer'
 export const POINT_TEXT_LAYER_NAME = 'mapbox-gl-plot-point-text-layer'
+export const POINT_TEXT_COLLISION_LAYER_NAME = 'mapbox-gl-plot-point-text-collision-layer'
 
 export const DEFAULT_TEXT_SIZE = 12
 export const DEFAULT_TEXT_COLOR = '#333'
@@ -24,6 +25,17 @@ export const DEFAULT_CIRCLE_STROKE_COLOR = '#f00'
 const baseRadius = ['coalesce', ['get', 'circle-radius'], DEFAULT_CIRCLE_RADIUS]
 const baseStrokeWidth = ['coalesce', ['get', 'circle-stroke-width'], DEFAULT_CIRCLE_STROKE_WIDTH]
 const baseTextSize = ['coalesce', ['get', 'text-size'], DEFAULT_TEXT_SIZE]
+const calculatedTextOffset = [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  5,
+  ['coalesce', ['get', '_calcTextOffsetZ5'], ['get', '_calcTextOffset'], [0, 0]],
+  14,
+  ['coalesce', ['get', '_calcTextOffsetZ14'], ['get', '_calcTextOffset'], [0, 0]],
+  22,
+  ['coalesce', ['get', '_calcTextOffsetZ22'], ['get', '_calcTextOffset'], [0, 0]],
+]
 
 // 提取 Hover 悬停时的放大倍数
 const hoverScale = ['case', ['boolean', ['feature-state', 'hover'], false], 1.2, 1]
@@ -80,12 +92,13 @@ export const POINT_TEXT_LAYER: LayerSpecification = {
     ['==', '$type', 'Point'],
     ['==', 'isName', true],
     ['==', 'visibility', 'visible'],
+    ['!=', 'text-allow-overlap', false],
   ],
   source: PLOT_SOURCE_NAME,
   layout: {
     'text-field': ['get', 'text'],
     'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular'],
-    'text-offset': ['coalesce', ['get', 'text-offset'], ['get', '_calcTextOffset'], [0, 0]],
+    'text-offset': ['coalesce', ['get', 'text-offset'], calculatedTextOffset, [0, 0]],
     'text-anchor': 'top',
     'text-rotate': ['coalesce', ['get', 'text-rotate'], 0],
     'text-allow-overlap': true,
@@ -109,6 +122,23 @@ export const POINT_TEXT_LAYER: LayerSpecification = {
   },
 }
 
+/** 为需要参与碰撞检测的名称提供独立图层，因为该属性不支持按 Feature 表达式设置。 */
+export const POINT_TEXT_COLLISION_LAYER: LayerSpecification = {
+  ...POINT_TEXT_LAYER,
+  id: POINT_TEXT_COLLISION_LAYER_NAME,
+  filter: [
+    'all',
+    ['==', '$type', 'Point'],
+    ['==', 'isName', true],
+    ['==', 'visibility', 'visible'],
+    ['==', 'text-allow-overlap', false],
+  ] as FilterSpecification,
+  layout: {
+    ...POINT_TEXT_LAYER.layout,
+    'text-allow-overlap': false,
+  },
+}
+
 export const LAYER_LIST: SortLayer[] = [
   {
     layer: POINT_CIRCLE_LAYER,
@@ -116,6 +146,10 @@ export const LAYER_LIST: SortLayer[] = [
   },
   {
     layer: POINT_TEXT_LAYER,
+    zIndex: TEXT_Z_INDEX,
+  },
+  {
+    layer: POINT_TEXT_COLLISION_LAYER,
     zIndex: TEXT_Z_INDEX,
   },
 ]

@@ -15,7 +15,7 @@ import {
 import { EMPTY_SOURCE, PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
 import type { CalcOffsetParams } from '@/types/Plot/IconPoint.ts'
 import type { PlotType } from '@/types/Plot/Poi.ts'
-import type { IPointOptions } from '@/types/Plot/Point.ts'
+import type { CirclePointStyle, ICirclePointOptions, IPointOptions } from '@/types/Plot/Point.ts'
 
 import { PointCreateEvent, PointResidentEvent, PointUpdateEvent } from '../Events/PointEvents'
 
@@ -26,12 +26,17 @@ function normalizeOptions<T extends IPointOptions>(options: T): T {
   }
 }
 
-export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJSON.Point | null> {
+export class Point<T extends IPointOptions = ICirclePointOptions> extends Poi<
+  T,
+  GeoJSON.Point | null
+> {
   static NAME: PlotType = NAME
 
   override readonly LAYER: string = POINT_CIRCLE_LAYER_NAME
 
   protected removed = false
+
+  private interactionInitialized = false
 
   public residentEvent: PointResidentEvent<this>
 
@@ -46,13 +51,11 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
     this.updateEvent = new PointUpdateEvent(map, this)
     this.createEvent = new PointCreateEvent(map, this)
     if (new.target === Point) {
-      this.syncInteractionState()
+      this.initializeInteraction()
     } else {
       // Custom subclasses may initialize their layer after super() returns.
       queueMicrotask(() => {
-        if (!this.removed && !this.isEdit && !this.isCreate && this.visibility === 'visible') {
-          this.syncInteractionState()
-        }
+        this.initializeInteraction()
       })
     }
   }
@@ -142,15 +145,22 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
       }
     }
 
-    const h = (DEFAULT_CIRCLE_RADIUS + DEFAULT_CIRCLE_STROKE_WIDTH) * 2
+    const style = this.options.style as CirclePointStyle | undefined
+    const radius = style?.['circle-radius']
+    const strokeWidth = style?.['circle-stroke-width']
+    const textSize = this.options.style?.['text-size']
+    const h =
+      ((typeof radius === 'number' ? radius : DEFAULT_CIRCLE_RADIUS) +
+        (typeof strokeWidth === 'number' ? strokeWidth : DEFAULT_CIRCLE_STROKE_WIDTH)) *
+      2
     const scale = 1
     const anchor = 'center'
 
-    const calculatedOffset = this.calculateTextOffset({
+    const calculatedOffsets = this.calculateTextOffsets({
       iconHeight: h,
       iconScale: scale,
       iconAnchor: anchor,
-      textSize: DEFAULT_TEXT_SIZE,
+      textSize: typeof textSize === 'number' ? textSize : DEFAULT_TEXT_SIZE,
       gap: GAP_PX,
     })
 
@@ -163,7 +173,8 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
         visibility: this.options.visibility,
         isName: this.options.isName,
         text: this.options.name,
-        _calcTextOffset: calculatedOffset,
+        'text-allow-overlap': this.options.style?.['text-allow-overlap'] ?? true,
+        ...calculatedOffsets,
         meta: 'circle',
       },
       {
@@ -247,6 +258,12 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
     }
   }
 
+  protected initializeInteraction(): void {
+    if (this.interactionInitialized || this.removed) return
+    this.interactionInitialized = true
+    this.syncInteractionState()
+  }
+
   /**
    * 计算文字相对于图标的偏移量
    * 返回单位为 em (Mapbox text-offset 标准单位)
@@ -281,5 +298,26 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
 
     // 返回 [x, y]，这里我们只处理垂直偏移
     return [0, offsetY_em]
+  }
+
+  /** 为三个缩放基准点计算偏移，使额外 gap 保持为固定像素。 */
+  protected calculateTextOffsets(params: CalcOffsetParams): Record<string, [number, number]> {
+    const baseIconScale = params.iconScale ?? 1
+    const baseTextSize =
+      params.textSize && params.textSize > 0 ? params.textSize : DEFAULT_TEXT_SIZE
+    const atScale = (zoomScale: number): [number, number] =>
+      this.calculateTextOffset({
+        ...params,
+        iconScale: baseIconScale * zoomScale,
+        textSize: baseTextSize * zoomScale,
+      })
+
+    const normal = atScale(1)
+    return {
+      _calcTextOffset: normal,
+      _calcTextOffsetZ5: atScale(0.5),
+      _calcTextOffsetZ14: normal,
+      _calcTextOffsetZ22: atScale(2.5),
+    }
   }
 }

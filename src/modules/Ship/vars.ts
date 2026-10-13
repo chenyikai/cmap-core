@@ -53,6 +53,7 @@ export const SHIP_ICON_LAYER: LayerSpecification = {
   layout: {
     'icon-allow-overlap': true,
     'icon-image': ['get', 'icon'],
+    'icon-rotation-alignment': 'map',
     'icon-rotate': ['get', 'direction'],
     'icon-size': [
       'interpolate',

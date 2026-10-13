@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ship 回归检查</title>
+    <style>
+      body {
+        margin: 0;
+        font:
+          14px system-ui,
+          sans-serif;
+      }
+      #map {
+        position: absolute;
+        inset: 0;
+      }
+      #panel {
+        position: absolute;
+        z-index: 10;
+        top: 12px;
+        left: 12px;
+        padding: 16px;
+        width: 390px;
+        background: #fffe;
+        border-radius: 8px;
+      }
+      button {
+        margin: 4px;
+        padding: 8px;
+      }
+      #results {
+        white-space: pre-wrap;
+        line-height: 1.7;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <section id="panel">
+      <strong>Ship 回归检查 · 原有 Tooltip 样式</strong>
+      <div>
+        <button id="run" disabled>运行回归检查</button>
+        <button id="rotate" disabled>旋转并倾斜地图</button>
+        <button id="dense" disabled>显示 198 条船舶</button>
+        <button id="destroy" disabled>验证真实地图销毁</button>
+      </div>
+      <div id="results">等待地图加载…</div>
+    </section>
+    <script type="module" src="./browser.ts"></script>
+  </body>
+</html>

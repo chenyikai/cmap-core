@@ -2,8 +2,12 @@ import type { Map as MapboxMap, MapEventType, MapMouseEvent } from 'mapbox-gl'
 
 import type { EventHandler } from '@/types/EventManager'
 
-// 内部存储结构：FeatureId (统一强转为 string) -> EventType -> Callback[]
-type ListenerRegistry = Map<string, Map<string, EventHandler[]>>
+// LayerId -> EventType -> FeatureId -> callbacks
+type FeatureListeners = Map<string, Set<EventHandler>>
+type LayerListeners = Map<MapEventType, FeatureListeners>
+type ListenerRegistry = Map<string, LayerListeners>
+type MapHandler = (e: MapMouseEvent) => void
+type ActiveLayerListeners = Map<string, Map<MapEventType, MapHandler>>
 
 export class EventManager {
   private map: MapboxMap
@@ -11,8 +15,8 @@ export class EventManager {
   // 业务回调注册表
   private listeners: ListenerRegistry = new Map()
 
-  // 记录底层已注册的监听器，防止重复绑定: "layerId:eventType" -> Handler
-  private activeLayerListeners = new Map<string, (e: any) => void>()
+  // 记录底层已注册的监听器，按 layer 和 event 分组，避免依赖字符串拼接解析。
+  private activeLayerListeners: ActiveLayerListeners = new Map()
 
   // 记录当前鼠标悬停的 Feature ID，按 layerId 分开记录，支持多图层同时 hover
   private currentHoverIdByLayer = new Map<string, string>()
@@ -34,30 +38,25 @@ export class EventManager {
     eventType: MapEventType,
     callback: EventHandler,
   ): void {
-    // 🌟 修复核心1：强制转换为 String 键值，避免数字与字符串引起的 Map 查找失败
     const key = String(id)
-
-    if (!this.listeners.has(key)) {
-      this.listeners.set(key, new Map())
-    }
-    const instanceEvents = this.listeners.get(key)
-
-    if (!instanceEvents) {
-      console.error('未找到listener')
-      return
+    let layerListeners = this.listeners.get(layerId)
+    if (!layerListeners) {
+      layerListeners = new Map()
+      this.listeners.set(layerId, layerListeners)
     }
 
-    if (!instanceEvents.has(eventType)) {
-      instanceEvents.set(eventType, [])
+    let featureListeners = layerListeners.get(eventType)
+    if (!featureListeners) {
+      featureListeners = new Map()
+      layerListeners.set(eventType, featureListeners)
     }
 
-    const callbacks = instanceEvents.get(eventType)
-
+    let callbacks = featureListeners.get(key)
     if (!callbacks) {
-      return
+      callbacks = new Set()
+      featureListeners.set(key, callbacks)
     }
-
-    if (!callbacks.includes(callback)) callbacks.push(callback)
+    callbacks.add(callback)
 
     // 确保底层 Mapbox 监听已激活
     this.ensureMapListener(layerId, eventType)
@@ -71,42 +70,43 @@ export class EventManager {
    */
   public off(id: string | number, eventType?: MapEventType, callback?: EventHandler): void {
     const key = String(id)
-    const instanceEvents = this.listeners.get(key)
-    if (!instanceEvents) return
+    for (const [layerId, layerListeners] of this.listeners) {
+      const eventTypes = eventType ? [eventType] : [...layerListeners.keys()]
+      for (const type of eventTypes) {
+        const featureListeners = layerListeners.get(type)
+        const callbacks = featureListeners?.get(key)
+        if (!featureListeners || !callbacks) continue
 
-    // 情况 A: 移除该 ID 的所有监听
-    if (!eventType) {
-      this.listeners.delete(key)
-      return
+        if (callback) callbacks.delete(callback)
+        else callbacks.clear()
+
+        if (callbacks.size === 0) featureListeners.delete(key)
+        if (featureListeners.size === 0) {
+          layerListeners.delete(type)
+          this.releaseMapListenerIfUnused(layerId, type)
+          if (type === 'mouseleave') {
+            this.releaseMapListenerIfUnused(layerId, 'mouseenter')
+          }
+        }
+      }
+
+      if (layerListeners.size === 0) {
+        this.listeners.delete(layerId)
+        this.currentHoverIdByLayer.delete(layerId)
+      }
     }
-
-    const callbacks = instanceEvents.get(eventType)
-    if (!callbacks) return
-
-    // 情况 B: 移除该 ID 下某类型的所有监听
-    if (!callback) {
-      instanceEvents.delete(eventType)
-      return
-    }
-
-    // 情况 C: 移除特定回调
-    const idx = callbacks.indexOf(callback)
-    if (idx !== -1) {
-      callbacks.splice(idx, 1)
-    }
-
-    // 清理空 Map
-    if (callbacks.length === 0) instanceEvents.delete(eventType)
-    if (instanceEvents.size === 0) this.listeners.delete(key)
   }
 
   /**
    * 确保 Mapbox 底层对该图层的该事件进行了监听
    */
   private ensureMapListener(layerId: string, eventType: MapEventType): void {
-    const key = `${layerId}:${eventType}`
-
-    if (this.activeLayerListeners.has(key)) return
+    let activeEvents = this.activeLayerListeners.get(layerId)
+    if (!activeEvents) {
+      activeEvents = new Map()
+      this.activeLayerListeners.set(layerId, activeEvents)
+    }
+    if (activeEvents.has(eventType)) return
 
     // 定义底层通用的分发器
     const handler = (e: MapMouseEvent): void => {
@@ -115,12 +115,29 @@ export class EventManager {
 
     // @ts-expect-error mapbox-gl types mismatch
     this.map.on(eventType, layerId, handler)
-    this.activeLayerListeners.set(key, handler)
+    activeEvents.set(eventType, handler)
 
     // mouseleave 依赖 mouseenter 记录 hover 状态，需确保 mouseenter 底层监听也已激活
     if (eventType === 'mouseleave') {
       this.ensureMapListener(layerId, 'mouseenter' as MapEventType)
     }
+  }
+
+  private releaseMapListenerIfUnused(layerId: string, eventType: MapEventType): void {
+    const layerListeners = this.listeners.get(layerId)
+    const hasBusinessListeners = (layerListeners?.get(eventType)?.size ?? 0) > 0
+    const requiredByMouseleave =
+      eventType === 'mouseenter' && (layerListeners?.get('mouseleave')?.size ?? 0) > 0
+    if (hasBusinessListeners || requiredByMouseleave) return
+
+    const activeEvents = this.activeLayerListeners.get(layerId)
+    const handler = activeEvents?.get(eventType)
+    if (!activeEvents || !handler) return
+
+    // @ts-expect-error mapbox-gl types mismatch
+    this.map.off(eventType, layerId, handler)
+    activeEvents.delete(eventType)
+    if (activeEvents.size === 0) this.activeLayerListeners.delete(layerId)
   }
 
   /**
@@ -163,15 +180,11 @@ export class EventManager {
     }
 
     // 查找并执行业务层注入的回调（使用快照迭代，防止回调内部修改数组导致的问题）
-    const instanceEvents = this.listeners.get(targetId)
-
-    if (instanceEvents) {
-      const callbacks = instanceEvents.get(eventType)
-      if (callbacks) {
-        ;[...callbacks].forEach((fn) => {
-          fn(e)
-        })
-      }
+    const callbacks = this.listeners.get(layerId)?.get(eventType)?.get(targetId)
+    if (callbacks) {
+      ;[...callbacks].forEach((fn) => {
+        fn(e)
+      })
     }
   }
 
@@ -181,16 +194,15 @@ export class EventManager {
    */
   public destroy(): void {
     // 解绑所有底层 Mapbox 事件
-    this.activeLayerListeners.forEach((handler, key) => {
-      // 用 lastIndexOf 分割，避免 layerId 本身含 ':' 时解析错误
-      const sep = key.lastIndexOf(':')
-      const layerId = key.substring(0, sep)
-      const eventType = key.substring(sep + 1) as MapEventType
-      try {
-        this.map.off(eventType, layerId, handler)
-      } catch (err) {
-        // 忽略地图已销毁导致的错误
-      }
+    this.activeLayerListeners.forEach((activeEvents, layerId) => {
+      activeEvents.forEach((handler, eventType) => {
+        try {
+          // @ts-expect-error mapbox-gl types mismatch
+          this.map.off(eventType, layerId, handler)
+        } catch (err) {
+          // 忽略地图已销毁导致的错误
+        }
+      })
     })
 
     this.activeLayerListeners.clear()
