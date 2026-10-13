@@ -48,7 +48,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
   public override onAdd(): void {
     this.context.register.addSource(SHIP_SOURCE_NAME, {
       type: 'geojson',
-      // dynamic: true,
+      dynamic: true,
       data: {
         type: 'FeatureCollection',
         features: [],

@@ -217,6 +217,27 @@ export function shipCompatibilityContract(
   return manager
 }
 
+export function resourceRegisterCompatibilityContract(
+  map: ConstructorParameters<typeof ResourceRegister>[0],
+  source: Parameters<ResourceRegister['addSource']>[1],
+  layer: SortLayer,
+  feature: Parameters<ResourceRegister['setGeoJSONData']>[1],
+): ResourceRegister {
+  const register = new ResourceRegister(map)
+  register.addSource('contract', source)
+  register.addLayer(layer)
+  register.setGeoJSONData('contract', feature)
+  register.findFeature('contract', '0')
+  register.getSource('contract')
+  register.setState('contract', '0', { selected: true })
+  register.getState('contract', '0')
+  register.removeLayer(layer.layer.id)
+  register.removeSource('contract')
+  register.destroy()
+  register.destroy(true)
+  return register
+}
+
 export type PublicTypeContract = [
   AllAnchor,
   Anchor,

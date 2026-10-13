@@ -1,10 +1,11 @@
-import { LngLat, type GeoJSONSource } from 'mapbox-gl'
+import { LngLat } from 'mapbox-gl'
 import '../../src/styles/index.scss'
 import { CMap } from '../../src/modules/CMap'
 import Ship from '../../src/modules/Ship'
 import { AisShip } from '../../src/modules/Ship/plugins/AisShip'
 import { SHIP_SOURCE_NAME } from '../../src/modules/Ship/vars'
 import type { IAisShipOptions } from '../../src/types/Ship'
+import { getSourceSnapshot } from '../../src/core/ResourceRegister/snapshot'
 
 const cmap = new CMap({
   container: 'map',
@@ -50,8 +51,7 @@ const data = (id: string | number, extra: Partial<IAisShipOptions> = {}): IAisSh
   ...extra,
 })
 const snapshot = (): GeoJSON.Feature[] => {
-  const source = map.getSource<GeoJSONSource>(SHIP_SOURCE_NAME)!
-  return (source._data as GeoJSON.FeatureCollection).features
+  return (getSourceSnapshot(map, SHIP_SOURCE_NAME) as GeoJSON.FeatureCollection).features
 }
 function scene(count = 5): void {
   map.jumpTo({ center: [122.25, 29.95], zoom: count > 5 ? 13 : 16, bearing: 0, pitch: 0 })
@@ -107,7 +107,7 @@ async function run(): Promise<void> {
     manager.focus(0)
     manager.removeAll()
     assert(map.getCanvasContainer().style.cursor === '', '鼠标状态残留')
-    assert(!map.getFeatureState({ source: SHIP_SOURCE_NAME, id: 0 }).hover, '悬停状态残留')
+    assert(!map.getFeatureState({ source: SHIP_SOURCE_NAME, id: 0 })?.hover, '悬停状态残留')
     passed.push('✓ ID=0 交互；清空后状态和聚焦框移除')
 
     manager.add(data('pending'))
