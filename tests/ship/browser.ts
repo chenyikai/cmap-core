@@ -1,4 +1,5 @@
 import { LngLat } from 'mapbox-gl'
+import { rhumbDistance } from '@turf/turf'
 import '../../src/styles/index.scss'
 import { CMap } from '../../src/modules/CMap'
 import Ship from '../../src/modules/Ship'
@@ -61,13 +62,15 @@ function scene(count = 5): void {
         name:
           count > 5
             ? `浙渔 ${10000 + i}`
-            : ['正北船体', '向东船体', '向南船体', '向西船体', '静止船体'][i],
+            : ['左转船体', '右转船体', '直航船体', '向西左转', '静止船体'][i],
         position: map.unproject([
           480 + (i % (count > 5 ? 15 : 3)) * (count > 5 ? 42 : 210),
           200 + Math.floor(i / (count > 5 ? 15 : 3)) * (count > 5 ? 32 : 240),
         ]),
         hdg: (i % 4) * 90,
         cog: (i % 4) * 90,
+        speed: count <= 5 && i < 4 ? 1.2 : 0,
+        rot: count <= 5 ? [-25, 25, 0, -25, 0][i] : 0,
       }),
     ),
   )
@@ -101,6 +104,39 @@ async function run(): Promise<void> {
       '地图旋转改变船体地理坐标',
     )
     passed.push('✓ 旋转 90° / 倾斜 45° 后船体坐标稳定')
+
+    for (const rot of [-25, 25]) {
+      manager.add(data(0, { speed: 1.2, rot, width: 40 }))
+      const hull = JSON.stringify(ship.real().geometry)
+      for (const zoom of [16, 18]) {
+        map.jumpTo({ zoom })
+        manager.render()
+        await waitFrames()
+        const geometry = ship.real().geometry
+        assert(
+          geometry.type === 'Polygon' && geometry.coordinates[0].length === 8,
+          '船体含重复短线',
+        )
+        const coordinates = values(JSON.stringify(geometry))
+        assert(
+          values(hull).every((value, i) => Math.abs(value - coordinates[i]) < 1e-8),
+          '缩放改变移动船体轮廓',
+        )
+        const line = ship.headingLine().geometry!
+        assert(line.coordinates.length === 3, '转向小弯丢失')
+        const [start, head, turn] = line.coordinates
+        assert(
+          Math.abs(rhumbDistance(head, turn, { units: 'meters' }) - 20) < 1e-5,
+          '真实船型小弯不是船宽一半',
+        )
+        assert(
+          Math.abs(rhumbDistance(start, head, { units: 'meters' }) - 1.2 * 92.52) < 1e-5,
+          '速度长线长度改变',
+        )
+        assert(snapshot().length === 2, '船体或速度线重复提交')
+      }
+    }
+    passed.push('✓ 真实船型无重复短线；左右转弯为半船宽；长线长度不变')
 
     manager.event.onMove({ features: [{ id: 0 }] } as never)
     assert(ship.isHover, '数字 0 无法悬停')

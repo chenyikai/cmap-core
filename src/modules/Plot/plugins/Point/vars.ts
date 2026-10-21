@@ -1,4 +1,4 @@
-import type { FilterSpecification, LayerSpecification } from 'mapbox-gl'
+import type { ExpressionSpecification, FilterSpecification, LayerSpecification } from 'mapbox-gl'
 
 import type { SortLayer } from '@/core/ResourceRegister'
 import { PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
@@ -25,16 +25,36 @@ export const DEFAULT_CIRCLE_STROKE_COLOR = '#f00'
 const baseRadius = ['coalesce', ['get', 'circle-radius'], DEFAULT_CIRCLE_RADIUS]
 const baseStrokeWidth = ['coalesce', ['get', 'circle-stroke-width'], DEFAULT_CIRCLE_STROKE_WIDTH]
 const baseTextSize = ['coalesce', ['get', 'text-size'], DEFAULT_TEXT_SIZE]
-const calculatedTextOffset = [
+// Zoom expressions must be top-level. Apply the explicit override at every stop
+// so it remains constant across zooms while the automatic offset interpolates.
+const textOffset: ExpressionSpecification = [
   'interpolate',
   ['linear'],
   ['zoom'],
   5,
-  ['coalesce', ['get', '_calcTextOffsetZ5'], ['get', '_calcTextOffset'], [0, 0]],
+  [
+    'coalesce',
+    ['get', 'text-offset'],
+    ['get', '_calcTextOffsetZ5'],
+    ['get', '_calcTextOffset'],
+    ['literal', [0, 0]],
+  ],
   14,
-  ['coalesce', ['get', '_calcTextOffsetZ14'], ['get', '_calcTextOffset'], [0, 0]],
+  [
+    'coalesce',
+    ['get', 'text-offset'],
+    ['get', '_calcTextOffsetZ14'],
+    ['get', '_calcTextOffset'],
+    ['literal', [0, 0]],
+  ],
   22,
-  ['coalesce', ['get', '_calcTextOffsetZ22'], ['get', '_calcTextOffset'], [0, 0]],
+  [
+    'coalesce',
+    ['get', 'text-offset'],
+    ['get', '_calcTextOffsetZ22'],
+    ['get', '_calcTextOffset'],
+    ['literal', [0, 0]],
+  ],
 ]
 
 // 提取 Hover 悬停时的放大倍数
@@ -98,7 +118,7 @@ export const POINT_TEXT_LAYER: LayerSpecification = {
   layout: {
     'text-field': ['get', 'text'],
     'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular'],
-    'text-offset': ['coalesce', ['get', 'text-offset'], calculatedTextOffset, [0, 0]],
+    'text-offset': textOffset,
     'text-anchor': 'top',
     'text-rotate': ['coalesce', ['get', 'text-rotate'], 0],
     'text-allow-overlap': true,

@@ -9,6 +9,7 @@ import * as turf from '@turf/turf'
 import * as lodash from 'lodash-es'
 import EventEmitter from 'eventemitter3'
 import mapbox from 'mapbox-gl'
+import { validate as validateStyle, expression } from 'mapbox-gl/dist/style-spec/index.es.js'
 import polylabel from 'polylabel'
 
 // Execute the real Plot classes with a deterministic map adapter, without WebGL.
@@ -194,14 +195,57 @@ test('Point variants normalize LngLatLike array positions', () => {
 
 test('Point style keeps explicit text offset ahead of the calculated fallback', () => {
   const textOffset = POINT_TEXT_LAYER.layout['text-offset']
-  assert.equal(JSON.stringify(textOffset[1]), JSON.stringify(['get', 'text-offset']))
-  assert.equal(textOffset[2][0], 'interpolate')
-  assert.equal(JSON.stringify(textOffset[2][4][1]), JSON.stringify(['get', '_calcTextOffsetZ5']))
+  assert.equal(textOffset[0], 'interpolate')
+  for (const index of [4, 6, 8]) {
+    assert.equal(JSON.stringify(textOffset[index][1]), JSON.stringify(['get', 'text-offset']))
+  }
+  assert.equal(JSON.stringify(textOffset[4][2]), JSON.stringify(['get', '_calcTextOffsetZ5']))
 
   const iconSize = POINT_ICON_LAYER.layout['icon-size']
   assert.equal(iconSize[4][2], 0.5)
   assert.equal(POINT_TEXT_LAYER.layout['text-allow-overlap'], true)
   assert.equal(POINT_TEXT_COLLISION_LAYER.layout['text-allow-overlap'], false)
+})
+
+test('Point text layers pass the real Mapbox validator and preserve explicit and calculated offsets', () => {
+  const layers = JSON.parse(JSON.stringify([POINT_TEXT_LAYER, POINT_TEXT_COLLISION_LAYER]))
+  const errors = validateStyle({
+    version: 8,
+    glyphs: 'data:application/x-protobuf;base64,#{fontstack}/{range}',
+    sources: {
+      [PLOT_SOURCE_NAME]: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
+    },
+    layers,
+  })
+  assert.deepEqual(
+    errors.map((error) => error.message),
+    [],
+  )
+  const result = expression.createPropertyExpression(layers[0].layout['text-offset'], {
+    type: 'array',
+    value: 'number',
+    length: 2,
+    default: [0, 0],
+    'property-type': 'data-driven',
+    expression: { interpolated: true, parameters: ['zoom', 'feature'] },
+  })
+  assert.equal(result.result, 'success')
+  const properties = {
+    _calcTextOffsetZ5: [0, 1],
+    _calcTextOffsetZ14: [0, 2],
+    _calcTextOffsetZ22: [0, 3],
+  }
+  for (const zoom of [5, 10, 14, 18, 22]) {
+    assert.deepEqual(
+      result.value.evaluate(
+        { zoom },
+        { type: 1, properties: { ...properties, 'text-offset': [2, 4] } },
+      ),
+      [2, 4],
+    )
+  }
+  assert.deepEqual(result.value.evaluate({ zoom: 14 }, { type: 1, properties }), [0, 2])
+  assert.deepEqual(result.value.evaluate({ zoom: 14 }, { type: 1, properties: {} }), [0, 0])
 })
 
 test('IconPoint accepts external icon dimensions and keeps its label gap stable across zooms', () => {

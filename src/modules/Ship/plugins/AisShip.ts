@@ -191,7 +191,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
       const ey = this.options.height / 2
       const coordinate = (x: number, y: number): LngLat =>
         new MercatorCoordinate(center.x + x * units, center.y + y * units).toLngLat()
-      // Preserve the existing short turn decoration, separately from headingLine().
+      // Keep legacy getShape() fields for callers; real() only uses the hull vertices.
       const turn = pixelsToMeters(this.context.map, position.lat, this.options.speed * 3)
 
       return {
@@ -344,19 +344,9 @@ export class AisShip extends BaseShip<IAisShipOptions> {
     if (!shape) {
       return this.icon()
     } else {
-      const {
-        head,
-        rightBow,
-        rightQuarter,
-        rightStern,
-        leftStern,
-        leftQuarter,
-        leftBow,
-        leftDirection,
-        rightDirection,
-        turn,
-      } = shape
-      let points: LngLat[] = [
+      const { head, rightBow, rightQuarter, rightStern, leftStern, leftQuarter, leftBow } = shape
+      // Speed and turn indicators belong exclusively to headingLine(), not the hull outline.
+      const points: LngLat[] = [
         head,
         rightBow,
         rightQuarter,
@@ -366,14 +356,6 @@ export class AisShip extends BaseShip<IAisShipOptions> {
         leftBow,
         head,
       ]
-
-      if (this.orientation === 'left') {
-        points = [leftDirection, turn, ...points, turn, leftDirection]
-      } else if (this.orientation === 'right') {
-        points = [rightDirection, turn, ...points, turn, rightDirection]
-      } else if (this.orientation === 'straight') {
-        points = [turn, ...points, turn]
-      }
 
       const line: GeoJSON.Feature<GeoJSON.LineString, IAisShipOptions> =
         lineString<IAisShipOptions>(points.map((item) => item.toArray()))
@@ -396,6 +378,18 @@ export class AisShip extends BaseShip<IAisShipOptions> {
     }
   }
 
+  private headingTurnLength(): number {
+    // Match the actual hull/icon choice, including missing-dimension icon fallback.
+    if (
+      this.context.map.getZoom() >= (this.options.realZoom ?? 16) &&
+      this.options.width &&
+      this.options.height
+    ) {
+      return this.options.width / 2
+    }
+    return pixelsToMeters(this.context.map, this.position().lat, 10)
+  }
+
   override headingLine(): GeoJSON.Feature<
     GeoJSON.LineString | null,
     { meta: 'directionLine'; 'line-color': string }
@@ -412,24 +406,14 @@ export class AisShip extends BaseShip<IAisShipOptions> {
 
     const path: GeoJSON.Position[] = []
     if (this.orientation === 'left') {
-      const turn = rhumbDestination(
-        head,
-        pixelsToMeters(this.context.map, this.position().toArray()[1], 10),
-        this.direction - 90,
-        {
-          units: 'meters',
-        },
-      )
+      const turn = rhumbDestination(head, this.headingTurnLength(), this.direction - 90, {
+        units: 'meters',
+      })
       path.push(this.position().toArray(), head.geometry.coordinates, turn.geometry.coordinates)
     } else if (this.orientation === 'right') {
-      const turn = rhumbDestination(
-        head,
-        pixelsToMeters(this.context.map, this.position().toArray()[1], 10),
-        this.direction + 90,
-        {
-          units: 'meters',
-        },
-      )
+      const turn = rhumbDestination(head, this.headingTurnLength(), this.direction + 90, {
+        units: 'meters',
+      })
       path.push(this.position().toArray(), head.geometry.coordinates, turn.geometry.coordinates)
     } else if (this.orientation === 'straight') {
       path.push(this.position().toArray(), head.geometry.coordinates)

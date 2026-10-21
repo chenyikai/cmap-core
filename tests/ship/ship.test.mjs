@@ -1,12 +1,13 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import mapbox from 'mapbox-gl'
-import { rhumbBearing, point } from '@turf/turf'
+import { rhumbBearing, rhumbDistance, point } from '@turf/turf'
 import { createMap, load, plain } from '../tooltip/harness.mjs'
 
 const { default: Ship } = load('src/modules/Ship')
 const { AisShip } = load('src/modules/Ship/plugins/AisShip')
 const { ResidentEvent } = load('src/modules/Ship/Events/ResidentEvent')
+const { pixelsToMeters } = load('src/utils/util')
 const data = (id, extra = {}) => ({
   id,
   type: AisShip.NAME,
@@ -229,6 +230,130 @@ test('real hull remains geographically stable across bearing, pitch, zoom and ma
   const bearing = rhumbBearing(point(ship.position().toArray()), point(before.coordinates[0][0]))
   assert.ok(Math.abs(bearing) < 0.001)
   assert.equal(ship.getShape().head instanceof mapbox.Point, true)
+  f.manager.destroy()
+})
+
+test('moving real hulls contain only the closed hull, independent of speed, turn and camera', () => {
+  const f = fixture(),
+    camera = geographicMap(f.map)
+  const ship = f.manager.add(data('hull', { width: 20, height: 100 }))
+  const hull = plain(ship.real().geometry)
+  assert.equal(hull.type, 'Polygon')
+  assert.equal(hull.coordinates[0].length, 8)
+  assert.deepEqual(hull.coordinates[0][0], hull.coordinates[0].at(-1))
+  for (const speed of [0.5, 10, 30]) {
+    for (const rot of [0, -128, -25, 25]) {
+      ship.update({ ...ship.options, speed, rot })
+      camera(75, 45)
+      f.map.setZoom(18)
+      f.map.fire('zoomend')
+      assert.deepEqual(plain(ship.real().geometry), hull)
+      assert.deepEqual(plain(f.features.get('hull').geometry), hull)
+      assert.equal(f.features.size, 2)
+      camera(0, 0)
+      f.map.setZoom(16)
+    }
+  }
+  // Keep the public shape contract even though its legacy decoration is not rendered.
+  for (const key of ['head', 'leftDirection', 'rightDirection', 'turn']) {
+    assert.ok(ship.getShape()[key] instanceof mapbox.Point)
+  }
+  f.manager.destroy()
+})
+
+function assertHeadingLine(ship, turnLength, expectedPoints = 3) {
+  const feature = ship.headingLine()
+  assert.equal(feature.id, `${ship.id}-direction-line`)
+  assert.equal(feature.properties.meta, 'directionLine')
+  const path = plain(feature.geometry.coordinates)
+  assert.equal(path.length, expectedPoints)
+  assert.deepEqual(path[0], ship.position().toArray())
+  const length = rhumbDistance(path[0], path[1], { units: 'meters' })
+  assert.ok(Math.abs(length - ship.options.speed * 92.52) < 0.00001)
+  const angleError = (actual, expected) => Math.abs(((actual - expected + 540) % 360) - 180)
+  assert.ok(angleError(rhumbBearing(path[0], path[1]), ship.direction) < 0.00001)
+  if (expectedPoints === 3) {
+    const length = rhumbDistance(path[1], path[2], { units: 'meters' })
+    assert.ok(Math.abs(length - turnLength) < 0.00001, `${length} != ${turnLength}`)
+    const turnBearing = ship.direction + (ship.options.rot < 0 ? -90 : 90)
+    assert.ok(angleError(rhumbBearing(path[1], path[2]), turnBearing) < 0.00001)
+  }
+  return path
+}
+
+test('real heading-line turns use half the ship width without changing the speed vector', () => {
+  const f = fixture()
+  const ship = f.manager.add(data('turn', { width: 20, height: 100, speed: 10, rot: -25 }))
+  for (const width of [20, 48]) {
+    for (const hdg of [45, 90, 270]) {
+      for (const rot of [-25, 25]) {
+        ship.update({ ...ship.options, width, hdg, rot })
+        f.map.setZoom(15)
+        const iconPath = assertHeadingLine(ship, pixelsToMeters(f.map, ship.position().lat, 10))
+        for (const zoom of [16, 18]) {
+          f.map.setZoom(zoom)
+          f.map.fire('zoomend')
+          assert.equal(ship.getFeature().geometry.type, 'Polygon')
+          const realPath = assertHeadingLine(ship, width / 2)
+          assert.deepEqual(realPath.slice(0, 2), iconPath.slice(0, 2))
+          assert.deepEqual(
+            plain(f.features.get('turn-direction-line').geometry.coordinates),
+            realPath,
+          )
+          assert.equal(f.features.size, 2)
+        }
+      }
+    }
+  }
+  f.manager.destroy()
+})
+
+test('heading-line turn sizing follows custom realZoom and actual icon fallback', () => {
+  const f = fixture()
+  const ship = f.manager.add(
+    data('turn', {
+      width: 36,
+      height: 120,
+      speed: 10,
+      rot: 25,
+      realZoom: 18,
+    }),
+  )
+  for (const zoom of [16, 18, 17, 18]) {
+    f.map.setZoom(zoom)
+    assert.equal(ship.getFeature().geometry.type, zoom >= 18 ? 'Polygon' : 'Point')
+    assertHeadingLine(ship, zoom >= 18 ? 18 : pixelsToMeters(f.map, ship.position().lat, 10))
+  }
+  for (const dimensions of [
+    { width: 36, height: undefined },
+    { width: undefined, height: 120 },
+    { width: 0, height: 120 },
+    { width: 36, height: 0 },
+  ]) {
+    ship.update({ ...ship.options, ...dimensions })
+    assert.equal(ship.getFeature().geometry.type, 'Point')
+    assertHeadingLine(ship, pixelsToMeters(f.map, ship.position().lat, 10))
+  }
+  f.manager.destroy()
+})
+
+test('turning, straight and stopped real ships retain only one heading-line feature', () => {
+  const f = fixture()
+  f.map.setZoom(16)
+  const ship = f.manager.add(data('turn', { width: 20, height: 100, speed: 10, rot: -25 }))
+  for (const rot of [-25, 25, 0, -128]) {
+    ship.update({ ...ship.options, rot })
+    assertHeadingLine(ship, 10, rot === 0 || rot === -128 ? 2 : 3)
+    assert.equal(f.features.get('turn').geometry.coordinates[0].length, 8)
+    assert.equal(f.features.size, 2)
+  }
+  ship.update({ ...ship.options, speed: 0.49, rot: 25 })
+  assert.equal(ship.headingLine().geometry, null)
+  assert.equal(f.features.has('turn-direction-line'), false)
+  assert.equal(f.features.size, 1)
+  ship.update({ ...ship.options, speed: 0.5 })
+  assertHeadingLine(ship, 10)
+  assert.equal(f.features.size, 2)
   f.manager.destroy()
 })
 
