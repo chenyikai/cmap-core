@@ -65,6 +65,11 @@ test('navigation supports a non-root static deployment', () => {
   assert.equal(exampleURL('ship'), '/CMap/examples/ship/index.html')
   assert.equal(guideURL('ship'), '/CMap/examples/index.html?guide=ship')
   assert.ok(read('vite.demo.config.ts').includes('rollupOptions'))
+  assert.ok(
+    read('.github/workflows/pages.yml').includes(
+      'DEMO_BASE_PATH: /${{ github.event.repository.name }}/',
+    ),
+  )
 })
 
 test('Markdown renders headings, code, tables, lists and internal links', () => {

@@ -40,7 +40,7 @@ jobs:
       - name: Validate repository
         run: pnpm run check
         env:
-          DEMO_BASE_PATH: /CMap/
+          DEMO_BASE_PATH: /${{ github.event.repository.name }}/
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

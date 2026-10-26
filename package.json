@@ -1,6 +1,6 @@
 {
   "name": "cmap-core",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "packageManager": "pnpm@10.33.0",
   "type": "module",
   "files": [

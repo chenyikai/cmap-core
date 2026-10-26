@@ -75,14 +75,14 @@ Settings -> Pages -> Build and deployment -> Source -> GitHub Actions
 
 1. 安装固定版本的 Node.js 和 pnpm。
 2. 执行 `pnpm run check`。
-3. 使用 `DEMO_BASE_PATH=/CMap/` 构建 Demo。
+3. 根据 GitHub 仓库名称生成部署前缀，当前使用 `DEMO_BASE_PATH=/cmap-core/` 构建 Demo。
 4. 上传 `dist-demo` 构建产物。
 5. 部署到 GitHub Pages。
 
 默认站点地址：
 
 ```text
-https://chenyikai.github.io/CMap/
+https://chenyikai.github.io/cmap-core/examples/index.html
 ```
 
 Pages 只接收 Actions 构建产物，仓库不再提交 `haitu-demo/` 或 `dist-demo/`。
@@ -96,7 +96,7 @@ Pages 只接收 Actions 构建产物，仓库不再提交 `haitu-demo/` 或 `dis
 使用自定义域名时，需要同步完成两项配置：
 
 1. 在 GitHub Pages 设置中填写域名并配置 DNS。
-2. 将 `pages.yml` 中的 `DEMO_BASE_PATH` 从 `/CMap/` 改为 `/`。
+2. 将 `pages.yml` 中按仓库名生成的 `DEMO_BASE_PATH` 改为 `/`。
 
 ### 前端接口与 Token
 
@@ -208,10 +208,10 @@ pnpm pub:major
 
 ### Pages 页面空白或资源 404
 
-检查构建后的资源地址是否以 `/CMap/assets/` 开头，并确认 `pages.yml` 中：
+检查构建后的资源地址是否以 `/cmap-core/assets/` 开头，并确认 `pages.yml` 中按仓库名设置前缀：
 
 ```yaml
-DEMO_BASE_PATH: /CMap/
+DEMO_BASE_PATH: /${{ github.event.repository.name }}/
 ```
 
 ### 本地正常，但 Pages 接口失败

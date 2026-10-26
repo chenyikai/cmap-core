@@ -76,10 +76,10 @@ pnpm exec vite preview --config vite.demo.config.ts --port 4174
 子目录部署使用一致的构建前缀：
 
 ```bash
-DEMO_BASE_PATH=/CMap/ pnpm run build:demo
+DEMO_BASE_PATH=/cmap-core/ pnpm run build:demo
 ```
 
-部署整个 dist-demo 目录，访问 `/CMap/examples/index.html`。示例导航、源码加载和文档资源都跟随 BASE_URL。仓库现有 GitHub Pages 工作流使用该前缀；这里不执行发布，只生成本地构建产物。
+部署整个 dist-demo 目录，访问 `/cmap-core/examples/index.html`。示例导航、源码加载和文档资源都跟随 BASE_URL。GitHub Pages 工作流根据实际仓库名称生成前缀，避免仓库重命名后资源路径失效；这里的构建命令只生成本地产物，不执行发布。
 
 ## 验证建议
 
