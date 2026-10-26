@@ -1,6 +1,5 @@
 import EventEmitter from 'eventemitter3'
 import { isEmpty } from 'lodash-es'
-import type { GeoJSONSource, SourceSpecification } from 'mapbox-gl'
 import { Map } from 'mapbox-gl'
 
 import IconManager from '@/core/IconManager'
@@ -9,11 +8,8 @@ import type { ICMapOptions } from '@/types/CMap'
 import { MapType } from '@/types/CMap'
 import type { SvgIcon } from '@/types/IconManager'
 
+import { StyleResources } from './StyleResources'
 import { createStyle } from './vars.ts'
-
-// createStyle 生成的底图内置 source/layer，切换时不需要保留
-const BASE_SOURCE_IDS = new Set(['base', 'label'])
-const BASE_LAYER_IDS = new Set(['background', 'base_layer', 'label_layer', 'base-end', 'point-end'])
 
 export class CMap extends EventEmitter {
   public readonly map: Map
@@ -21,6 +17,7 @@ export class CMap extends EventEmitter {
   private cache = new Set<(map: Map) => void>()
   private timer: number | null = null
   private readonly originalRemove: () => void
+  private readonly styleResources: StyleResources
 
   readonly icon: IconManager
 
@@ -41,6 +38,7 @@ export class CMap extends EventEmitter {
     }
 
     this.map = new Map(this.options)
+    this.styleResources = new StyleResources(this.map)
     this.icon = new IconManager(this.map)
 
     this.originalRemove = this.map.remove.bind(this.map)
@@ -86,44 +84,7 @@ export class CMap extends EventEmitter {
   }
 
   change(type: MapType): void {
-    const map = this.getMap()
-    const currentStyle = map.getStyle()
-
-    // 备份自定义 sources（GeoJSON 取运行时 data）
-    const customSources: { id: string; spec: SourceSpecification }[] = Object.entries(
-      currentStyle.sources,
-    )
-      .filter(([id]) => !BASE_SOURCE_IDS.has(id))
-      .map(([id, source]) => {
-        if (source.type === 'geojson') {
-          const runtime: GeoJSONSource = map.getSource(id)!
-          return { id, spec: { ...source, data: runtime._data } as SourceSpecification }
-        }
-        return { id, spec: source as SourceSpecification }
-      })
-
-    // 备份自定义 layers（保持原始顺序）
-    const customLayers = currentStyle.layers.filter((l) => !BASE_LAYER_IDS.has(l.id))
-
-    const restore = (): void => {
-      for (const { id, spec } of customSources) {
-        map.addSource(id, spec)
-      }
-      for (const layer of customLayers) {
-        map.addLayer(layer)
-      }
-    }
-
-    const onStyleData = (): void => {
-      if (map.isStyleLoaded()) {
-        restore()
-      } else {
-        map.once('styledata', onStyleData)
-      }
-    }
-
-    map.setStyle(createStyle(type, this.options.http2, this.options.TDTToken))
-    map.once('styledata', onStyleData)
+    this.styleResources.change(createStyle(type, this.options.http2, this.options.TDTToken))
   }
 
   getMap(): Map {

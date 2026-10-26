@@ -56,19 +56,20 @@ class Focus extends EventEmitter {
   }
 
   get(id: string): FocusItem | undefined {
-    return this.focusItems.find((item) => item.id === id)
+    return this.focusItems.find((item) => String(item.id) === id)
   }
 
   remove(id: string): void {
-    const i = this.focusItems.findIndex((item) => item.id === id)
-    if (i !== -1) {
-      this.focusItems.splice(i, 1)
-    }
+    const i = this.focusItems.findIndex((item) => String(item.id) === id)
+    if (i === -1) return
+    this.focusItems.splice(i, 1)
+    if (this.focusItems.length === 0) this.map.off('zoomend', this.zoomendFunc)
     this.render()
   }
 
   removeAll(): void {
     this.focusItems = []
+    this.map.off('zoomend', this.zoomendFunc)
     this.render()
   }
 
@@ -76,17 +77,11 @@ class Focus extends EventEmitter {
     const source = this.map.getSource<GeoJSONSource>(FOCUS_SOURCE_NAME)
 
     if (source) {
-      if (this.features.length > 0) {
-        source.updateData({
-          type: 'FeatureCollection',
-          features: this.features,
-        })
-      } else {
-        source.setData({
-          type: 'FeatureCollection',
-          features: this.features,
-        })
-      }
+      // A replacement must also remove borders absent from the current list.
+      source.setData({
+        type: 'FeatureCollection',
+        features: this.features,
+      })
     }
   }
 

@@ -2,11 +2,6 @@ import { point } from '@turf/turf'
 import type * as GeoJSON from 'geojson'
 import type { Map } from 'mapbox-gl'
 
-import {
-  PointCreateEvent,
-  PointResidentEvent,
-  PointUpdateEvent,
-} from '@/modules/Plot/plugins/Events/PointEvents.ts'
 import { Point } from '@/modules/Plot/plugins/Point'
 import type { IIconPointOptions } from '@/types/Plot/IconPoint.ts'
 import type { PlotType } from '@/types/Plot/Poi.ts'
@@ -29,10 +24,7 @@ export class IconPoint extends Point<IIconPointOptions> {
   constructor(map: Map, options: IIconPointOptions) {
     super(map, options)
 
-    this.residentEvent = new PointResidentEvent<IconPoint>(map, this)
-    this.updateEvent = new PointUpdateEvent<IconPoint>(map, this)
-    this.createEvent = new PointCreateEvent<IconPoint>(map, this)
-    this.residentEvent.enabled()
+    this.initializeInteraction()
   }
 
   public override onAdd(): void {
@@ -44,7 +36,8 @@ export class IconPoint extends Point<IIconPointOptions> {
   }
 
   public override getFeature(): GeoJSON.Feature<GeoJSON.Point | null> {
-    if (!this.options.position) {
+    const position = this.center
+    if (!position) {
       return {
         type: 'Feature',
         geometry: null,
@@ -53,12 +46,15 @@ export class IconPoint extends Point<IIconPointOptions> {
       }
     }
 
-    const h = this.context.iconManage.getImage(this.options.icon)?.height ?? 0
+    const h =
+      this.options.iconDimensions?.height ??
+      this.context.iconManage.getImage(this.options.icon)?.height ??
+      0
     const scale = this.options.style?.['icon-size'] ?? DEFAULT_ICON_SIZE
     const anchor = this.options.style?.['icon-anchor'] ?? DEFAULT_ICON_ANCHOR
     const tSize = this.options.style?.['text-size'] ?? DEFAULT_TEXT_SIZE
 
-    const calculatedOffset = this.calculateTextOffset({
+    const calculatedOffsets = this.calculateTextOffsets({
       iconHeight: h,
       iconScale: scale,
       iconAnchor: anchor,
@@ -67,7 +63,7 @@ export class IconPoint extends Point<IIconPointOptions> {
     })
 
     return point(
-      this.options.position.toArray(),
+      position.toArray(),
       {
         ...this.options.style,
         ...this.options.properties,
@@ -76,7 +72,8 @@ export class IconPoint extends Point<IIconPointOptions> {
         text: this.options.name,
         visibility: this.options.visibility,
         isName: this.options.isName,
-        _calcTextOffset: calculatedOffset,
+        'text-allow-overlap': this.options.style?.['text-allow-overlap'] ?? true,
+        ...calculatedOffsets,
         meta: 'icon',
       },
       {

@@ -1,0 +1,8 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "declaration": false,
+    "paths": { "@/*": ["src/*"], "cmap-core": ["src/index.ts"] }
+  },
+  "include": ["./**/*.ts", "./**/*.d.ts"]
+}

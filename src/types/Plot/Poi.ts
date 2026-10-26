@@ -1,6 +1,6 @@
 import type { LngLat } from 'mapbox-gl'
 
-export type PlotPosition = LngLat | LineStringPosition | PolygonPosition
+export type PlotPosition = PointPosition | LineStringPosition | PolygonPosition
 
 export type PointPosition = LngLat
 

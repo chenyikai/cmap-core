@@ -22,9 +22,11 @@ import type {
   IArrowLineOptions,
   IBaseShipOptions,
   ICircleOptions,
+  ICirclePointOptions,
   ICMapOptions,
   Icon,
   IconAnchor,
+  IconDimensions,
   IconLoadResult,
   IconPointStyle,
   IContextOptions,
@@ -52,12 +54,15 @@ import type {
   PointInstance,
   PointPosition,
   PointStyle,
+  PointTextStyle,
   PolygonPosition,
   Shape,
   SimpleAnchor,
   SortLayer,
   StyleImageMetadata,
   SvgIcon,
+  TooltipTextStyle,
+  TooltipUpdateOptions,
   TrackItem,
   TrackItemWithLabel,
 } from 'cmap-core'
@@ -66,6 +71,11 @@ import {
   ArrowLine,
   BaseShip,
   Cache,
+  Circle,
+  CircleBaseEvent,
+  CircleCreateEvent,
+  CircleResidentEvent,
+  CircleUpdateEvent,
   CMap,
   Collision,
   CollisionItem,
@@ -124,6 +134,11 @@ export const publicClasses = {
   BaseShip,
   Cache,
   CMap,
+  Circle,
+  CircleBaseEvent,
+  CircleCreateEvent,
+  CircleResidentEvent,
+  CircleUpdateEvent,
   Collision,
   CollisionItem,
   Context,
@@ -158,6 +173,71 @@ export const publicClasses = {
   Track,
 }
 
+export const pointLngLatLikeContract: IPointOptions = {
+  id: 'point-contract',
+  position: [120.38, 36.07],
+  visibility: 'visible',
+}
+
+export const tooltipTextOptions: ITooltipOptions = {
+  position: [120.38, 36.07],
+  text: '浙渔 001',
+  targetRadius: 10,
+}
+
+export function tooltipAutoRenderContract(
+  map: ConstructorParameters<typeof Tooltip>[0],
+  element: HTMLElement,
+): Tooltip {
+  const tooltip = new Tooltip(map, tooltipTextOptions)
+  tooltip.update({ text: '新船名', style: { color: '#333', paddingX: 5 } })
+  tooltip.setLngLat({ lng: 120, lat: 30 })
+  tooltip.update({ element })
+  Tooltip.refreshStyles(map)
+  return tooltip
+}
+
+export function shipCompatibilityContract(
+  map: ConstructorParameters<typeof Ship>[0],
+  data: IAisShipOptions,
+  tooltip: Tooltip,
+): Ship {
+  const manager = new Ship(map, { plugins: [AisShip] })
+  manager.add(data)
+  manager.load([data])
+  manager.get(data.id)?.setTooltip(tooltip)
+  manager.get(String(data.id))?.update(data)
+  manager.focus(data.id)
+  manager.unfocus(data.id)
+  manager.select(data.id)
+  manager.unselect(data.id)
+  manager.render()
+  manager.remove(data.id)
+  manager.removeAll()
+  return manager
+}
+
+export function resourceRegisterCompatibilityContract(
+  map: ConstructorParameters<typeof ResourceRegister>[0],
+  source: Parameters<ResourceRegister['addSource']>[1],
+  layer: SortLayer,
+  feature: Parameters<ResourceRegister['setGeoJSONData']>[1],
+): ResourceRegister {
+  const register = new ResourceRegister(map)
+  register.addSource('contract', source)
+  register.addLayer(layer)
+  register.setGeoJSONData('contract', feature)
+  register.findFeature('contract', '0')
+  register.getSource('contract')
+  register.setState('contract', '0', { selected: true })
+  register.getState('contract', '0')
+  register.removeLayer(layer.layer.id)
+  register.removeSource('contract')
+  register.destroy()
+  register.destroy(true)
+  return register
+}
+
 export type PublicTypeContract = [
   AllAnchor,
   Anchor,
@@ -182,6 +262,7 @@ export type PublicTypeContract = [
   IArrowLineOptions,
   IBaseShipOptions,
   ICircleOptions,
+  ICirclePointOptions,
   ICMapOptions,
   IContextOptions,
   Id,
@@ -201,6 +282,7 @@ export type PublicTypeContract = [
   ITrackOptions,
   Icon,
   IconAnchor,
+  IconDimensions,
   IconLoadResult,
   IconPointStyle,
   IndexPointStyle,
@@ -212,6 +294,7 @@ export type PublicTypeContract = [
   PointInstance,
   PointPosition,
   PointStyle,
+  PointTextStyle,
   PolygonPosition,
   Shape,
   SimpleAnchor,
@@ -220,4 +303,6 @@ export type PublicTypeContract = [
   SvgIcon,
   TrackItem,
   TrackItemWithLabel,
+  TooltipTextStyle,
+  TooltipUpdateOptions,
 ]

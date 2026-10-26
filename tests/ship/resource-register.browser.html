@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ResourceRegister 回归检查</title>
+    <style>
+      body {
+        margin: 0;
+        font:
+          14px system-ui,
+          sans-serif;
+      }
+      #map {
+        position: absolute;
+        inset: 0;
+      }
+      #panel {
+        position: relative;
+        margin: 20px;
+        padding: 20px;
+        width: 510px;
+        background: #fffffff2;
+        border-radius: 8px;
+      }
+      #results {
+        white-space: pre-wrap;
+        line-height: 1.9;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <section id="panel">
+      <h2>ResourceRegister · 真实 Mapbox 回归</h2>
+      <p>验证 updateData 增量、Worker 实际内容及连续底图切换。</p>
+      <div id="results">等待地图加载…</div>
+    </section>
+    <script type="module" src="./resource-register.browser.ts"></script>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-import type { IPointOptions } from '@/types/Plot/Point.ts'
+import type { IPointOptions, PointTextStyle } from '@/types/Plot/Point.ts'
 
 export type IconAnchor =
   | 'center'
@@ -11,17 +11,21 @@ export type IconAnchor =
   | 'bottom-left'
   | 'bottom-right'
 
-export interface IconPointStyle {
-  'text-color'?: string
-  'text-size'?: number
+export interface IconPointStyle extends PointTextStyle {
   'icon-size'?: number
   'icon-rotate'?: number
-  'text-offset'?: [number, number]
   'icon-anchor'?: IconAnchor
 }
 
-export interface IIconPointOptions extends IPointOptions {
+export interface IconDimensions {
+  width: number
+  height: number
+}
+
+export interface IIconPointOptions extends IPointOptions<IconPointStyle> {
   icon: string
+  /** 使用 map.addImage() 直接注册图标时，可通过此字段提供布局尺寸。 */
+  iconDimensions?: IconDimensions
   style?: IconPointStyle
 }
 

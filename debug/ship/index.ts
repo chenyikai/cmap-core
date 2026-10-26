@@ -1,35 +1,58 @@
-import { LngLat, type Map } from 'mapbox-gl'
+import { LngLatBounds, type Map } from 'mapbox-gl'
 import type { TabPageApi } from '@tweakpane/core' // 注意：从 core 导入类型
 import { AisShip, Ship } from '@/index'
 import { logEvent } from '../utils/logger'
 import { staticShipData } from './mock'
+import { toShipOptions } from './mockAdapter'
+import { COASTAL_REGIONS, createShipMockData, type CoastalRegionId } from './mockGenerator'
 
 let shipManager: Ship | null = null
 
 export function initShipDebug(map: Map, folder: TabPageApi) {
+  const params = { region: 'all', count: 6000, tooltip: true }
+  folder.addBinding(params, 'region', {
+    label: 'Mock 范围',
+    options: {
+      '中国沿海（全部）': 'all',
+      ...Object.fromEntries(COASTAL_REGIONS.map((region) => [region.name, region.id])),
+      '原舟山样本（198 艘）': 'legacy',
+    },
+  })
+  folder.addBinding(params, 'count', {
+    label: '生成数量',
+    options: { '1,000 艘': 1000, '6,000 艘': 6000, '20,000 艘（压力测试）': 20000 },
+  })
+  folder.addBinding(params, 'tooltip', { label: '加载船名' })
+
   folder.addButton({ title: '加载海量船舶 (Mock)' }).on('click', () => {
     if (!shipManager) {
       shipManager = new Ship(map, { plugins: [AisShip] })
     }
 
-    const list = staticShipData.map((item: any) => ({
-      type: 'Ais',
-      direction: item.hdg || 0,
-      height: item.length,
-      width: item.width,
-      id: item.mmsi,
-      name: item.cnname || item.mmsi,
-      position: new LngLat(Number(item.location.split(',')[1]), Number(item.location.split(',')[0])),
-      speed: item.sog,
-      hdg: item.hdg || 0,
-      cog: item.cog,
-      rot: item.rot,
-      time: item.updateTime,
-      tooltip: true,
-    }))
+    const data =
+      params.region === 'legacy'
+        ? staticShipData
+        : createShipMockData({
+            count: params.count,
+            region: params.region as CoastalRegionId | 'all',
+          })
+    const list = data.map((item) => toShipOptions(item, params.tooltip))
 
     shipManager.load(list)
-    logEvent('船舶加载完毕', { count: list.length })
+    const bounds = new LngLatBounds()
+    for (const ship of list) bounds.extend(ship.position)
+    if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 80, maxZoom: 14, duration: 700 })
+    logEvent('船舶加载完毕', {
+      count: list.length,
+      region: params.region,
+      note:
+        params.region === 'legacy'
+          ? '原舟山样本'
+          : '合成 Mock，非真实船位；放大地图可检查船名与船体轮廓',
+      vesselTypes: new Set(
+        data.flatMap((item) => ('mock' in item && item.mock ? [item.mock.vesselType] : [])),
+      ).size,
+    })
   })
 
   folder.addBlade({ view: 'separator' })

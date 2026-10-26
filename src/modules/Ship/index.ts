@@ -1,29 +1,30 @@
 import type { Map as MapboxGlMap } from 'mapbox-gl'
 
-import Collision from '@/core/Collision'
 import { Module } from '@/core/Module'
 import type { Tooltip } from '@/core/Tooltip'
 import type { BaseShip } from '@/modules/Ship/BaseShip.ts'
 import { ResidentEvent } from '@/modules/Ship/Events/ResidentEvent'
-import type { CollisionItemOptions } from '@/types/Collision/item.ts'
 import type { IShipOptions } from '@/types/Ship'
 import type { BaseShipConstructor, IBaseShipOptions } from '@/types/Ship/BaseShip.ts'
-import type { Anchor } from '@/types/Toolip'
 
 class Ship extends Module {
   options: IShipOptions
-  ships: BaseShip<any>[] = []
+  ships: BaseShip<IBaseShipOptions>[] = []
   event: ResidentEvent
 
   private pluginRegistry = new Map<string, BaseShipConstructor>()
-  private collision: Collision<Anchor>
+  private readonly shipIndex = new Map<string, BaseShip<IBaseShipOptions>>()
   private focusId: IBaseShipOptions['id'] | null = null
+  private removed = false
+
+  protected override get mapLifecycleEvent(): 'remove' {
+    return 'remove'
+  }
 
   constructor(map: MapboxGlMap, options: IShipOptions) {
     super(map)
     this.options = options
-    this.collision = new Collision<Anchor>(this.context.map)
-    this.event = new ResidentEvent(map)
+    this.event = new ResidentEvent(map, undefined, this.shipIndex)
 
     this.registerPlugins(options.plugins)
   }
@@ -32,7 +33,10 @@ class Ship extends Module {
     // throw new Error('Method not implemented.')
   }
   override onRemove(): void {
-    // throw new Error('Method not implemented.')
+    if (this.removed) return
+    this.removed = true
+    this.removeAll()
+    this.event.destroy()
   }
 
   get tooltips(): Tooltip[] {
@@ -49,28 +53,15 @@ class Ship extends Module {
     })
   }
 
-  private createCollisions(): CollisionItemOptions<Anchor>[] {
-    return this.tooltips.map((tooltip) => ({
-      id: tooltip.id,
-      positions: tooltip.getAllBbox(),
-      priority: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
-    }))
-  }
-
-  private collisionTooltip(): void {
-    this.collision.load(this.createCollisions()).forEach((collision) => {
-      const tooltip = this.tooltips.find((tooltip) => tooltip.id === collision.id)
-      if (!tooltip) return
-
-      if (collision.visible) {
-        tooltip.setAnchor(collision.dir)
-      }
-      //   tooltip.hide()
-      // }
-    })
-  }
-
   add(data: IBaseShipOptions): BaseShip<any> | undefined {
+    const previous = this.get(data.id)
+    const ship = this.upsert(data)
+    if (ship && ship !== previous) this.ships.push(ship)
+    return ship
+  }
+
+  private upsert(data: IBaseShipOptions): BaseShip<IBaseShipOptions> | undefined {
+    if (this.removed || this.mapRemoved) return undefined
     const Constructor = this.pluginRegistry.get(data.type)
 
     if (!Constructor) {
@@ -78,57 +69,71 @@ class Ship extends Module {
       return undefined
     }
 
-    const ship = new Constructor(this.context.map, data)
-    this.ships.push(ship)
+    const existing = this.shipIndex.get(String(data.id))
+    if (existing?.options.type === data.type) {
+      // Keep the original Feature ID type; lookups accept either numeric or string IDs.
+      existing.update({ ...data, id: existing.id })
+      return existing
+    }
+    if (existing) this.remove(existing.id)
+
+    const ship = new Constructor(this.context.map, data) as BaseShip<IBaseShipOptions>
     this.event.add(ship)
+    ship.render()
 
     return ship
   }
 
   load(list: IBaseShipOptions[]): BaseShip<any>[] {
-    this.removeAll()
+    if (this.removed || this.mapRemoved) return []
+    const focusedId = this.focusId
+    const restoreFocus = focusedId != null && this.shipIndex.get(String(focusedId))?.isFocus
+    // One authoritative instance per ID. Duplicate input uses the last record.
+    const incoming = new Map(list.map((item) => [String(item.id), item]))
+    for (const [key, ship] of this.shipIndex) {
+      const next = incoming.get(key)
+      if (next?.type !== ship.options.type) this.removeEntry(ship)
+    }
 
-    const newShips: BaseShip<any>[] = []
-    list.forEach((item) => {
-      const ship = this.add(item)
+    const newShips: BaseShip<IBaseShipOptions>[] = []
+    incoming.forEach((item) => {
+      const ship = this.upsert(item)
       if (ship) {
         newShips.push(ship)
       }
     })
 
-    this.render()
-
-    this.collisionTooltip()
-
-    if (this.focusId) {
-      const ship = this.get(this.focusId)
-      if (ship) {
-        ship.focus()
-      }
+    this.ships = newShips
+    if (restoreFocus) {
+      const ship = this.shipIndex.get(String(focusedId))
+      if (ship && !ship.isFocus) this.focus(ship.id)
     }
 
-    return newShips
+    return [...newShips]
   }
 
   remove(id: IBaseShipOptions['id']): void {
-    this.event.remove(id)
+    const ship = this.shipIndex.get(String(id))
+    if (!ship) return
+    this.removeEntry(ship)
+    this.ships = this.ships.filter((item) => item !== ship)
+  }
 
-    const i = this.ships.findIndex((ship) => ship.id === id)
-    if (i !== -1) {
-      this.ships[i].remove()
-      this.ships.splice(i, 1)
-    }
+  private removeEntry(ship: BaseShip<IBaseShipOptions>): void {
+    this.event.remove(ship.id)
+    ship.remove()
+    if (this.focusId != null && String(this.focusId) === String(ship.id)) this.focusId = null
   }
 
   removeAll(): void {
-    this.collision.clear()
-
-    this.ships.forEach((ship) => {
+    const ships = [...this.shipIndex.values()]
+    this.event.removeAll()
+    ships.forEach((ship) => {
       ship.remove()
     })
     this.ships = []
 
-    this.event.removeAll()
+    this.focusId = null
   }
 
   render(): void {
@@ -138,14 +143,21 @@ class Ship extends Module {
   }
 
   get(id: string | number): BaseShip<any> | undefined {
-    return this.ships.find((item) => item.id === id)
+    return this.shipIndex.get(String(id))
+  }
+
+  private changeFocus(ship: BaseShip<IBaseShipOptions>): void {
+    if (this.focusId != null && String(this.focusId) !== String(ship.id)) {
+      this.get(this.focusId)?.unselect()
+    }
+    this.focusId = ship.id
   }
 
   focus(id: IBaseShipOptions['id']): void {
-    const ship = this.get(id)
+    const ship = this.shipIndex.get(String(id))
     if (ship) {
+      this.changeFocus(ship)
       ship.focus()
-      this.focusId = ship.id
     } else {
       console.warn(`The ship-${String(id)} was not found.`)
     }
@@ -155,17 +167,17 @@ class Ship extends Module {
     const ship = this.get(id)
     if (ship) {
       ship.unfocus()
-      this.focusId = null
+      if (String(this.focusId) === String(ship.id)) this.focusId = null
     } else {
       console.warn(`The ship-${String(id)} was not found.`)
     }
   }
 
   select(id: IBaseShipOptions['id']): void {
-    const ship = this.get(id)
+    const ship = this.shipIndex.get(String(id))
     if (ship) {
+      this.changeFocus(ship)
       ship.select()
-      this.focusId = ship.id
     } else {
       console.warn(`The ship-${String(id)} was not found.`)
     }
@@ -175,7 +187,7 @@ class Ship extends Module {
     const ship = this.get(id)
     if (ship) {
       ship.unselect()
-      this.focusId = null
+      if (String(this.focusId) === String(ship.id)) this.focusId = null
     } else {
       console.warn(`The ship-${String(id)} was not found.`)
     }

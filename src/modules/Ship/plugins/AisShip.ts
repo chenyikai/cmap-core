@@ -2,7 +2,7 @@ import { lineString, lineToPolygon, point, rhumbDestination, transformRotate } f
 import dayjs from 'dayjs'
 import type * as GeoJSON from 'geojson'
 import type { LngLat, Map } from 'mapbox-gl'
-import { Point } from 'mapbox-gl'
+import { MercatorCoordinate, Point } from 'mapbox-gl'
 
 import { Tooltip } from '@/core/Tooltip/index.ts'
 import { BaseShip } from '@/modules/Ship/BaseShip.ts'
@@ -12,33 +12,43 @@ import type { Orientation, Shape } from '@/types/Ship/BaseShip'
 import { distanceToPx, pixelsToMeters } from '@/utils/util.ts'
 
 export class AisShip extends BaseShip<IAisShipOptions> {
+  private nameTooltip: Tooltip | null = null
+  private removed = false
+  private pendingFocus: (() => void) | null = null
+  private renderKey: string | null = null
+  private focusVisible = false
   override readonly SOURCE: string = SHIP_SOURCE_NAME
   static override NAME: string = NAME
 
   constructor(map: Map, options: IAisShipOptions) {
     super(map, options)
 
-    if (this.options.tooltip) {
-      this.setTooltip(
-        new Tooltip(this.context.map, {
-          id: this.id,
-          position: this.position(),
-          className: 'mapbox-gl-ship-name-tooltip',
-          offsetX: 5,
-          offsetY: 25,
-          element: this.label(),
-          anchor: 'bottom-right',
-          line: true,
-          visible: false,
-        }),
-      )
-    }
+    if (this.options.tooltip) this.createNameTooltip()
+  }
+
+  private createNameTooltip(): void {
+    const targetRadius = this.labelTargetRadius()
+    this.nameTooltip = new Tooltip(this.context.map, {
+      id: this.id,
+      position: this.position(),
+      className: 'mapbox-gl-ship-name-tooltip',
+      offsetX: 5,
+      offsetY: Math.max(25, targetRadius + 4),
+      text: this.options.name,
+      theme: 'ship',
+      collision: true,
+      targetRadius,
+      anchor: 'bottom-right',
+      line: true,
+      visible: true,
+    })
+    this.tooltip = this.nameTooltip
   }
 
   public override onAdd(): void {
     this.context.register.addSource(SHIP_SOURCE_NAME, {
       type: 'geojson',
-      // dynamic: true,
+      dynamic: true,
       data: {
         type: 'FeatureCollection',
         features: [],
@@ -53,7 +63,7 @@ export class AisShip extends BaseShip<IAisShipOptions> {
     // await this.context.iconManage.load(SHIP_ICON)
   }
   public override onRemove(): void {
-    throw new Error('Method not implemented.')
+    this.remove()
   }
 
   override get id(): string | number {
@@ -164,22 +174,37 @@ export class AisShip extends BaseShip<IAisShipOptions> {
   }
 
   override getShape(): Shape | null {
+    const shape = this.geographicShape()
+    if (!shape) return null
+    return Object.fromEntries(
+      Object.entries(shape).map(([key, position]) => [key, this.context.map.project(position)]),
+    ) as unknown as Shape
+  }
+
+  /** Build the hull in local metre coordinates, independent of the camera bearing/pitch. */
+  private geographicShape(): Record<keyof Shape, LngLat> | null {
     if (this.options.width && this.options.height) {
-      const { x, y }: Point = this.context.map.project(this.position())
-      const ex: number = distanceToPx(this.context.map, this.options.width) / 2
-      const ey: number = distanceToPx(this.context.map, this.options.height) / 2
+      const position = this.position()
+      const center = MercatorCoordinate.fromLngLat(position)
+      const units = center.meterInMercatorCoordinateUnits()
+      const ex = this.options.width / 2
+      const ey = this.options.height / 2
+      const coordinate = (x: number, y: number): LngLat =>
+        new MercatorCoordinate(center.x + x * units, center.y + y * units).toLngLat()
+      // Keep legacy getShape() fields for callers; real() only uses the hull vertices.
+      const turn = pixelsToMeters(this.context.map, position.lat, this.options.speed * 3)
 
       return {
-        leftDirection: new Point(x - ex, y - ey * 2),
-        rightDirection: new Point(x + ex, y - ey * 2),
-        turn: new Point(x, y - ey - this.options.speed * 3),
-        head: new Point(x, y - ey),
-        rightBow: new Point(x + ex, y - ey * 0.5),
-        rightQuarter: new Point(x + ex, y + ey * 0.85),
-        rightStern: new Point(x + ex * 0.7, y + ey),
-        leftStern: new Point(x - ex * 0.7, y + ey),
-        leftQuarter: new Point(x - ex, y + ey * 0.85),
-        leftBow: new Point(x - ex, y - ey * 0.5),
+        leftDirection: coordinate(-ex, -ey * 2),
+        rightDirection: coordinate(ex, -ey * 2),
+        turn: coordinate(0, -ey - turn),
+        head: coordinate(0, -ey),
+        rightBow: coordinate(ex, -ey * 0.5),
+        rightQuarter: coordinate(ex, ey * 0.85),
+        rightStern: coordinate(ex * 0.7, ey),
+        leftStern: coordinate(-ex * 0.7, ey),
+        leftQuarter: coordinate(-ex, ey * 0.85),
+        leftBow: coordinate(-ex, -ey * 0.5),
       }
     } else {
       return null
@@ -198,12 +223,18 @@ export class AisShip extends BaseShip<IAisShipOptions> {
     }
   }
   override remove(): void {
+    if (this.removed) return
+    this.removed = true
+    this.cancelSelection()
+    this.detachLifecycle()
     this.removeTooltip()
-
-    if (this.isFocus) {
-      this.unfocus()
+    // Mapbox fires remove after disposing its style and canvas. Only release local handles then.
+    if (this.mapRemoved) return
+    if (this.focusVisible) {
       this.context.focus.remove(String(this.id))
+      this.focusVisible = false
     }
+    this.context.map.removeFeatureState({ source: this.SOURCE, id: this.id })
 
     const emptyFeature: GeoJSON.Feature<null> = {
       type: 'Feature',
@@ -223,39 +254,69 @@ export class AisShip extends BaseShip<IAisShipOptions> {
     this.context.map.triggerRepaint()
   }
   override setTooltip(tooltip: Tooltip): void {
+    if (this.removed) return
+    if (this.tooltip && this.tooltip !== tooltip) this.tooltip.remove()
+    this.nameTooltip = null
     this.tooltip = tooltip
+    this.renderKey = null
   }
 
   override removeTooltip(): void {
     this.tooltip?.remove()
     this.tooltip = null
+    this.nameTooltip = null
+    this.renderKey = null
   }
 
   override update(options: IAisShipOptions): void {
+    if (this.removed || this.mapRemoved) return
+    const tooltipChanged = !!this.options.tooltip !== !!options.tooltip
     this.options = options
-    this.render()
+    if (tooltipChanged) {
+      if (this.nameTooltip && !options.tooltip) this.removeTooltip()
+      else if (options.tooltip && !this.tooltip) this.createNameTooltip()
+    }
+    if (this.currentRenderKey() !== this.renderKey) this.render()
   }
 
   override select(): void {
+    if (this.removed || this.mapRemoved) return
+    this.cancelSelection()
+    this.context.map.stop()
+    const focus = (): void => {
+      if (this.pendingFocus !== focus) return
+      this.cancelSelection()
+      this.focus()
+    }
+    this.pendingFocus = focus
+    this.context.map.once('moveend', focus)
     this.context.map.flyTo({
       center: this.position(),
       zoom: 16,
     })
 
-    this.context.map.once('moveend', () => {
-      this.focus()
-    })
+    if (!this.context.map.isMoving()) focus()
+  }
+
+  private cancelSelection(): void {
+    if (!this.pendingFocus) return
+    this.context.map.off('moveend', this.pendingFocus)
+    this.pendingFocus = null
   }
   override unselect(): void {
     this.unfocus()
   }
 
   override focus(): void {
+    if (this.removed || this.mapRemoved) return
+    this.cancelSelection()
     this.setState({ focus: true })
 
     this.render()
   }
   override unfocus(): void {
+    this.cancelSelection()
+    if (this.removed || this.mapRemoved) return
     this.setState({ focus: false })
 
     this.render()
@@ -278,24 +339,14 @@ export class AisShip extends BaseShip<IAisShipOptions> {
   override real():
     | GeoJSON.Feature<GeoJSON.Polygon, IAisShipOptions>
     | GeoJSON.Feature<GeoJSON.Point, IAisShipOptions> {
-    const shape = this.getShape()
+    const shape = this.geographicShape()
 
     if (!shape) {
       return this.icon()
     } else {
-      const {
-        head,
-        rightBow,
-        rightQuarter,
-        rightStern,
-        leftStern,
-        leftQuarter,
-        leftBow,
-        leftDirection,
-        rightDirection,
-        turn,
-      } = shape
-      let points: Point[] = [
+      const { head, rightBow, rightQuarter, rightStern, leftStern, leftQuarter, leftBow } = shape
+      // Speed and turn indicators belong exclusively to headingLine(), not the hull outline.
+      const points: LngLat[] = [
         head,
         rightBow,
         rightQuarter,
@@ -306,18 +357,8 @@ export class AisShip extends BaseShip<IAisShipOptions> {
         head,
       ]
 
-      if (this.orientation === 'left') {
-        points = [leftDirection, turn, ...points, turn, leftDirection]
-      } else if (this.orientation === 'right') {
-        points = [rightDirection, turn, ...points, turn, rightDirection]
-      } else if (this.orientation === 'straight') {
-        points = [turn, ...points, turn]
-      }
-
       const line: GeoJSON.Feature<GeoJSON.LineString, IAisShipOptions> =
-        lineString<IAisShipOptions>(
-          points.map((item) => this.context.map.unproject(item).toArray()),
-        )
+        lineString<IAisShipOptions>(points.map((item) => item.toArray()))
 
       let ship: GeoJSON.Feature<GeoJSON.Polygon, IAisShipOptions> = lineToPolygon(line, {
         properties: {
@@ -337,6 +378,18 @@ export class AisShip extends BaseShip<IAisShipOptions> {
     }
   }
 
+  private headingTurnLength(): number {
+    // Match the actual hull/icon choice, including missing-dimension icon fallback.
+    if (
+      this.context.map.getZoom() >= (this.options.realZoom ?? 16) &&
+      this.options.width &&
+      this.options.height
+    ) {
+      return this.options.width / 2
+    }
+    return pixelsToMeters(this.context.map, this.position().lat, 10)
+  }
+
   override headingLine(): GeoJSON.Feature<
     GeoJSON.LineString | null,
     { meta: 'directionLine'; 'line-color': string }
@@ -353,24 +406,14 @@ export class AisShip extends BaseShip<IAisShipOptions> {
 
     const path: GeoJSON.Position[] = []
     if (this.orientation === 'left') {
-      const turn = rhumbDestination(
-        head,
-        pixelsToMeters(this.context.map, this.position().toArray()[1], 10),
-        this.direction - 90,
-        {
-          units: 'meters',
-        },
-      )
+      const turn = rhumbDestination(head, this.headingTurnLength(), this.direction - 90, {
+        units: 'meters',
+      })
       path.push(this.position().toArray(), head.geometry.coordinates, turn.geometry.coordinates)
     } else if (this.orientation === 'right') {
-      const turn = rhumbDestination(
-        head,
-        pixelsToMeters(this.context.map, this.position().toArray()[1], 10),
-        this.direction + 90,
-        {
-          units: 'meters',
-        },
-      )
+      const turn = rhumbDestination(head, this.headingTurnLength(), this.direction + 90, {
+        units: 'meters',
+      })
       path.push(this.position().toArray(), head.geometry.coordinates, turn.geometry.coordinates)
     } else if (this.orientation === 'straight') {
       path.push(this.position().toArray(), head.geometry.coordinates)
@@ -397,27 +440,73 @@ export class AisShip extends BaseShip<IAisShipOptions> {
     )
   }
 
+  private currentRenderKey(): string {
+    // Compare values, not object references: callers often recreate unchanged AIS records.
+    return JSON.stringify([
+      this.options,
+      this.context.map.getZoom(),
+      this.updateStatus,
+      this.isHover,
+      this.isFocus,
+      // Legacy offset/heading calculations use the map-center latitude.
+      this.context.map.getCenter().lat,
+    ])
+  }
+
   override render(): void {
-    const bounds = this.context.map.getBounds()
-    if (!bounds?.contains(this.position())) {
-      this.tooltip?.hide()
-      return
+    if (this.removed || this.mapRemoved) return
+    const key = this.currentRenderKey()
+    // Text and position updates reuse the label and its cached bitmap.
+    if (this.tooltip) {
+      const position = this.position()
+      const changedText =
+        this.tooltip === this.nameTooltip && this.tooltip.options.text !== this.options.name
+      const targetRadius = this.labelTargetRadius()
+      this.tooltip.update({
+        position,
+        ...(this.tooltip === this.nameTooltip
+          ? { targetRadius, offsetY: Math.max(25, targetRadius + 4) }
+          : {}),
+        ...(changedText ? { text: this.options.name } : {}),
+      })
     }
-
-    this.tooltip?.render()
-
-    this.context.register.setGeoJSONData(this.SOURCE, [this.headingLine(), this.getFeature()])
+    // Keep geometry in sync even offscreen; Mapbox performs viewport culling itself.
+    // Otherwise panning reveals a Tooltip whose ship feature was never submitted.
+    const feature = this.getFeature()
+    this.context.register.setGeoJSONData(this.SOURCE, [this.headingLine(), feature])
 
     if (this.isFocus) {
       const icon = this.context.iconManage.getImage(this.getIconName())
-      this.context.focus.set(this.getFeature(), {
-        size: icon?.width,
-        armLength: 10,
-        padding: 10,
-      })
-    } else {
+      this.context.focus.set(
+        { ...feature, id: String(this.id) },
+        {
+          size: icon?.width,
+          armLength: 10,
+          padding: 10,
+        },
+      )
+      this.focusVisible = true
+    } else if (this.focusVisible) {
       this.context.focus.remove(String(this.id))
+      this.focusVisible = false
     }
+    this.renderKey = key
+  }
+
+  /** Protect the ship body/icon during label layout; independent of its heading line. */
+  private labelTargetRadius(): number {
+    const zoom = this.context.map.getZoom()
+    if (zoom >= (this.options.realZoom ?? 16) && this.options.width && this.options.height) {
+      return distanceToPx(this.context.map, Math.hypot(this.options.width, this.options.height)) / 2
+    }
+    const image = this.context.iconManage.getImage(this.getIconName())
+    // The built-in AIS triangle is 33 x 49; custom registered images use their actual size.
+    const width = image?.width ?? 33
+    const height = image?.height ?? 49
+    const min = this.options.minIconSize ?? 0.2
+    const max = this.options.maxIconSize ?? 0.5
+    const scale = min + (max - min) * Math.max(0, Math.min(1, zoom / 19))
+    return (Math.hypot(width, height) * scale) / 2
   }
   override label(): HTMLElement {
     const id = `${String(this.id)}-ship-name-box`

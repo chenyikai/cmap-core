@@ -1,6 +1,6 @@
 import { point } from '@turf/turf'
 import type * as GeoJSON from 'geojson'
-import type { LngLat, Map } from 'mapbox-gl'
+import { LngLat, type LngLatLike, type Map } from 'mapbox-gl'
 
 import { Poi } from '@/modules/Plot/plugins/Poi.ts'
 import {
@@ -15,28 +15,49 @@ import {
 import { EMPTY_SOURCE, PLOT_SOURCE_NAME } from '@/modules/Plot/vars.ts'
 import type { CalcOffsetParams } from '@/types/Plot/IconPoint.ts'
 import type { PlotType } from '@/types/Plot/Poi.ts'
-import type { IPointOptions } from '@/types/Plot/Point.ts'
+import type { CirclePointStyle, ICirclePointOptions, IPointOptions } from '@/types/Plot/Point.ts'
 
 import { PointCreateEvent, PointResidentEvent, PointUpdateEvent } from '../Events/PointEvents'
 
-export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJSON.Point | null> {
+function normalizeOptions<T extends IPointOptions>(options: T): T {
+  return {
+    ...options,
+    position: options.position == null ? undefined : LngLat.convert(options.position),
+  }
+}
+
+export class Point<T extends IPointOptions = ICirclePointOptions> extends Poi<
+  T,
+  GeoJSON.Point | null
+> {
   static NAME: PlotType = NAME
 
   override readonly LAYER: string = POINT_CIRCLE_LAYER_NAME
 
-  public residentEvent: PointResidentEvent
+  protected removed = false
 
-  public updateEvent: PointUpdateEvent
+  private interactionInitialized = false
 
-  public createEvent: PointCreateEvent
+  public residentEvent: PointResidentEvent<this>
+
+  public updateEvent: PointUpdateEvent<this>
+
+  public createEvent: PointCreateEvent<this>
 
   constructor(map: Map, options: T) {
-    super(map, options)
+    super(map, normalizeOptions(options))
 
     this.residentEvent = new PointResidentEvent(map, this)
     this.updateEvent = new PointUpdateEvent(map, this)
     this.createEvent = new PointCreateEvent(map, this)
-    this.residentEvent.enabled()
+    if (new.target === Point) {
+      this.initializeInteraction()
+    } else {
+      // Custom subclasses may initialize their layer after super() returns.
+      queueMicrotask(() => {
+        this.initializeInteraction()
+      })
+    }
   }
 
   public override onAdd(): void {
@@ -54,41 +75,61 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
     return this.options.id
   }
   public override edit(): void {
-    this.setState({ edit: true })
-    this.residentEvent.disabled()
-    this.updateEvent.enabled()
+    if (this.removed) return
+    this.setState({ create: false, edit: true })
+    this.syncInteractionState()
   }
   public override unedit(): void {
     this.setState({ edit: false })
-    this.residentEvent.enabled()
-    this.updateEvent.disabled()
+    this.syncInteractionState()
+  }
+
+  public override hide(): void {
+    if (this.removed) return
+    this.options.visibility = 'none'
+    this.setState({ create: false, hover: false })
+    this.syncInteractionState()
+    this.context.focus.remove(this.id)
+    this.render()
+  }
+
+  public override show(): void {
+    if (this.removed) return
+    this.options.visibility = 'visible'
+    this.syncInteractionState()
+    this.render()
   }
 
   public override focus(): void {
-    throw new Error('Method not implemented.')
+    this.setState({ focus: true })
+    this.render()
   }
   public override unfocus(): void {
-    throw new Error('Method not implemented.')
+    this.setState({ focus: false })
+    this.context.focus.remove(this.id)
   }
   public override select(): void {
-    throw new Error('Method not implemented.')
+    if (!this.center) return
+    this.context.map.easeTo({ center: this.center })
+    this.focus()
   }
   public override unselect(): void {
-    throw new Error('Method not implemented.')
+    this.unfocus()
   }
 
   public override get center(): LngLat | null {
     if (!this.options.position) return null
 
-    return this.options.position
+    return LngLat.convert(this.options.position)
   }
 
   public override get geometry(): GeoJSON.Point | null {
-    throw new Error('Method not implemented.')
+    return this.getFeature().geometry
   }
 
   public override getFeature(): GeoJSON.Feature<GeoJSON.Point | null> {
-    if (!this.options.position) {
+    const position = this.center
+    if (!position) {
       // const emptyFeature: GeoJSON.Feature<null, T['style'] & T['properties']> = {
       //   type: 'Feature',
       //   geometry: null,
@@ -104,20 +145,27 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
       }
     }
 
-    const h = (DEFAULT_CIRCLE_RADIUS + DEFAULT_CIRCLE_STROKE_WIDTH) * 2
+    const style = this.options.style as CirclePointStyle | undefined
+    const radius = style?.['circle-radius']
+    const strokeWidth = style?.['circle-stroke-width']
+    const textSize = this.options.style?.['text-size']
+    const h =
+      ((typeof radius === 'number' ? radius : DEFAULT_CIRCLE_RADIUS) +
+        (typeof strokeWidth === 'number' ? strokeWidth : DEFAULT_CIRCLE_STROKE_WIDTH)) *
+      2
     const scale = 1
     const anchor = 'center'
 
-    const calculatedOffset = this.calculateTextOffset({
+    const calculatedOffsets = this.calculateTextOffsets({
       iconHeight: h,
       iconScale: scale,
       iconAnchor: anchor,
-      textSize: DEFAULT_TEXT_SIZE,
+      textSize: typeof textSize === 'number' ? textSize : DEFAULT_TEXT_SIZE,
       gap: GAP_PX,
     })
 
     return point(
-      this.options.position.toArray(),
+      position.toArray(),
       {
         ...this.options.style,
         ...this.options.properties,
@@ -125,7 +173,8 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
         visibility: this.options.visibility,
         isName: this.options.isName,
         text: this.options.name,
-        _calcTextOffset: calculatedOffset,
+        'text-allow-overlap': this.options.style?.['text-allow-overlap'] ?? true,
+        ...calculatedOffsets,
         meta: 'circle',
       },
       {
@@ -135,25 +184,34 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
   }
   public override start(): void {
     if (this.center === null) {
-      this.createEvent.enabled()
+      this.setState({ create: true, edit: false })
+      this.syncInteractionState()
     }
   }
   public override stop(): void {
-    this.createEvent.disabled()
+    this.setState({ create: false })
+    this.syncInteractionState()
   }
 
-  public override move(position: T['position']): void {
-    this.options.position = position
+  public override move(position: LngLatLike): void {
+    this.options.position = LngLat.convert(position)
     this.render()
   }
   public override update(options: T): void {
-    this.options = options
+    if (options.id !== this.id) throw new Error('Plot id cannot be changed')
+    this.options = normalizeOptions(options)
+    this.syncInteractionState()
     this.render()
   }
   public override remove(): void {
-    this.residentEvent.disabled()
-    this.updateEvent.disabled()
-    this.createEvent.disabled()
+    if (this.removed) return
+    this.removed = true
+    this.detachLifecycle()
+    this.residentEvent.destroy()
+    this.updateEvent.destroy()
+    this.createEvent.destroy()
+    this.context.focus.remove(this.id)
+    this.context.map.removeFeatureState({ source: this.SOURCE, id: this.id })
 
     this.removeAllListeners()
 
@@ -167,7 +225,43 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
     this.context.register.setGeoJSONData(PLOT_SOURCE_NAME, emptyFeature)
   }
   public override render(): void {
-    this.context.register.setGeoJSONData(PLOT_SOURCE_NAME, this.getFeature() as GeoJSON.Feature)
+    if (this.removed) return
+    const feature = this.getFeature()
+    if (this.isFocus && feature.geometry && this.visibility === 'visible') {
+      this.context.focus.set(feature as GeoJSON.Feature)
+    } else {
+      this.context.focus.remove(this.id)
+    }
+    this.context.register.setGeoJSONData(PLOT_SOURCE_NAME, feature as GeoJSON.Feature)
+  }
+
+  protected syncInteractionState(): void {
+    if (this.removed || this.visibility !== 'visible') {
+      this.createEvent.disabled()
+      this.updateEvent.disabled()
+      this.residentEvent.disabled()
+      return
+    }
+
+    if (this.isCreate) {
+      this.createEvent.enabled()
+      this.updateEvent.disabled()
+      this.residentEvent.disabled()
+    } else if (this.isEdit) {
+      this.createEvent.disabled()
+      this.updateEvent.enabled()
+      this.residentEvent.disabled()
+    } else {
+      this.createEvent.disabled()
+      this.updateEvent.disabled()
+      this.residentEvent.enabled()
+    }
+  }
+
+  protected initializeInteraction(): void {
+    if (this.interactionInitialized || this.removed) return
+    this.interactionInitialized = true
+    this.syncInteractionState()
   }
 
   /**
@@ -204,5 +298,26 @@ export class Point<T extends IPointOptions = IPointOptions> extends Poi<T, GeoJS
 
     // 返回 [x, y]，这里我们只处理垂直偏移
     return [0, offsetY_em]
+  }
+
+  /** 为三个缩放基准点计算偏移，使额外 gap 保持为固定像素。 */
+  protected calculateTextOffsets(params: CalcOffsetParams): Record<string, [number, number]> {
+    const baseIconScale = params.iconScale ?? 1
+    const baseTextSize =
+      params.textSize && params.textSize > 0 ? params.textSize : DEFAULT_TEXT_SIZE
+    const atScale = (zoomScale: number): [number, number] =>
+      this.calculateTextOffset({
+        ...params,
+        iconScale: baseIconScale * zoomScale,
+        textSize: baseTextSize * zoomScale,
+      })
+
+    const normal = atScale(1)
+    return {
+      _calcTextOffset: normal,
+      _calcTextOffsetZ5: atScale(0.5),
+      _calcTextOffsetZ14: normal,
+      _calcTextOffsetZ22: atScale(2.5),
+    }
   }
 }
