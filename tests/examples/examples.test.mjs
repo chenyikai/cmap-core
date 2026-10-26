@@ -72,6 +72,14 @@ test('navigation supports a non-root static deployment', () => {
   )
 })
 
+test('release checkout preserves existing version tags', () => {
+  const workflow = read('.github/workflows/release.yml')
+  const checkout = workflow.match(/- name: Checkout Repo\n([\s\S]*?)(?=\n\s*- name:|$)/)?.[1]
+  assert.ok(checkout, 'release workflow must check out the repository')
+  assert.match(checkout, /uses: actions\/checkout@/)
+  assert.match(checkout, /with:\s*\n\s*(?:#[^\n]*\n\s*)?fetch-depth: 0\s*(?:\n|$)/)
+})
+
 test('Markdown renders headings, code, tables, lists and internal links', () => {
   const html = renderMarkdown(
     '# 标题\n\n## 小节\n\n[接入](getting-started.md)\n\n```ts\nconst x = "<tag>"\n```\n\n| 参数 | 说明 |\n| --- | --- |\n| `x` | 值 |\n\n- 第一项\n- 第二项\n',

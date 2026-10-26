@@ -1,5 +1,11 @@
 # cmap-core
 
+## Unreleased
+
+### 发布流程
+
+- Release 工作流检出完整 Git 历史和已有 Tag，避免提前推送版本 Tag 后，npm 发布成功但同名 Tag 推送被拒绝；补充回归检查、故障恢复说明及重命名后的 npm Trusted Publisher 仓库配置。
+
 ## 0.3.0
 
 版本日期：2026-10-26。合并 dev 分支的 SDK 功能、稳定性修复及接入文档。

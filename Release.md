@@ -151,7 +151,7 @@ git push
 推荐使用 npm Trusted Publishing（OIDC），不在 GitHub 中长期保存 npm Token。需要在 npm 包设置中添加 GitHub Actions Trusted Publisher，并填写：
 
 - GitHub 用户或组织：`chenyikai`
-- Repository：`CMap`
+- Repository：`cmap-core`
 - Workflow：`release.yml`
 
 仓库的 Release 工作流已经包含 OIDC 所需的 `id-token: write` 权限。
@@ -196,6 +196,12 @@ pnpm pub:major
 ```json
 "release": "pnpm run build && changeset publish"
 ```
+
+### npm 已发布，但推送 Tag 报 `already exists`
+
+如果先手动创建并推送了版本 Tag，而 Release 工作流只做浅检出，Changesets 可能在发布成功后创建同名但不同对象的 Tag，随后被远端拒绝。Release 工作流使用 `fetch-depth: 0` 检出完整历史和已有 Tag，确保复用原 Tag。
+
+遇到历史失败时，先用 `npm view cmap-core@<版本号> version` 核实 npm 状态。已发布的版本不需要再次发布，更不要删除、移动或强推原 Tag。后续工作流会跳过已发布版本；如果失败发生在创建 GitHub Release 之前，重跑不会自动补建 Release 页面，需要单独基于原 Tag 创建。仓库里的 `CHANGELOG.md` 和 Git Tag 不受影响。
 
 ### npm 发布返回 `E404 Not Found - PUT`
 
