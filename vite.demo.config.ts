@@ -23,6 +23,7 @@ export default defineConfig(({ mode }) => {
         input: {
           debugger: resolve(__dirname, 'index.html'),
           examples: resolve(__dirname, 'examples/index.html'),
+          'tile-debugger': resolve(__dirname, 'tests/manual/custom-style-tiles.html'),
           ...Object.fromEntries(
             readdirSync(resolve(__dirname, 'examples'), { withFileTypes: true })
               .filter(

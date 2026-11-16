@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CMap 自定义 raster style 测试</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        color: #233342;
+        font:
+          14px/1.6 system-ui,
+          sans-serif;
+        background: #f5f7fa;
+      }
+      header {
+        padding: 18px 24px;
+        border-bottom: 1px solid #dbe2e8;
+        background: white;
+      }
+      .heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 22px;
+      }
+      p {
+        margin: 6px 0;
+      }
+      a {
+        color: #176a76;
+      }
+      main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 370px;
+        height: 65vh;
+        min-height: 500px;
+      }
+      #map {
+        min-width: 0;
+      }
+      aside {
+        padding: 18px;
+        overflow: auto;
+        background: white;
+        border-left: 1px solid #dbe2e8;
+      }
+      h2 {
+        font-size: 15px;
+        margin: 18px 0 6px;
+      }
+      pre {
+        padding: 10px;
+        background: #f1f5f7;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        font-size: 12px;
+      }
+      select,
+      input,
+      button,
+      textarea {
+        padding: 7px 10px;
+        border: 1px solid #b8c7d0;
+        border-radius: 5px;
+        background: white;
+        color: inherit;
+        font: inherit;
+      }
+      input,
+      select {
+        min-width: 0;
+        width: 100%;
+      }
+      input:focus,
+      select:focus,
+      button:focus-visible {
+        outline: 2px solid #187987;
+        outline-offset: 2px;
+      }
+      button {
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      button:disabled {
+        cursor: default;
+        opacity: 0.55;
+      }
+      .primary {
+        color: white;
+        background: #176a76;
+        border-color: #176a76;
+      }
+      label {
+        display: grid;
+        gap: 4px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .url-row {
+        display: flex;
+        gap: 10px;
+        align-items: end;
+        margin-top: 12px;
+      }
+      .url-row label {
+        flex: 1;
+      }
+      #url {
+        font-family: ui-monospace, monospace;
+        font-size: 13px;
+      }
+      .settings {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+      .hint {
+        color: #60747e;
+        font-size: 12px;
+      }
+      #form-status {
+        min-height: 22px;
+        color: #925017;
+      }
+      #state {
+        font-weight: 600;
+      }
+      #sample-url {
+        overflow-wrap: anywhere;
+        font-size: 12px;
+      }
+      #copy-value {
+        width: 100%;
+        min-height: 80px;
+      }
+      details summary {
+        cursor: pointer;
+        color: #176a76;
+      }
+      @media (max-width: 1000px) {
+        .settings {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 800px) {
+        header {
+          padding: 16px;
+        }
+        .heading {
+          align-items: start;
+          flex-direction: column;
+        }
+        main {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+        #map {
+          height: 55vh;
+          min-height: 320px;
+        }
+        aside {
+          border-left: 0;
+        }
+        .settings {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .url-row {
+          align-items: stretch;
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="heading">
+        <h1>CMap 自定义 raster style 测试</h1>
+        <a href="../../examples/index.html">SDK 文档与示例 ↗</a>
+      </div>
+      <p>输入瓦片地址并设置覆盖区域，直接预览地图、检测响应，或复制配置交给其他人调试。</p>
+      <form id="tile-form" novalidate autocomplete="off">
+        <div class="url-row">
+          <label for="url"
+            >瓦片地址模板
+            <input
+              id="url"
+              type="text"
+              spellcheck="false"
+              placeholder="https://example.com/tiles/{z}/{x}/{y}.png"
+              required
+            />
+          </label>
+          <button class="primary" type="submit">加载图层</button>
+        </div>
+        <div class="settings">
+          <label
+            >编号规则<select id="scheme">
+              <option value="xyz">XYZ（Y 向下）</option>
+              <option value="tms">TMS（Y 向上）</option>
+            </select></label
+          >
+          <label
+            >瓦片尺寸<select id="tileSize">
+              <option value="256">256 × 256</option>
+              <option value="512">512 × 512</option>
+            </select></label
+          >
+          <label
+            >最小瓦片级别<input id="minzoom" type="number" min="0" max="22" step="1" required
+          /></label>
+          <label
+            >最大瓦片级别<input id="maxzoom" type="number" min="0" max="22" step="1" required
+          /></label>
+          <label
+            >中心经度<input id="lng" type="number" min="-180" max="180" step="any" required
+          /></label>
+          <label
+            >中心纬度<input
+              id="lat"
+              type="number"
+              min="-85.05112878"
+              max="85.05112878"
+              step="any"
+              required
+          /></label>
+          <label
+            >地图缩放<input id="zoom" type="number" min="0" max="22" step="any" required
+          /></label>
+        </div>
+      </form>
+      <div class="toolbar">
+        <button id="current-view" type="button">使用当前视野</button>
+        <button id="probe" type="button">检测中心瓦片</button>
+        <button id="copy-config" type="button">复制接入配置</button>
+        <button id="share" type="button">复制调试链接</button>
+        <button id="reset" type="button">重置配置</button>
+        <button id="control" type="button">本地对照图</button>
+      </div>
+      <p id="form-status" role="status" aria-live="polite"></p>
+      <div id="share-result" hidden>
+        <label>手动复制<textarea id="copy-value" readonly></textarea></label>
+      </div>
+      <details>
+        <summary>地址格式与调试说明</summary>
+        <p class="hint">
+          支持包含 {z}、{x}、{y} 的 HTTP/HTTPS 地址，包括查询参数；行列顺序直接写在地址中，例如
+          /{z}/{y}/{x}.jpg。适用于 Web Mercator 栅格瓦片，切换 XYZ/TMS 不会转换投影。
+        </p>
+        <p class="hint">
+          瓦片尺寸为 256
+          时，地图缩放与瓦片级别通常相差一级。请按服务的实际覆盖范围调整最小/最大瓦片级别和中心位置。
+        </p>
+        <p class="hint">
+          浏览器直接访问瓦片服务，需要服务允许跨域；HTTPS 页面需使用 HTTPS
+          瓦片。分享链接包含瓦片地址和查询参数，发送前请确认其中的 Token 可以分享。
+        </p>
+      </details>
+    </header>
+    <main>
+      <div id="map"></div>
+      <aside>
+        <div id="state" role="status" aria-live="polite">初始化…</div>
+        <p id="camera"></p>
+        <p id="zoom-hint" class="hint"></p>
+        <h2>中心瓦片响应检测</h2>
+        <a id="sample-url" href="#" target="_blank" rel="noopener noreferrer" hidden></a>
+        <pre id="sample">等待检测…</pre>
+        <h2>瓦片调度地址（最近 6 个）</h2>
+        <pre id="requests">尚无请求</pre>
+        <h2>生命周期 / 错误</h2>
+        <pre id="events"></pre>
+        <details open>
+          <summary>当前 CMap 接入配置</summary>
+          <pre id="config"></pre>
+        </details>
+      </aside>
+    </main>
+    <script type="module" src="./custom-style-tiles.js"></script>
+  </body>
+</html>

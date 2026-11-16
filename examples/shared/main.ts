@@ -15,7 +15,8 @@ const guide = guides.find((item) => item.id === guideId)
 document.body.innerHTML = `<aside class="sidebar"><a class="brand" href="${base}examples/index.html"><span class="brand-mark">C</span><span>CMap<span class="brand-sub">SDK 开发者中心</span></span></a>
   <div class="sidebar-links"><a href="${guideURL('getting-started')}">快速接入</a><a href="${base}">原调试台 ↗</a></div>
   <label class="search"><span>查找模块</span><input id="search" placeholder="地图、船舶、Tooltip…" type="search"></label>
-  <nav><div class="nav-heading">使用文档</div>${guides.map((item) => `<a data-search="${item.title}" class="${guideId === item.id ? 'active' : ''}" href="${guideURL(item.id)}">${item.title}</a>`).join('')}
+  <nav><div class="nav-heading">调试工具</div><a data-search="瓦片 自定义 raster XYZ TMS" href="${base}tests/manual/custom-style-tiles.html">自定义瓦片调试 ↗</a>
+  <div class="nav-heading">使用文档</div>${guides.map((item) => `<a data-search="${item.title}" class="${guideId === item.id ? 'active' : ''}" href="${guideURL(item.id)}">${item.title}</a>`).join('')}
   ${[...new Set(demos.map((item) => item.group))]
     .map(
       (group) =>
