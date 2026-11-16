@@ -1,11 +1,13 @@
 import { CMap } from 'cmap-core'
 import { NavigationControl } from 'mapbox-gl'
 import 'cmap-core/style.css'
+import { parseTileAddress } from './tile-address.js'
 
 const element = (id) => document.getElementById(id)
 const defaults = {
   url: '',
   scheme: 'xyz',
+  order: 'zxy',
   tileSize: 256,
   minzoom: 0,
   maxzoom: 22,
@@ -40,6 +42,8 @@ const controlTile = canvas.toDataURL('image/png')
 
 function validate(config) {
   if (!config || typeof config.url !== 'string') throw new Error('请输入瓦片地址。')
+  // Existing shared links predate the path-order field.
+  config = { ...config, order: config.order ?? defaults.order }
   const url = config.url.trim()
   if (!url || /\s/.test(url)) throw new Error('瓦片地址不能为空或包含空格、换行。')
   let parsed
@@ -53,12 +57,13 @@ function validate(config) {
   }
   if (parsed.hash) throw new Error('瓦片地址不能包含 # 片段。')
   if (!['{z}', '{x}', '{y}'].every((token) => url.includes(token))) {
-    throw new Error('地址必须包含 {z}、{x}、{y}，请勿填写单张图片的固定坐标。')
+    throw new Error('地址必须包含完整的 {z}、{x}、{y} 模板，或通过输入框解析一张具体瓦片。')
   }
   if (/\{[^}]*\}/.test(url.replace(/\{[zxy]\}/g, ''))) {
     throw new Error('目前支持 {z}、{x}、{y}；请将域名、图层名等其他参数填写为实际值。')
   }
   if (!['xyz', 'tms'].includes(config.scheme)) throw new Error('请选择 XYZ 或 TMS。')
+  if (!['zxy', 'zyx'].includes(config.order)) throw new Error('请选择 z/x/y 或 z/y/x 路径顺序。')
   if (![256, 512].includes(config.tileSize)) throw new Error('瓦片尺寸请选择 256 或 512。')
   const ranges = {
     minzoom: ['最小瓦片级别', 0, 22],
@@ -91,14 +96,27 @@ function writeForm(config) {
 }
 
 function readForm() {
-  return validate(
-    Object.fromEntries(
-      Object.keys(defaults).map((key) => {
-        const value = element(key).value.trim()
-        return [key, ['url', 'scheme'].includes(key) ? value : value === '' ? NaN : Number(value)]
-      }),
-    ),
+  let config = Object.fromEntries(
+    Object.keys(defaults).map((key) => {
+      const value = element(key).value.trim()
+      return [
+        key,
+        ['url', 'scheme', 'order'].includes(key) ? value : value === '' ? NaN : Number(value),
+      ]
+    }),
   )
+  const tile = parseTileAddress(config.url, config)
+  if (tile)
+    config = {
+      ...config,
+      url: tile.template,
+      lng: tile.lng,
+      lat: tile.lat,
+      zoom: tile.zoom,
+      minzoom: tile.z,
+      maxzoom: tile.z,
+    }
+  return { config: validate(config), tile }
 }
 
 function cameraConfig() {
@@ -132,7 +150,7 @@ function mount(config, local = false) {
   element('copy-config').disabled = local
   element('share').disabled = local
   element('form-status').textContent = local
-    ? '正在使用本地对照图。填写瓦片地址和位置后，点击“加载图层”。'
+    ? '正在使用本地对照图。输入具体瓦片地址可自动定位，也可以填写模板和位置。'
     : '已应用输入配置。'
   element('share-result').hidden = true
   element('sample-url').hidden = true
@@ -313,7 +331,14 @@ async function copy(text, success) {
 form.addEventListener('submit', (event) => {
   event.preventDefault()
   try {
-    mount(readForm())
+    const { config, tile } = readForm()
+    writeForm(config)
+    mount(config)
+    if (tile) {
+      element('form-status').textContent =
+        `已解析 z=${tile.z} / x=${tile.x} / y=${tile.y}，已生成模板并定位到瓦片中心。暂仅请求 ${tile.z} 级；确认服务支持其他层级后可调整范围。`
+      void probe()
+    }
   } catch (error) {
     element('form-status').textContent = error.message
   }

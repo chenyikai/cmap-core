@@ -119,7 +119,7 @@
       }
       .settings {
         display: grid;
-        grid-template-columns: repeat(7, minmax(0, 1fr));
+        grid-template-columns: repeat(8, minmax(0, 1fr));
         gap: 10px;
         margin-top: 10px;
       }
@@ -192,11 +192,13 @@
         <h1>CMap 自定义 raster style 测试</h1>
         <a href="../../examples/index.html">SDK 文档与示例 ↗</a>
       </div>
-      <p>输入瓦片地址并设置覆盖区域，直接预览地图、检测响应，或复制配置交给其他人调试。</p>
+      <p>
+        粘贴一张具体瓦片地址即可自动生成模板并定位，也可输入模板手动配置。支持预览、响应检测和分享。
+      </p>
       <form id="tile-form" novalidate autocomplete="off">
         <div class="url-row">
           <label for="url"
-            >瓦片地址模板
+            >瓦片地址（模板或具体图片）
             <input
               id="url"
               type="text"
@@ -208,6 +210,12 @@
           <button class="primary" type="submit">加载图层</button>
         </div>
         <div class="settings">
+          <label
+            >具体地址路径顺序<select id="order">
+              <option value="zxy">z / x / y</option>
+              <option value="zyx">z / y / x</option>
+            </select></label
+          >
           <label
             >编号规则<select id="scheme">
               <option value="xyz">XYZ（Y 向下）</option>
@@ -258,12 +266,17 @@
       <details>
         <summary>地址格式与调试说明</summary>
         <p class="hint">
-          支持包含 {z}、{x}、{y} 的 HTTP/HTTPS 地址，包括查询参数；行列顺序直接写在地址中，例如
-          /{z}/{y}/{x}.jpg。适用于 Web Mercator 栅格瓦片，切换 XYZ/TMS 不会转换投影。
+          具体地址支持 /z/x/y.png、.jpg、.webp 等或 z/x/y、TileMatrix/TileCol/TileRow
+          查询参数（数字级别）。点击“加载图层”自动生成模板、填写中心与缩放，并检测该瓦片。其他查询参数原样保留。
+        </p>
+        <p class="hint">
+          数字路径默认按 z/x/y 解析；若服务为
+          z/y/x，请先选择对应路径顺序。查询参数按名称识别，已有模板按占位符识别。TMS
+          需先选择编号规则。自动定位假设标准 Web Mercator 网格，不能自动识别投影或自定义 WMTS 矩阵。
         </p>
         <p class="hint">
           瓦片尺寸为 256
-          时，地图缩放与瓦片级别通常相差一级。请按服务的实际覆盖范围调整最小/最大瓦片级别和中心位置。
+          时，地图缩放与瓦片级别通常相差一级。单张瓦片无法推断服务的完整级别范围，因此自动定位暂将最小/最大瓦片级别都设为该瓦片级别；需要时可手动扩大范围。
         </p>
         <p class="hint">
           浏览器直接访问瓦片服务，需要服务允许跨域；HTTPS 页面需使用 HTTPS
